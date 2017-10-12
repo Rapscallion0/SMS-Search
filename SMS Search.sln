@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2002
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMS Search", "SMS Search.csproj", "{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		BuildVersion_BuildAction = Both
+		BuildVersion_AssemblyInfoFilename = Properties\AssemblyInfo.cs
+		BuildVersion_StartDate = 2000/1/1
+		BuildVersion_ConfigurationName = Any
+		BuildVersion_UseGlobalSettings = False
+		BuildVersion_BuildVersioningStyle = None.None.None.None
+		BuildVersion_DetectChanges = False
+		BuildVersion_UpdateAssemblyVersion = False
+		BuildVersion_UpdateFileVersion = False
+		SolutionGuid = {04A8DF77-6EFE-41A4-8764-05D5C6DC1CA8}
+	EndGlobalSection
+EndGlobal
