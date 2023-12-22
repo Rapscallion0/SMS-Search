@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SMS Search")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Rapscallion Tools")]
 [assembly: AssemblyProduct("Properties")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("© 2013-2023 Rapscallion Tools")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +29,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.4.110.17285")]
-[assembly: AssemblyFileVersion("1.4.110.17285")]
+[assembly: AssemblyVersion("1.5.1.23353")]
+[assembly: AssemblyFileVersion("1.5.1.23353")]
+
+[assembly: AssemblyInformationalVersion("1.5.1.23353")]

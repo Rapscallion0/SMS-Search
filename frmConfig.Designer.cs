@@ -137,6 +137,8 @@ namespace SMS_Search
             this.txtQryTlz = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.chkLogging = new System.Windows.Forms.CheckBox();
+            this.cmbStartupLocation = new System.Windows.Forms.ComboBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.tabGeneral.SuspendLayout();
             this.tabCtlConfig.SuspendLayout();
             this.tabAdvanced.SuspendLayout();
@@ -146,7 +148,7 @@ namespace SMS_Search
             // btnResetConfig
             // 
             this.btnResetConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnResetConfig.Location = new System.Drawing.Point(325, 371);
+            this.btnResetConfig.Location = new System.Drawing.Point(321, 404);
             this.btnResetConfig.Name = "btnResetConfig";
             this.btnResetConfig.Size = new System.Drawing.Size(75, 23);
             this.btnResetConfig.TabIndex = 5;
@@ -158,7 +160,7 @@ namespace SMS_Search
             // btnApplyConfig
             // 
             this.btnApplyConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnApplyConfig.Location = new System.Drawing.Point(406, 371);
+            this.btnApplyConfig.Location = new System.Drawing.Point(402, 404);
             this.btnApplyConfig.Name = "btnApplyConfig";
             this.btnApplyConfig.Size = new System.Drawing.Size(75, 23);
             this.btnApplyConfig.TabIndex = 6;
@@ -210,7 +212,7 @@ namespace SMS_Search
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(487, 371);
+            this.btnCancel.Location = new System.Drawing.Point(483, 404);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 7;
@@ -222,7 +224,7 @@ namespace SMS_Search
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(244, 371);
+            this.btnOk.Location = new System.Drawing.Point(240, 404);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 4;
@@ -244,7 +246,7 @@ namespace SMS_Search
             // 
             // btnTestConn
             // 
-            this.btnTestConn.Location = new System.Drawing.Point(449, 30);
+            this.btnTestConn.Location = new System.Drawing.Point(443, 30);
             this.btnTestConn.Name = "btnTestConn";
             this.btnTestConn.Size = new System.Drawing.Size(115, 23);
             this.btnTestConn.TabIndex = 2;
@@ -325,6 +327,8 @@ namespace SMS_Search
             // tabGeneral
             // 
             this.tabGeneral.BackColor = System.Drawing.SystemColors.Control;
+            this.tabGeneral.Controls.Add(this.cmbStartupLocation);
+            this.tabGeneral.Controls.Add(this.label8);
             this.tabGeneral.Controls.Add(this.chkDescriptionColumns);
             this.tabGeneral.Controls.Add(this.chkMultiInstance);
             this.tabGeneral.Controls.Add(this.cmbTableLookup);
@@ -341,7 +345,7 @@ namespace SMS_Search
             this.tabGeneral.Location = new System.Drawing.Point(4, 22);
             this.tabGeneral.Name = "tabGeneral";
             this.tabGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.tabGeneral.Size = new System.Drawing.Size(539, 205);
+            this.tabGeneral.Size = new System.Drawing.Size(539, 227);
             this.tabGeneral.TabIndex = 3;
             this.tabGeneral.Text = "General";
             // 
@@ -372,7 +376,7 @@ namespace SMS_Search
             this.cmbTableLookup.Items.AddRange(new object[] {
             "Show Fields",
             "Show Records"});
-            this.cmbTableLookup.Location = new System.Drawing.Point(93, 160);
+            this.cmbTableLookup.Location = new System.Drawing.Point(92, 192);
             this.cmbTableLookup.Name = "cmbTableLookup";
             this.cmbTableLookup.Size = new System.Drawing.Size(102, 21);
             this.cmbTableLookup.TabIndex = 43;
@@ -380,7 +384,7 @@ namespace SMS_Search
             // lblTableLookup
             // 
             this.lblTableLookup.AutoSize = true;
-            this.lblTableLookup.Location = new System.Drawing.Point(18, 163);
+            this.lblTableLookup.Location = new System.Drawing.Point(17, 195);
             this.lblTableLookup.Name = "lblTableLookup";
             this.lblTableLookup.Size = new System.Drawing.Size(69, 13);
             this.lblTableLookup.TabIndex = 42;
@@ -424,7 +428,7 @@ namespace SMS_Search
             "Function",
             "Totalizer",
             "Fields"});
-            this.cmbStartTab.Location = new System.Drawing.Point(93, 132);
+            this.cmbStartTab.Location = new System.Drawing.Point(92, 164);
             this.cmbStartTab.Name = "cmbStartTab";
             this.cmbStartTab.Size = new System.Drawing.Size(85, 21);
             this.cmbStartTab.TabIndex = 4;
@@ -432,7 +436,7 @@ namespace SMS_Search
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(18, 135);
+            this.label7.Location = new System.Drawing.Point(17, 167);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(59, 13);
             this.label7.TabIndex = 37;
@@ -450,7 +454,7 @@ namespace SMS_Search
             // chkSearchAny
             // 
             this.chkSearchAny.AutoSize = true;
-            this.chkSearchAny.Location = new System.Drawing.Point(21, 106);
+            this.chkSearchAny.Location = new System.Drawing.Point(20, 138);
             this.chkSearchAny.Name = "chkSearchAny";
             this.chkSearchAny.Size = new System.Drawing.Size(174, 17);
             this.chkSearchAny.TabIndex = 3;
@@ -460,7 +464,7 @@ namespace SMS_Search
             // chkShowInTray
             // 
             this.chkShowInTray.AutoSize = true;
-            this.chkShowInTray.Location = new System.Drawing.Point(21, 74);
+            this.chkShowInTray.Location = new System.Drawing.Point(20, 106);
             this.chkShowInTray.Name = "chkShowInTray";
             this.chkShowInTray.Size = new System.Drawing.Size(240, 17);
             this.chkShowInTray.TabIndex = 2;
@@ -483,10 +487,10 @@ namespace SMS_Search
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabCtlConfig.Controls.Add(this.tabGeneral);
             this.tabCtlConfig.Controls.Add(this.tabAdvanced);
-            this.tabCtlConfig.Location = new System.Drawing.Point(15, 134);
+            this.tabCtlConfig.Location = new System.Drawing.Point(11, 145);
             this.tabCtlConfig.Name = "tabCtlConfig";
             this.tabCtlConfig.SelectedIndex = 0;
-            this.tabCtlConfig.Size = new System.Drawing.Size(547, 231);
+            this.tabCtlConfig.Size = new System.Drawing.Size(547, 253);
             this.tabCtlConfig.TabIndex = 3;
             // 
             // tabAdvanced
@@ -600,10 +604,33 @@ namespace SMS_Search
             this.chkLogging.Text = "Enable logging";
             this.chkLogging.UseVisualStyleBackColor = true;
             // 
+            // cmbStartupLocation
+            // 
+            this.cmbStartupLocation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbStartupLocation.FormattingEnabled = true;
+            this.cmbStartupLocation.Items.AddRange(new object[] {
+            "Primary display",
+            "Active display",
+            "Cursor location",
+            "Last location"});
+            this.cmbStartupLocation.Location = new System.Drawing.Point(104, 72);
+            this.cmbStartupLocation.Name = "cmbStartupLocation";
+            this.cmbStartupLocation.Size = new System.Drawing.Size(117, 21);
+            this.cmbStartupLocation.TabIndex = 47;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(18, 75);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(81, 13);
+            this.label8.TabIndex = 46;
+            this.label8.Text = "Startup location";
+            // 
             // frmConfig
             // 
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(572, 400);
+            this.ClientSize = new System.Drawing.Size(564, 431);
             this.Controls.Add(this.chkWindowsAuth);
             this.Controls.Add(this.chkScanNetwork);
             this.Controls.Add(this.cmbDbServer);
@@ -621,10 +648,14 @@ namespace SMS_Search
             this.Controls.Add(this.lblDbUser);
             this.Controls.Add(this.txtDbPassword);
             this.Controls.Add(this.txtDbUser);
-            this.MaximumSize = new System.Drawing.Size(580, 430);
-            this.MinimumSize = new System.Drawing.Size(580, 400);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(580, 470);
             this.Name = "frmConfig";
             this.ShowInTaskbar = false;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "SMS Search configuration";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.frmConfig_Load);
@@ -641,5 +672,8 @@ namespace SMS_Search
 
         }
         #endregion
+
+        private ComboBox cmbStartupLocation;
+        private Label label8;
     }
 }

@@ -45,11 +45,7 @@ namespace SMS_Search
 		{
 			if (!chkScanNetwork.Checked)
 			{
-                //RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL");
-                //string[] array = (string[])registryKey.GetValueNames();
-                //if (array.Length > 0)
-
-                RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+                RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, view: RegistryView.Registry64);
                 RegistryKey key = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL");
 
                 foreach(string sqlInstance in key.GetValueNames())   
@@ -602,6 +598,5 @@ namespace SMS_Search
             lblDbPassword.Visible = true;
 			base.Height = MaximumSize.Height;
 		}
-
-	}
+    }
 }

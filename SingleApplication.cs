@@ -26,7 +26,7 @@ namespace SingleInstance
 			for (int i = 0; i < array.Length; i++)
 			{
 				Process process = array[i];
-				if (process.Id != currentProcess.Id && process.MainModule.FileName == currentProcess.MainModule.FileName && process.MainWindowHandle != IntPtr.Zero)
+                if (process.Id != currentProcess.Id && process.MainModule.FileName == currentProcess.MainModule.FileName && process.MainWindowHandle != IntPtr.Zero)
 				{
 					result = process.MainWindowHandle;
 					break;

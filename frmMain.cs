@@ -38,7 +38,7 @@ namespace SMS_Search
 		}
 
 		private BackgroundWorker backgroundWorker;
-		private int FormHeightMin = 265 + SystemInformation.FrameBorderSize.Height * 2;
+		private int FormHeightMin = 275 + SystemInformation.FrameBorderSize.Height * 2;
 		private int FormHeightExpanded = 600;
 		private int FormWidthMin = 600 + SystemInformation.FrameBorderSize.Width * 2;
 		private int GridMinRowHeight = 92;
@@ -222,14 +222,13 @@ namespace SMS_Search
 		{
 			Cursor = Cursors.WaitCursor;
             
-           	/*
+           	
             if (!dbConn.TestDbConn(ini.IniReadValue("CONNECTION", "SERVER"), ini.IniReadValue("CONNECTION", "DATABASE"), true) || !File.Exists(frmMain.ConfigFilePath))
 			{
 				frmConfig frmConfig = new frmConfig();
 				frmConfig.ShowDialog();
 			}
-            */
-
+            
 			tscmbDbServer.Text = ini.IniReadValue("CONNECTION", "SERVER");
 			tscmbDbDatabase.Text = ini.IniReadValue("CONNECTION", "DATABASE");
 			PopulateTableList();
@@ -1066,17 +1065,28 @@ namespace SMS_Search
         
         private void btnSetup_Click(object sender, EventArgs e)
 		{
-			Cursor = Cursors.WaitCursor;
-			frmConfig frmConfig = new frmConfig();
-			frmConfig.ShowDialog();
+			// Check if both Ctrl and Shift are pressed
+			if ((Control.ModifierKeys & Keys.Control) == Keys.Control && (Control.ModifierKeys & Keys.Shift) == Keys.Shift)
+			{
+                // Open the second form
+                frmPassDecrypt rot13Form = new frmPassDecrypt();
+                rot13Form.ShowDialog();
+			}
+			else
+			{
+				Cursor = Cursors.WaitCursor;
+				frmConfig frmConfig = new frmConfig();
+				frmConfig.StartPosition = FormStartPosition.CenterParent;
+				frmConfig.ShowDialog();
 
-            if (!dbConn.TestDbConn(ini.IniReadValue("CONNECTION", "SERVER"), ini.IniReadValue("CONNECTION", "DATABASE"), true) || !File.Exists(frmMain.ConfigFilePath))
-            {
-                //frmConfig frmConfig = new frmConfig();
-                frmConfig.ShowDialog();
-            }
+				if (!dbConn.TestDbConn(ini.IniReadValue("CONNECTION", "SERVER"), ini.IniReadValue("CONNECTION", "DATABASE"), true) || !File.Exists(frmMain.ConfigFilePath))
+				{
+					//frmConfig frmConfig = new frmConfig();
+					frmConfig.ShowDialog();
+				}
 
-			ValidateConfigFile();
+				ValidateConfigFile();
+			}
 		}
 
 		private void setColumnArray()
@@ -1229,7 +1239,7 @@ namespace SMS_Search
                     foreach (DataRow dataRow in schema.Rows)
 					{
                         //if (DataColumn )
-						tscmbDbDatabase.Items.Add(dataRow["database_name"]);
+						tscmbDbDatabase.Items.Add(dataRow["database_name"]); 
 					}
 				}
 			}
@@ -1245,7 +1255,8 @@ namespace SMS_Search
 
 		private string CleanSql(string toClean)
 		{
-            TSql110Parser _parser;
+            /*
+			TSql110Parser _parser;
             Sql110ScriptGenerator _scriptGen;
 
             bool fQuotedIdenfifiers = false;
@@ -1257,19 +1268,21 @@ namespace SMS_Search
             
             
             _scriptGen = new Sql110ScriptGenerator(options);
-
+			*/
             string[,] cleanArray = new string[,] 
             {
                 {"&amp;", "&"},
-                {"&lt;", "<"},
+				{"<(/|)(((logsql|sql|prm|msg|errsql|logurl|).*?)|(pre|p|(br(( |)/|))))>", ""},
+				{"&lt;", "<"},
                 {"&gt;", ">"},
                 {@"\[", "("},
                 {@"\]", ")"},
                 {"&quot;", "'"},
-                {"<(/|)(((logsql|sql|prm|msg|errsql|logurl).*?)|(pre|p|(br(( |)/|))))>", ""},
-                {@"( |)\b(JOIN)\b", "\r\n\t$2"},
-                {@"( |)\b(FROM|WHERE|GROUP BY|ORDER BY|HAVING|DECLARE)\b", "\r\n$2"},
-                {@"( |)\b(ON)\b", "\r\n\t\t$2"},
+				{@"( |)\b(JOIN|WHEN)\b", "\r\n\t$2"},
+				{@"\{09\}", ""},
+				{@"( |)\b(FROM|WHERE|GROUP BY|ORDER BY|HAVING|DECLARE)\b", "\r\n$2"},
+				{@"\b(UNION)\b ", "\r\n$1\r\n"},
+				{@"( |)\b(ON)\b", "\r\n\t\t$2"},
                 {"( AND | OR )","$1\r\n\t"}
             };
 
@@ -1304,7 +1317,7 @@ namespace SMS_Search
                 toClean = script;
             }
             */
-            toClean = Regex.Replace(toClean, "(?i)( |)\\b(WHEN)\\b", "\r\n\t$2");
+            //toClean = Regex.Replace(toClean, "(?i)( |)\\b(WHEN)\\b", "\r\n\t$2");
             
         return toClean;
         }

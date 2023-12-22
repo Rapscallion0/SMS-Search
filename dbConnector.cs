@@ -6,7 +6,7 @@ namespace DbConn
 	public class dbConnector
 	{
 		public bool TestDbConn(string DbServer, string DbDatabase, bool DispError)
-		{
+        {
 			bool result = true;
 			string connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
 			SqlConnection sqlConnection = new SqlConnection();
@@ -14,18 +14,19 @@ namespace DbConn
 			{
 				if (DbServer == "" || DbDatabase == "")
 				{
-					throw new ArgumentException("Cannot connect to Database when a blank 'Server Name' or 'Database Name' is specified.");
+                    throw new ArgumentException("Cannot connect to Database when a blank 'Server Name' or 'Database Name' is specified.");
 				}
 				sqlConnection.ConnectionString = connectionString;
 				sqlConnection.Open();
 			}
 			catch (Exception ex)
 			{
-				if (DispError)
+			//	if (DispError || ex != )
 				{
 					MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
 				}
 				result = false;
+				Application.Exit();
 			}
 			sqlConnection.Close();
 			sqlConnection.Dispose();
