@@ -1,8 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: "[REQUEST] "
-labels: ''
+title: "[Request] "
+labels: ["enhancement"]
+projects: ["SMS Search"]
 assignees: Rapscallion0
 
 ---
