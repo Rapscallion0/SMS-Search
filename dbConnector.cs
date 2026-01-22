@@ -1,6 +1,8 @@
 using System;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+
 namespace DbConn
 {
 	public class dbConnector
@@ -36,5 +38,26 @@ namespace DbConn
 				return false;
 			}
 		}
+
+        public async Task<bool> TestDbConnAsync(string DbServer, string DbDatabase)
+        {
+            string connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(DbServer) || string.IsNullOrEmpty(DbDatabase))
+                    {
+                        throw new ArgumentException("Cannot connect to Database when a blank 'Server Name' or 'Database Name' is specified.");
+                    }
+                    await sqlConnection.OpenAsync();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
 	}
 }
