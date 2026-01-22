@@ -3,6 +3,7 @@ using Ini;
 using Microsoft.Win32;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Sql;
@@ -10,6 +11,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Versions;
 namespace SMS_Search
@@ -30,36 +32,64 @@ namespace SMS_Search
 		{
             loadConfig();
 		}
-		private void frmConfig_Shown(object sender, EventArgs e)
+		private async void frmConfig_Shown(object sender, EventArgs e)
 		{
             Cursor = Cursors.WaitCursor;
-			Application.DoEvents();
+
 			if (ServerNames.Count < 1)
 			{
-                GetDbServers();
+                await PopulateDbServersAsync();
 			}
-            cmbDbServer.DataSource = ServerNames;
+
+            if (cmbDbServer.DataSource != ServerNames)
+            {
+                cmbDbServer.DataSource = ServerNames;
+            }
+
             Cursor = Cursors.Default;
 		}
-		private void GetDbServers()
+
+        private async Task PopulateDbServersAsync()
+        {
+            bool scanNetwork = chkScanNetwork.Checked;
+            List<string> servers = await Task.Run(() => GetDbServersList(scanNetwork));
+
+            if (this.IsDisposed || cmbDbServer.IsDisposed) return;
+
+            ServerNames.Clear();
+            foreach (var server in servers)
+            {
+                ServerNames.Add(server);
+            }
+            ServerNames.Sort();
+
+            cmbDbServer.DataSource = null;
+            cmbDbServer.DataSource = ServerNames;
+        }
+
+		private List<string> GetDbServersList(bool scanNetwork)
 		{
-			if (!chkScanNetwork.Checked)
+            List<string> list = new List<string>();
+			if (!scanNetwork)
 			{
                 RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, view: RegistryView.Registry64);
                 RegistryKey key = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL");
 
-                foreach(string sqlInstance in key.GetValueNames())   
-				{
-					if (sqlInstance == "MSSQLSERVER")
-						{
-                        ServerNames.Add(Environment.MachineName);
-						}
-						else
-						{
-                        ServerNames.Add(Environment.MachineName + "\\" + sqlInstance);
-						}
-					}
-				}
+                if (key != null)
+                {
+                    foreach(string sqlInstance in key.GetValueNames())
+				    {
+					    if (sqlInstance == "MSSQLSERVER")
+					    {
+                            list.Add(Environment.MachineName);
+					    }
+					    else
+					    {
+                            list.Add(Environment.MachineName + "\\" + sqlInstance);
+					    }
+				    }
+                }
+			}
 			else
 			{
 				SqlDataSourceEnumerator instance = SqlDataSourceEnumerator.Instance;
@@ -71,16 +101,17 @@ namespace SMS_Search
 					DataRow dataRow = array4[j];
 					if (dataRow["InstanceName"] is string)
 					{
-                        ServerNames.Add(dataRow["ServerName"] + "\\" + dataRow["InstanceName"]);
+                        list.Add(dataRow["ServerName"] + "\\" + dataRow["InstanceName"]);
 					}
 					else
 					{
-                        ServerNames.Add(dataRow["ServerName"]);
+                        list.Add(dataRow["ServerName"].ToString());
 					}
 				}
 			}
-            ServerNames.Sort();
+            return list;
 		}
+
 		private void GetDbNames()
 		{
 			if (DbNames.Count < 1)
