@@ -175,43 +175,11 @@ namespace SMS_Search
         /// </summary>
         private void PopulateTableList()
 		{
-			Cursor = Cursors.WaitCursor;
+			if (backgroundWorker.IsBusy) return;
 			string text = cmbTableFld.Text.ToString();
-			// Original after decompile
-            //"Data Source=" + tscmbDbServer.Text + "; Integrated Security=True;";
-			
-            string selectCommandText = "SELECT NAME FROM sys.tables ORDER BY NAME";
-			try
-			{
-				dataAdapter = new SqlDataAdapter(selectCommandText, GetConnString(tscmbDbServer.Text, tscmbDbDatabase.Text));
-				DataTable dataTable = new DataTable();
-				dataTable.Locale = CultureInfo.InvariantCulture;
-				dataTable.Clear();
-				dataAdapter.Fill(dataTable);
-				bindingSourceTbl.DataSource = dataTable;
-				cmbTableFld.DataSource = bindingSourceTbl;
-				cmbTableFld.DisplayMember = "NAME";
-				cmbTableFld.ValueMember = "NAME";
-			}
-			catch (SqlException ex)
-			{
-				MessageBox.Show(ex.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-			}
-			finally
-			{
-				dataAdapter.Dispose();
-				GC.Collect();
-				Cursor = Cursors.Default;
-			}
-			int num = cmbTableFld.FindString(text);
-			if (num != -1)
-			{
-				cmbTableFld.Text = text;
-			}
-			else
-			{
-				cmbTableFld.SelectedIndex = 0;
-			}
+			Cursor = Cursors.WaitCursor;
+            backgroundWorker.RunWorkerCompleted += PopulateTableList_RunWorkerCompleted;
+            backgroundWorker.RunWorkerAsync(new Tuple<string, string, string, string>("PopulateTableList", tscmbDbServer.Text, tscmbDbDatabase.Text, text));
 			setTabTextFocus();
 		}
 
@@ -1223,34 +1191,11 @@ namespace SMS_Search
 
 		private void getDbNames()
 		{
+			if (backgroundWorker.IsBusy) return;
 			tscmbDbDatabase.Items.Clear();
-			string connectionString = "Data Source=" + tscmbDbServer.Text + "; Integrated Security=True;";
-			try
-			{
-				Cursor = Cursors.WaitCursor;
-				using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-				{
-					sqlConnection.Open();
-					DataTable schema = sqlConnection.GetSchema("Databases");
-					sqlConnection.Close();
-					
-                    //DataTable td = schema.Select("dbid>6").CopyToDataTable<DataRow>();
-
-                    foreach (DataRow dataRow in schema.Rows)
-					{
-                        //if (DataColumn )
-						tscmbDbDatabase.Items.Add(dataRow["database_name"]); 
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-			}
-			finally
-			{
-				Cursor = Cursors.Default;
-			}
+			Cursor = Cursors.WaitCursor;
+            backgroundWorker.RunWorkerCompleted += getDbNames_RunWorkerCompleted;
+            backgroundWorker.RunWorkerAsync(new Tuple<string, string>("getDbNames", tscmbDbServer.Text));
 		}
 
 		private string CleanSql(string toClean)
@@ -1443,10 +1388,105 @@ namespace SMS_Search
 
 		private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
 		{
-			Thread.Sleep(1000);
+            if (e.Argument is Tuple<string, string, string, string> tuple4)
+            {
+                switch (tuple4.Item1)
+                {
+                    case "PopulateTableList":
+                        try
+                        {
+                            string selectCommandText = "SELECT NAME FROM sys.tables ORDER BY NAME";
+                            dataAdapter = new SqlDataAdapter(selectCommandText, GetConnString(tuple4.Item2, tuple4.Item3));
+                            DataTable dataTable = new DataTable();
+                            dataTable.Locale = CultureInfo.InvariantCulture;
+                            dataTable.Clear();
+                            dataAdapter.Fill(dataTable);
+                            e.Result = new Tuple<DataTable, string>(dataTable, tuple4.Item4);
+                        }
+                        catch (Exception ex)
+                        {
+                            e.Result = ex;
+                        }
+                        finally
+                        {
+                            dataAdapter.Dispose();
+                        }
+                        break;
+                }
+            }
+            else if (e.Argument is Tuple<string, string> tuple2)
+            {
+                switch (tuple2.Item1)
+                {
+                    case "getDbNames":
+                        try
+                        {
+                            string connectionString = "Data Source=" + tuple2.Item2 + "; Integrated Security=True;";
+                            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+                            {
+                                sqlConnection.Open();
+                                DataTable schema = sqlConnection.GetSchema("Databases");
+                                sqlConnection.Close();
+                                e.Result = schema;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            e.Result = ex;
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                Thread.Sleep(1000);
+            }
 		}
 
-		private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
+        private void getDbNames_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Result is Exception)
+            {
+                MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + (e.Result as Exception).Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
+            else if (e.Result is DataTable)
+            {
+                foreach (DataRow dataRow in (e.Result as DataTable).Rows)
+                {
+                    tscmbDbDatabase.Items.Add(dataRow["database_name"]);
+                }
+            }
+            backgroundWorker.RunWorkerCompleted -= getDbNames_RunWorkerCompleted;
+            Cursor = Cursors.Default;
+        }
+
+        private void PopulateTableList_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Result is Exception)
+            {
+                MessageBox.Show((e.Result as Exception).Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
+            else if (e.Result is Tuple<DataTable, string> tuple)
+            {
+                bindingSourceTbl.DataSource = tuple.Item1;
+                cmbTableFld.DataSource = bindingSourceTbl;
+                cmbTableFld.DisplayMember = "NAME";
+                cmbTableFld.ValueMember = "NAME";
+                int num = cmbTableFld.FindString(tuple.Item2);
+                if (num != -1)
+                {
+                    cmbTableFld.Text = tuple.Item2;
+                }
+                else
+                {
+                    cmbTableFld.SelectedIndex = 0;
+                }
+            }
+            backgroundWorker.RunWorkerCompleted -= PopulateTableList_RunWorkerCompleted;
+            Cursor = Cursors.Default;
+        }
+
+        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
 		{
 			MouseButtons button = e.Button;
 			if (button != MouseButtons.Left)
