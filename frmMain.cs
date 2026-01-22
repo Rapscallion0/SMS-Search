@@ -15,6 +15,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Versions;
 
@@ -277,11 +278,15 @@ namespace SMS_Search
 			WriteConfigConn(tscmbDbServer.Text, tscmbDbDatabase.Text);
 		}
 
-        private void btnPopGrid_Click(object sender, EventArgs e)
+        private async void btnPopGrid_Click(object sender, EventArgs e)
 		{
 			Cursor = Cursors.WaitCursor;
 			tslblInfo.Text = "";
-			bool SQLConnected = dbConn.TestDbConn(tscmbDbServer.Text, tscmbDbDatabase.Text, true);
+
+            string server = tscmbDbServer.Text;
+            string database = tscmbDbDatabase.Text;
+
+			bool SQLConnected = await dbConn.TestDbConnAsync(server, database);
 			arrayGrdDesc.Clear();
 			arrayGrdDesc.TrimToSize();
 			arrayGrdFld.Clear();
@@ -294,24 +299,42 @@ namespace SMS_Search
 				string text = CompileSqlSelect();
 				bool SQLError = false;
 				dGrd.DataSource = bindingSource;
+                DataTable dataTable = new DataTable();
+                dataTable.Locale = CultureInfo.InvariantCulture;
+
 				try
 				{
-					dataAdapter = new SqlDataAdapter(text, GetConnString(tscmbDbServer.Text, tscmbDbDatabase.Text));
-					new SqlCommandBuilder(dataAdapter);
-					DataTable dataTable = new DataTable();
-					dataTable.Locale = CultureInfo.InvariantCulture;
-					dataAdapter.Fill(dataTable);
+                    string connString = GetConnString(server, database);
+
+                    await Task.Run(() =>
+                    {
+					    dataAdapter = new SqlDataAdapter(text, connString);
+					    new SqlCommandBuilder(dataAdapter);
+					    dataAdapter.Fill(dataTable);
+                    });
+
 					bindingSource.DataSource = dataTable;
 					log.Logger(0, "SQL query executed");
 					log.Logger(0, text);
 				}
-				catch (SqlException ex)
+				catch (Exception ex)
 				{
-					SQLError = true;
-					MessageBox.Show(ex.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-					log.Logger(0, "SQL query executed");
-					log.Logger(0, text);
-					log.Logger(1, ex.Message);
+                    // Unwrap AggregateException if present, though Task.Run with await usually throws the inner exception.
+                    Exception inner = ex;
+                    if (ex is AggregateException ae) inner = ae.InnerException;
+
+                    if (inner is SqlException sqlEx)
+                    {
+					    SQLError = true;
+					    MessageBox.Show(sqlEx.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+					    log.Logger(0, "SQL query executed");
+					    log.Logger(0, text);
+					    log.Logger(1, sqlEx.Message);
+                    }
+                    else
+                    {
+                        throw;
+                    }
 				}
 				finally
 				{
@@ -344,7 +367,7 @@ namespace SMS_Search
 				}
 			}
 			setTabTextFocus();
-			setColumnArray();
+			await setColumnArrayAsync();
 			setHeaders();
 			Cursor = Cursors.Default;
 		}
@@ -1075,6 +1098,52 @@ namespace SMS_Search
 				arrayGrdDesc.Add(value);
 				sqlDataReader.Close();
 				sqlConnection.Close();
+			}
+		}
+
+        private async Task setColumnArrayAsync()
+		{
+            var columns = new List<string>();
+            foreach (DataGridViewColumn col in dGrd.Columns)
+            {
+                columns.Add(col.HeaderText);
+            }
+
+            var connString = GetConnString(tscmbDbServer.Text, tscmbDbDatabase.Text);
+
+            // Fetch all descriptions in background
+            var results = await Task.Run(() =>
+            {
+                var descList = new List<string>();
+                using (var sqlConnection = new SqlConnection(connString))
+                {
+                    sqlConnection.Open();
+                    foreach (var headerText in columns)
+                    {
+                        string cmdText = "Select top(1) F1454 from RB_FIELDS where F1453 = @headerText";
+                        string value = "";
+
+                        using(var sqlCommand = new SqlCommand(cmdText, sqlConnection))
+                        {
+                            sqlCommand.Parameters.AddWithValue("@headerText", headerText);
+                            using(var reader = sqlCommand.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    value = reader[0].ToString();
+                                }
+                            }
+                        }
+                        descList.Add(value);
+                    }
+                }
+                return descList;
+            });
+
+			foreach (DataGridViewColumn dataGridViewColumn in dGrd.Columns)
+			{
+				arrayGrdFld.Add(dataGridViewColumn.Name);
+				arrayGrdDesc.Add(results[dataGridViewColumn.Index]);
 			}
 		}
 
