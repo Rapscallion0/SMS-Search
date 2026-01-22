@@ -37,6 +37,44 @@ namespace SMS_Search
 			}
 		}
 
+		private struct ReplacementRule
+		{
+			public Regex Regex;
+			public string Replacement;
+		}
+
+		private static readonly ReplacementRule[] CleanSqlRules;
+
+		static frmMain()
+		{
+			string[,] cleanArray = new string[,]
+			{
+				{"&amp;", "&"},
+				{"<(/|)(((logsql|sql|prm|msg|errsql|logurl|).*?)|(pre|p|(br(( |)/|))))>", ""},
+				{"&lt;", "<"},
+				{"&gt;", ">"},
+				{@"\[", "("},
+				{@"\]", ")"},
+				{"&quot;", "'"},
+				{@"( |)\b(JOIN|WHEN)\b", "\r\n\t$2"},
+				{@"\{09\}", ""},
+				{@"( |)\b(FROM|WHERE|GROUP BY|ORDER BY|HAVING|DECLARE)\b", "\r\n$2"},
+				{@"\b(UNION)\b ", "\r\n$1\r\n"},
+				{@"( |)\b(ON)\b", "\r\n\t\t$2"},
+				{"( AND | OR )","$1\r\n\t"}
+			};
+
+			CleanSqlRules = new ReplacementRule[cleanArray.GetLength(0)];
+			for (int i = 0; i < cleanArray.GetLength(0); i++)
+			{
+				CleanSqlRules[i] = new ReplacementRule
+				{
+					Regex = new Regex(cleanArray[i, 0], RegexOptions.Compiled | RegexOptions.IgnoreCase),
+					Replacement = cleanArray[i, 1]
+				};
+			}
+		}
+
 		private BackgroundWorker backgroundWorker;
 		private int FormHeightMin = 275 + SystemInformation.FrameBorderSize.Height * 2;
 		private int FormHeightExpanded = 600;
@@ -1214,28 +1252,11 @@ namespace SMS_Search
             
             _scriptGen = new Sql110ScriptGenerator(options);
 			*/
-            string[,] cleanArray = new string[,] 
-            {
-                {"&amp;", "&"},
-				{"<(/|)(((logsql|sql|prm|msg|errsql|logurl|).*?)|(pre|p|(br(( |)/|))))>", ""},
-				{"&lt;", "<"},
-                {"&gt;", ">"},
-                {@"\[", "("},
-                {@"\]", ")"},
-                {"&quot;", "'"},
-				{@"( |)\b(JOIN|WHEN)\b", "\r\n\t$2"},
-				{@"\{09\}", ""},
-				{@"( |)\b(FROM|WHERE|GROUP BY|ORDER BY|HAVING|DECLARE)\b", "\r\n$2"},
-				{@"\b(UNION)\b ", "\r\n$1\r\n"},
-				{@"( |)\b(ON)\b", "\r\n\t\t$2"},
-                {"( AND | OR )","$1\r\n\t"}
-            };
 
-            for (int i = 0; i < cleanArray.GetLength(0); i++)
-            {
-                Regex rgx = new Regex("(?i)" + cleanArray[i, 0]);
-                toClean = rgx.Replace(toClean, cleanArray[i, 1]);
-            }
+			for (int i = 0; i < CleanSqlRules.Length; i++)
+			{
+				toClean = CleanSqlRules[i].Regex.Replace(toClean, CleanSqlRules[i].Replacement);
+			}
 
             /*
             // SQL cleanup
