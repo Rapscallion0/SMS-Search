@@ -1437,10 +1437,6 @@ namespace SMS_Search
                         break;
                 }
             }
-            else
-            {
-                Thread.Sleep(1000);
-            }
 		}
 
         private void getDbNames_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
