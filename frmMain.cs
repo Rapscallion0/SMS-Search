@@ -1208,7 +1208,12 @@ namespace SMS_Search
 			}
 			if (ini.IniReadValue("GENERAL", "RESIZECOLUMNS") == "1")
 			{
+				int firstDisplayedScrollingColumnIndex = dGrd.FirstDisplayedScrollingColumnIndex;
 				dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+				if (firstDisplayedScrollingColumnIndex >= 0)
+				{
+					dGrd.FirstDisplayedScrollingColumnIndex = firstDisplayedScrollingColumnIndex;
+				}
 			}
 		}
 
