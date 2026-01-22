@@ -1074,22 +1074,70 @@ namespace SMS_Search
 
 		private void setColumnArray()
 		{
+			List<string> headers = new List<string>();
+			foreach (DataGridViewColumn col in dGrd.Columns)
+			{
+				if (col.HeaderText != null)
+				{
+					headers.Add(col.HeaderText);
+				}
+			}
+
+			Dictionary<string, string> descriptions = new Dictionary<string, string>();
+
+			if (headers.Count > 0)
+			{
+				HashSet<string> uniqueHeaders = new HashSet<string>(headers);
+				StringBuilder sb = new StringBuilder();
+				sb.Append("SELECT F1453, F1454 FROM RB_FIELDS WHERE F1453 IN (");
+				bool first = true;
+				foreach (string h in uniqueHeaders)
+				{
+					if (!first) sb.Append(",");
+					sb.Append("'");
+					sb.Append(h.Replace("'", "''"));
+					sb.Append("'");
+					first = false;
+				}
+				sb.Append(")");
+
+				try
+				{
+					using (SqlConnection sqlConnection = new SqlConnection(GetConnString(tscmbDbServer.Text, tscmbDbDatabase.Text)))
+					{
+						using (SqlCommand sqlCommand = new SqlCommand(sb.ToString(), sqlConnection))
+						{
+							sqlConnection.Open();
+							using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+							{
+								while (sqlDataReader.Read())
+								{
+									string key = sqlDataReader["F1453"].ToString();
+									string val = sqlDataReader["F1454"].ToString();
+									if (!descriptions.ContainsKey(key))
+									{
+										descriptions[key] = val;
+									}
+								}
+							}
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					log.Logger(1, "Error in setColumnArray: " + ex.Message);
+				}
+			}
+
 			foreach (DataGridViewColumn dataGridViewColumn in dGrd.Columns)
 			{
-				string cmdText = "Select top(1) F1454 from RB_FIELDS where F1453 = '" + dataGridViewColumn.HeaderText + "'";
 				string value = "";
-				SqlConnection sqlConnection = new SqlConnection(GetConnString(tscmbDbServer.Text, tscmbDbDatabase.Text));
-				SqlCommand sqlCommand = new SqlCommand(cmdText, sqlConnection);
-				sqlConnection.Open();
-				SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
-				if (sqlDataReader.Read())
+				if (dataGridViewColumn.HeaderText != null && descriptions.ContainsKey(dataGridViewColumn.HeaderText))
 				{
-					value = sqlDataReader[0].ToString();
+					value = descriptions[dataGridViewColumn.HeaderText];
 				}
 				arrayGrdFld.Add(dataGridViewColumn.Name);
 				arrayGrdDesc.Add(value);
-				sqlDataReader.Close();
-				sqlConnection.Close();
 			}
 		}
 
