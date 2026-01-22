@@ -6,31 +6,35 @@ namespace DbConn
 	public class dbConnector
 	{
 		public bool TestDbConn(string DbServer, string DbDatabase, bool DispError)
-        {
-			bool result = true;
+		{
+			// Validate input
+			if (string.IsNullOrWhiteSpace(DbServer) || string.IsNullOrWhiteSpace(DbDatabase))
+			{
+				if (DispError)
+				{
+					MessageBox.Show("Cannot connect: blank Server or Database.", "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+				}
+				return false;
+			}
+
 			string connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
-			SqlConnection sqlConnection = new SqlConnection();
 			try
 			{
-				if (DbServer == "" || DbDatabase == "")
+				using (var sqlConnection = new SqlConnection(connectionString))
 				{
-                    throw new ArgumentException("Cannot connect to Database when a blank 'Server Name' or 'Database Name' is specified.");
+					sqlConnection.Open();
 				}
-				sqlConnection.ConnectionString = connectionString;
-				sqlConnection.Open();
+				return true;
 			}
 			catch (Exception ex)
 			{
-			//	if (DispError || ex != )
+				if (DispError)
 				{
 					MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
 				}
-				result = false;
-				Application.Exit();
+				// Do not terminate application here; return false and let caller decide next steps
+				return false;
 			}
-			sqlConnection.Close();
-			sqlConnection.Dispose();
-			return result;
 		}
 	}
 }
