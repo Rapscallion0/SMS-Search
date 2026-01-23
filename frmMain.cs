@@ -17,7 +17,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Versions;
 
 namespace SMS_Search
 {
@@ -57,7 +56,7 @@ namespace SMS_Search
 		private SqlDataAdapter dataAdapter = new SqlDataAdapter();
 		private static string ConfigFilePath = ".\\SMS Search.json";
 		private ConfigManager config = new ConfigManager(frmMain.ConfigFilePath);
-		private static GetVersion Versions = new GetVersion();
+		private static UpdateChecker Versions = new UpdateChecker();
 		private dbConnector dbConn = new dbConnector();
 		private string FctFields = "";
 		private string TlzFields = "";
@@ -90,7 +89,11 @@ namespace SMS_Search
 				frmEula frmEula = new frmEula();
 				frmEula.ShowDialog();
 			}
-			//config.GetValue("GENERAL", "CHECKUPDATE") == "1";
+
+            if (config.GetValue("GENERAL", "CHECKUPDATE") == "1")
+            {
+                CheckUpdateAsync();
+            }
 
             if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), false) || !File.Exists(frmMain.ConfigFilePath))
             {
@@ -152,21 +155,23 @@ namespace SMS_Search
 			BringToFront();
 		}
 
-        private static void checkUpdate()
+		private static async void CheckUpdateAsync()
 		{
-			string url = "https://sites.google.com/a/rapscallion.org/develop/sms-search/";
-			Version v = new Version(Application.ProductVersion.ToString());
-			Version newVersion = frmMain.Versions.GetNewVersion(url, "SMS%20Search%20Version.xml", "SMSSearch");
-			if (newVersion > v)
-			{
-				MessageBox.Show(string.Concat(new object[]
-				{
-					"There is an update available for download.\n\nCurrent Version:\t",
-					Application.ProductVersion,
-					"\nNew Version:\t",
-					newVersion
-				}), "SMS Search update checker", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-			}
+            UpdateInfo updateInfo = await Versions.CheckForUpdatesAsync();
+
+            if (updateInfo.IsNewer)
+            {
+                string text = "There is an update available for download.\n\nCurrent Version:\t" +
+                    Application.ProductVersion +
+                    "\nNew Version:\t" +
+                    updateInfo.Version +
+                    "\n\nWould you like to update now?";
+
+                if (MessageBox.Show(text, "SMS Search update checker", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                {
+                    await Versions.PerformUpdate(updateInfo);
+                }
+            }
 		}
 
         private void frmMain_Shown(object sender, EventArgs e)

@@ -92,6 +92,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Data" />
@@ -150,7 +152,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="SqlCleaner.cs" />
-    <Compile Include="GetVersion.cs" />
+    <Compile Include="UpdateChecker.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

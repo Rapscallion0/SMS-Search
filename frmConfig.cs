@@ -13,7 +13,6 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Versions;
 namespace SMS_Search
 {
 	public partial class frmConfig : Form
@@ -710,28 +709,29 @@ namespace SMS_Search
 		{
             validateServer();
 		}
-		private void btnChkUpdate_Click(object sender, EventArgs e)
+		private async void btnChkUpdate_Click(object sender, EventArgs e)
 		{
             Cursor = Cursors.WaitCursor;
-			string url = "https://sites.google.com/a/rapscallion.org/develop/sms-search/";
-			Version newVersion = Versions.GetNewVersion(url, "SMS%20Search%20Version.xml", "SMSSearch");
-			Version v = new Version(Application.ProductVersion);
-			string text;
-			if (newVersion > v)
+			UpdateInfo updateInfo = await Versions.CheckForUpdatesAsync();
+
+			if (updateInfo.IsNewer)
 			{
-				text = string.Concat(new object[]
-				{
-					"There is an update available for download.\n\nCurrent Version:\t",
-					Application.ProductVersion,
-					"\nNew Version:\t",
-					newVersion
-				});
+				string text = "There is an update available for download.\n\nCurrent Version:\t" +
+					Application.ProductVersion +
+					"\nNew Version:\t" +
+					updateInfo.Version +
+                    "\n\nWould you like to update now?";
+
+                if (MessageBox.Show(text, "SMS Search update checker", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                {
+                    await Versions.PerformUpdate(updateInfo);
+                }
 			}
 			else
 			{
-				text = "You are running the latest version.\n\nCurrent Version:\t" + Application.ProductVersion;
+				string text = "You are running the latest version.\n\nCurrent Version:\t" + Application.ProductVersion;
+                MessageBox.Show(text, "SMS Search update checker", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 			}
-			MessageBox.Show(text, "SMS Search update checker", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             Cursor = Cursors.Default;
 		}
 		private void chkWindowsAuth_CheckedChanged(object sender, EventArgs e)
