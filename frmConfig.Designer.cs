@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Versions;
 
 namespace SMS_Search
 {
@@ -36,7 +35,7 @@ namespace SMS_Search
         private const string Command = "*\\shell\\UnArchiver\\command";
         // private static string ConfigFilePath = ".\\SMS Search.ini";
         // private IniFile ini = new IniFile(frmConfig.ConfigFilePath);
-        private GetVersion Versions = new GetVersion();
+        private UpdateChecker Versions = new UpdateChecker();
         private dbConnector dbConn = new dbConnector();
         private ArrayList ServerNames = new ArrayList();
         private ArrayList DbNames = new ArrayList();
@@ -82,8 +81,6 @@ namespace SMS_Search
         private CheckBox chkDescriptionColumns;
         private CheckBox chkCheckUpdate;
         private Button btnChkUpdate;
-        private TextBox txtUpdateUrl;
-        private Label label1;
 
         #region Windows Form Designer generated code
 
@@ -505,8 +502,6 @@ namespace SMS_Search
             // 
             this.tabAdvanced.BackColor = System.Drawing.SystemColors.Control;
             this.tabAdvanced.Controls.Add(this.btnChkUpdate);
-            this.tabAdvanced.Controls.Add(this.txtUpdateUrl);
-            this.tabAdvanced.Controls.Add(this.label1);
             this.tabAdvanced.Controls.Add(this.chkCheckUpdate);
             this.tabAdvanced.Controls.Add(this.groupBox1);
             this.tabAdvanced.Controls.Add(this.chkLogging);
@@ -574,26 +569,7 @@ namespace SMS_Search
             this.btnChkUpdate.TabIndex = 10;
             this.btnChkUpdate.Text = "Check for update now";
             this.btnChkUpdate.UseVisualStyleBackColor = true;
-            this.btnChkUpdate.Visible = false;
             this.btnChkUpdate.Click += new System.EventHandler(this.btnChkUpdate_Click);
-            // 
-            // txtUpdateUrl
-            // 
-            this.txtUpdateUrl.Location = new System.Drawing.Point(143, 113);
-            this.txtUpdateUrl.Name = "txtUpdateUrl";
-            this.txtUpdateUrl.Size = new System.Drawing.Size(305, 20);
-            this.txtUpdateUrl.TabIndex = 9;
-            this.txtUpdateUrl.Visible = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(35, 116);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(102, 13);
-            this.label1.TabIndex = 8;
-            this.label1.Text = "Update server URL:";
-            this.label1.Visible = false;
             // 
             // chkCheckUpdate
             // 
@@ -604,7 +580,6 @@ namespace SMS_Search
             this.chkCheckUpdate.TabIndex = 7;
             this.chkCheckUpdate.Text = "Automatically check for update on startup";
             this.chkCheckUpdate.UseVisualStyleBackColor = true;
-            this.chkCheckUpdate.Visible = false;
             // 
             // groupBox1
             // 
