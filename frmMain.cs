@@ -1,5 +1,5 @@
 using DbConn;
-using Ini;
+// using Ini;
 using Log;
 // using Microsoft.SqlServer.TransactSql.ScriptDom;
 using SMS_Search.Properties;
@@ -46,8 +46,8 @@ namespace SMS_Search
 		private bool keyPressHandled;
 		private Logfile log = new Logfile();
 		private SqlDataAdapter dataAdapter = new SqlDataAdapter();
-		private static string ConfigFilePath = ".\\SMS Search.ini";
-		private IniFile ini = new IniFile(frmMain.ConfigFilePath);
+		private static string ConfigFilePath = ".\\SMS Search.json";
+		private ConfigManager config = new ConfigManager(frmMain.ConfigFilePath);
 		private static GetVersion Versions = new GetVersion();
 		private dbConnector dbConn = new dbConnector();
 		private string FctFields = "";
@@ -76,14 +76,14 @@ namespace SMS_Search
 
         private void frmMain_Load(object sender, EventArgs e)
 		{
-			if (ini.IniReadValue("GENERAL", "EULA") != "1")
+			if (config.GetValue("GENERAL", "EULA") != "1")
 			{
 				frmEula frmEula = new frmEula();
 				frmEula.ShowDialog();
 			}
-			//ini.IniReadValue("GENERAL", "CHECKUPDATE") == "1";
+			//config.GetValue("GENERAL", "CHECKUPDATE") == "1";
 
-            if (!dbConn.TestDbConn(ini.IniReadValue("CONNECTION", "SERVER"), ini.IniReadValue("CONNECTION", "DATABASE"), false) || !File.Exists(frmMain.ConfigFilePath))
+            if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), false) || !File.Exists(frmMain.ConfigFilePath))
             {
                 frmConfig frmConfig = new frmConfig();
                 frmConfig.ShowDialog();
@@ -96,7 +96,7 @@ namespace SMS_Search
 			setJulianDate();
 			Text = Text + " - v" + Application.ProductVersion;
 			string a;
-			if ((a = ini.IniReadValue("GENERAL", "TABLE_LOOKUP")) != null)
+			if ((a = config.GetValue("GENERAL", "TABLE_LOOKUP")) != null)
 			{
 				if (a == "FIELDS")
 				{
@@ -112,7 +112,7 @@ namespace SMS_Search
 			rdbShowFields.Select();
 			IL_F6:
 			string a2;
-			if ((a2 = ini.IniReadValue("GENERAL", "START_TAB")) != null)
+			if ((a2 = config.GetValue("GENERAL", "START_TAB")) != null)
 			{
 				if (a2 == "FCT_TAB")
 				{
@@ -132,7 +132,7 @@ namespace SMS_Search
 			}
 			tabCtl.SelectedTab = tabFct;
 			IL_182:
-			if (ini.IniReadValue("UNARCHIVE", "SHOWTARGET") == "1")
+			if (config.GetValue("UNARCHIVE", "SHOWTARGET") == "1")
 			{
 				frmUnarchive frmUnarchive = new frmUnarchive();
 				frmUnarchive.Show();
@@ -191,8 +191,8 @@ namespace SMS_Search
 			Cursor = Cursors.WaitCursor;
 
 			// Read connection values once
-			string server = ini.IniReadValue("CONNECTION", "SERVER");
-			string database = ini.IniReadValue("CONNECTION", "DATABASE");
+			string server = config.GetValue("CONNECTION", "SERVER");
+			string database = config.GetValue("CONNECTION", "DATABASE");
 
 			// If connection test fails or config file missing, show config dialog
 			if (!dbConn.TestDbConn(server, database, true) || !File.Exists(frmMain.ConfigFilePath))
@@ -201,10 +201,11 @@ namespace SMS_Search
 				{
 					cfg.ShowDialog();
 				}
+                config.Load(); // Re-load config in case it was changed
 
 				// Re-read values in case the user updated configuration
-				server = ini.IniReadValue("CONNECTION", "SERVER");
-				database = ini.IniReadValue("CONNECTION", "DATABASE");
+				server = config.GetValue("CONNECTION", "SERVER");
+				database = config.GetValue("CONNECTION", "DATABASE");
 			}
 
 			// Defensive UI updates: only touch controls if form and controls are valid
@@ -216,7 +217,7 @@ namespace SMS_Search
 
 			PopulateTableList();
 
-			if (ini.IniReadValue("GENERAL", "SHOWINTRAY") == "1")
+			if (config.GetValue("GENERAL", "SHOWINTRAY") == "1")
 			{
 				notifyIcon.Visible = true;
 				ShowInTaskbar = false;
@@ -229,7 +230,7 @@ namespace SMS_Search
 				MinimizeBox = true;
 			}
 
-			if (ini.IniReadValue("GENERAL", "ALWAYSONTOP") == "1")
+			if (config.GetValue("GENERAL", "ALWAYSONTOP") == "1")
 			{
 				TopMost = true;
 				onTop.Checked = true;
@@ -240,7 +241,7 @@ namespace SMS_Search
 				onTop.Checked = false;
 			}
 
-			if (ini.IniReadValue("GENERAL", "SEARCHANY") == "1")
+			if (config.GetValue("GENERAL", "SEARCHANY") == "1")
 			{
 				chkSearchAnyFct.Checked = true;
 				chkSearchAnyTlz.Checked = true;
@@ -253,7 +254,7 @@ namespace SMS_Search
 				chkSearchAnyFld.Checked = false;
 			}
 
-			if (ini.IniReadValue("GENERAL", "DESCRIPTIONCOLUMNS") == "1")
+			if (config.GetValue("GENERAL", "DESCRIPTIONCOLUMNS") == "1")
 			{
 				chkToggleDesc.Checked = true;
 			}
@@ -262,22 +263,22 @@ namespace SMS_Search
 				chkToggleDesc.Checked = false;
 			}
 
-			if (ini.IniReadValue("QUERY", "FUNCTION") == "")
+			if (config.GetValue("QUERY", "FUNCTION") == "")
 			{
 				FctFields = "F1063, F1064, F1051, F1050, F1081";
 			}
 			else
 			{
-				FctFields = ini.IniReadValue("QUERY", "FUNCTION");
+				FctFields = config.GetValue("QUERY", "FUNCTION");
 			}
 
-			if (ini.IniReadValue("QUERY", "TOTALIZER") == "")
+			if (config.GetValue("QUERY", "TOTALIZER") == "")
 			{
 				TlzFields = "F1034, F1039, F1128, F1129, F1179, F1253, F1710, F1131, F1048, F1709";
 			}
 			else
 			{
-				TlzFields = ini.IniReadValue("QUERY", "TOTALIZER");
+				TlzFields = config.GetValue("QUERY", "TOTALIZER");
 			}
 
 			Cursor = Cursors.Default;
@@ -842,8 +843,9 @@ namespace SMS_Search
 
         private void WriteConfigConn(string DbServer, string DbDatabase)
 		{
-			ini.IniWriteValue("CONNECTION", "SERVER", DbServer);
-			ini.IniWriteValue("CONNECTION", "DATABASE", DbDatabase);
+			config.SetValue("CONNECTION", "SERVER", DbServer);
+			config.SetValue("CONNECTION", "DATABASE", DbDatabase);
+            config.Save();
 		}
 
         #region Keypress handling
@@ -1062,11 +1064,12 @@ namespace SMS_Search
 				frmConfig.StartPosition = FormStartPosition.CenterParent;
 				frmConfig.ShowDialog();
 
-				if (!dbConn.TestDbConn(ini.IniReadValue("CONNECTION", "SERVER"), ini.IniReadValue("CONNECTION", "DATABASE"), true) || !File.Exists(frmMain.ConfigFilePath))
+				if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), true) || !File.Exists(frmMain.ConfigFilePath))
 				{
 					//frmConfig frmConfig = new frmConfig();
 					frmConfig.ShowDialog();
 				}
+                config.Load(); // Re-load config in case it was changed
 
 				ValidateConfigFile();
 			}
@@ -1168,7 +1171,7 @@ namespace SMS_Search
 			{
 				dGrd.Columns[dataGridViewColumn2.Index].HeaderText = arrayGrdDesc[dataGridViewColumn2.Index].ToString();
 			}
-			if (ini.IniReadValue("GENERAL", "RESIZECOLUMNS") == "1")
+			if (config.GetValue("GENERAL", "RESIZECOLUMNS") == "1")
 			{
 				dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 			}
@@ -1182,7 +1185,7 @@ namespace SMS_Search
 
 		private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (minimize && ini.IniReadValue("GENERAL", "SHOWINTRAY") == "1")
+			if (minimize && config.GetValue("GENERAL", "SHOWINTRAY") == "1")
 			{
 				if (e.CloseReason != CloseReason.TaskManagerClosing && e.CloseReason != CloseReason.WindowsShutDown)
 				{
@@ -1333,7 +1336,7 @@ namespace SMS_Search
 		private void btnCleanSqlFct_Click(object sender, EventArgs e)
 		{
 			txtCustSqlFct.Text = CleanSql(txtCustSqlFct.Text);
-			if (ini.IniReadValue("GENERAL", "COPYCLEANSQL") == "1" && txtCustSqlFct.Text != "")
+			if (config.GetValue("GENERAL", "COPYCLEANSQL") == "1" && txtCustSqlFct.Text != "")
 			{
 				Clipboard.SetText(txtCustSqlFct.Text);
 				tsInfo.Text = "\"Cleaned SQL\" copied to clipboard";
@@ -1343,7 +1346,7 @@ namespace SMS_Search
 		private void btnCleanSqlTlz_Click(object sender, EventArgs e)
 		{
 			txtCustSqlTlz.Text = CleanSql(txtCustSqlTlz.Text);
-			if (ini.IniReadValue("GENERAL", "COPYCLEANSQL") == "1" && txtCustSqlTlz.Text != "")
+			if (config.GetValue("GENERAL", "COPYCLEANSQL") == "1" && txtCustSqlTlz.Text != "")
 			{
 				Clipboard.SetText(txtCustSqlTlz.Text);
 				tsInfo.Text = "\"Cleaned SQL\" copied to clipboard";
@@ -1353,7 +1356,7 @@ namespace SMS_Search
 		private void btnCleanSqlFld_Click(object sender, EventArgs e)
 		{
 			txtCustSqlFld.Text = CleanSql(txtCustSqlFld.Text);
-			if (ini.IniReadValue("GENERAL", "COPYCLEANSQL") == "1" && txtCustSqlFld.Text != "")
+			if (config.GetValue("GENERAL", "COPYCLEANSQL") == "1" && txtCustSqlFld.Text != "")
 			{
 				Clipboard.SetText(txtCustSqlFld.Text);
 				tsInfo.Text = "\"Cleaned SQL\" copied to clipboard";

@@ -1,5 +1,5 @@
 using DbConn;
-using Ini;
+// using Ini;
 using Microsoft.Win32;
 using System;
 using System.Collections;
@@ -16,6 +16,8 @@ namespace SMS_Search
 {
 	public partial class frmConfig : Form
 	{
+        private static string ConfigFilePath = ".\\SMS Search.json";
+        private ConfigManager config = new ConfigManager(frmConfig.ConfigFilePath);
 
 		public frmConfig()
 		{
@@ -118,7 +120,7 @@ namespace SMS_Search
 		}
 		private void loadConfig()
 		{
-			if (ini.IniReadValue("CONNECTION", "SCANNETWORK") == "1")
+			if (config.GetValue("CONNECTION", "SCANNETWORK") == "1")
 			{
                 chkScanNetwork.Checked = true;
 			}
@@ -126,17 +128,17 @@ namespace SMS_Search
 			{
                 chkScanNetwork.Checked = false;
 			}
-			if (ini.IniReadValue("CONNECTION", "SERVER") == "")
+			if (config.GetValue("CONNECTION", "SERVER") == "")
 			{
                 cmbDbDatabase.Enabled = false;
 			}
 			else
 			{
-                cmbDbServer.Text = ini.IniReadValue("CONNECTION", "SERVER");
+                cmbDbServer.Text = config.GetValue("CONNECTION", "SERVER");
                 cmbDbDatabase.Enabled = true;
 			}
-            cmbDbDatabase.Text = ini.IniReadValue("CONNECTION", "DATABASE");
-			if (ini.IniReadValue("CONNECTION", "WINDOWSAUTH") == "1" || ini.IniReadValue("CONNECTION", "WINDOWSAUTH") == "")
+            cmbDbDatabase.Text = config.GetValue("CONNECTION", "DATABASE");
+			if (config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || config.GetValue("CONNECTION", "WINDOWSAUTH") == "")
 			{
                 chkWindowsAuth.Checked = true;
                 txtDbUser.Visible = false;
@@ -154,9 +156,9 @@ namespace SMS_Search
                 lblDbPassword.Visible = true;
 				base.Height = MaximumSize.Height;
 			}
-            txtDbUser.Text = ini.IniReadValue("CONNECTION", "SQLUSER");
-            txtDbPassword.Text = ini.IniReadValue("CONNECTION", "SQLPASSWORD");
-			if (ini.IniReadValue("GENERAL", "DEBUG_LOG") == "1")
+            txtDbUser.Text = config.GetValue("CONNECTION", "SQLUSER");
+            txtDbPassword.Text = config.GetValue("CONNECTION", "SQLPASSWORD");
+			if (config.GetValue("GENERAL", "DEBUG_LOG") == "1")
 			{
                 chkLogging.Checked = true;
 			}
@@ -164,7 +166,7 @@ namespace SMS_Search
 			{
                 chkLogging.Checked = false;
 			}
-			if (ini.IniReadValue("GENERAL", "MULTI_INSTANCE") == "1")
+			if (config.GetValue("GENERAL", "MULTI_INSTANCE") == "1")
 			{
                 chkMultiInstance.Checked = true;
 			}
@@ -172,7 +174,7 @@ namespace SMS_Search
 			{
                 chkMultiInstance.Checked = false;
 			}
-			if (ini.IniReadValue("GENERAL", "ALWAYSONTOP") == "1")
+			if (config.GetValue("GENERAL", "ALWAYSONTOP") == "1")
 			{
                 chkAlwaysOnTop.Checked = true;
 			}
@@ -180,7 +182,7 @@ namespace SMS_Search
 			{
                 chkAlwaysOnTop.Checked = false;
 			}
-			if (ini.IniReadValue("GENERAL", "SHOWINTRAY") == "1")
+			if (config.GetValue("GENERAL", "SHOWINTRAY") == "1")
 			{
                 chkShowInTray.Checked = true;
 			}
@@ -188,7 +190,7 @@ namespace SMS_Search
 			{
                 chkShowInTray.Checked = false;
 			}
-			if (ini.IniReadValue("GENERAL", "SEARCHANY") == "1")
+			if (config.GetValue("GENERAL", "SEARCHANY") == "1")
 			{
                 chkSearchAny.Checked = true;
 			}
@@ -196,7 +198,7 @@ namespace SMS_Search
 			{
                 chkSearchAny.Checked = false;
 			}
-			if (ini.IniReadValue("GENERAL", "DESCRIPTIONCOLUMNS") == "1")
+			if (config.GetValue("GENERAL", "DESCRIPTIONCOLUMNS") == "1")
 			{
                 chkDescriptionColumns.Checked = true;
 			}
@@ -204,7 +206,7 @@ namespace SMS_Search
 			{
                 chkDescriptionColumns.Checked = false;
 			}
-			if (ini.IniReadValue("GENERAL", "RESIZECOLUMNS") == "1")
+			if (config.GetValue("GENERAL", "RESIZECOLUMNS") == "1")
 			{
                 chkResizeColumns.Checked = true;
 			}
@@ -213,7 +215,7 @@ namespace SMS_Search
                 chkResizeColumns.Checked = false;
 			}
 			string a;
-			if ((a = ini.IniReadValue("GENERAL", "START_TAB")) != null)
+			if ((a = config.GetValue("GENERAL", "START_TAB")) != null)
 			{
 				if (a == "FCT_TAB")
 				{
@@ -234,7 +236,7 @@ namespace SMS_Search
             cmbStartTab.Text = "Function";
 			IL_3FF:
 			string a2;
-			if ((a2 = ini.IniReadValue("GENERAL", "TABLE_LOOKUP")) != null)
+			if ((a2 = config.GetValue("GENERAL", "TABLE_LOOKUP")) != null)
 			{
 				if (a2 == "FIELDS")
 				{
@@ -249,7 +251,7 @@ namespace SMS_Search
 			}
             cmbTableLookup.Text = "Show Fields";
 			IL_468:
-			if (ini.IniReadValue("GENERAL", "COPYCLEANSQL") == "1")
+			if (config.GetValue("GENERAL", "COPYCLEANSQL") == "1")
 			{
                 chkCopyCleanSql.Checked = true;
 			}
@@ -257,7 +259,7 @@ namespace SMS_Search
 			{
                 chkCopyCleanSql.Checked = false;
 			}
-			if (ini.IniReadValue("GENERAL", "CHECKUPDATE") == "1")
+			if (config.GetValue("GENERAL", "CHECKUPDATE") == "1")
 			{
                 chkCheckUpdate.Checked = true;
 			}
@@ -265,23 +267,23 @@ namespace SMS_Search
 			{
                 chkCheckUpdate.Checked = false;
 			}
-			if (ini.IniReadValue("QUERY", "FUNCTION") == "")
+			if (config.GetValue("QUERY", "FUNCTION") == "")
 			{
                 txtQryFct.Text = "F1063, F1064, F1051, F1050, F1081";
 			}
 			else
 			{
-                txtQryFct.Text = ini.IniReadValue("QUERY", "FUNCTION");
+                txtQryFct.Text = config.GetValue("QUERY", "FUNCTION");
 			}
-			if (ini.IniReadValue("QUERY", "TOTALIZER") == "")
+			if (config.GetValue("QUERY", "TOTALIZER") == "")
 			{
                 txtQryTlz.Text = "F1034, F1039, F1128, F1129, F1179, F1253, F1710, F1131, F1048, F1709";
 			}
 			else
 			{
-                txtQryTlz.Text = ini.IniReadValue("QUERY", "TOTALIZER");
+                txtQryTlz.Text = config.GetValue("QUERY", "TOTALIZER");
 			}
-			if (ini.IniReadValue("UNARCHIVE", "SHOWTARGET") == "1")
+			if (config.GetValue("UNARCHIVE", "SHOWTARGET") == "1")
 			{
                 chkUnarchiveTarget.Checked = true;
 				return;
@@ -307,143 +309,144 @@ namespace SMS_Search
 		{
 			if (chkScanNetwork.Checked)
 			{
-                ini.IniWriteValue("CONNECTION", "SCANNETWORK", "1");
+                config.SetValue("CONNECTION", "SCANNETWORK", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("CONNECTION", "SCANNETWORK", "0");
+                config.SetValue("CONNECTION", "SCANNETWORK", "0");
 			}
-            ini.IniWriteValue("CONNECTION", "SERVER", cmbDbServer.Text);
-            ini.IniWriteValue("CONNECTION", "DATABASE", cmbDbDatabase.Text);
+            config.SetValue("CONNECTION", "SERVER", cmbDbServer.Text);
+            config.SetValue("CONNECTION", "DATABASE", cmbDbDatabase.Text);
 			if (chkWindowsAuth.Checked)
 			{
-                ini.IniWriteValue("CONNECTION", "WINDOWSAUTH", "1");
-                ini.IniWriteValue("CONNECTION", "SQLUSER", txtDbUser.Text);
-                ini.IniWriteValue("CONNECTION", "SQLPASSWORD", txtDbPassword.Text);
+                config.SetValue("CONNECTION", "WINDOWSAUTH", "1");
+                config.SetValue("CONNECTION", "SQLUSER", txtDbUser.Text);
+                config.SetValue("CONNECTION", "SQLPASSWORD", txtDbPassword.Text);
 			}
 			else
 			{
-                ini.IniWriteValue("CONNECTION", "WINDOWSAUTH", "0");
-                ini.IniWriteValue("CONNECTION", "SQLUSER", "");
-                ini.IniWriteValue("CONNECTION", "SQLPASSWORD", "");
+                config.SetValue("CONNECTION", "WINDOWSAUTH", "0");
+                config.SetValue("CONNECTION", "SQLUSER", "");
+                config.SetValue("CONNECTION", "SQLPASSWORD", "");
 			}
 			if (chkLogging.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "DEBUG_LOG", "1");
+                config.SetValue("GENERAL", "DEBUG_LOG", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "DEBUG_LOG", "0");
+                config.SetValue("GENERAL", "DEBUG_LOG", "0");
 			}
 			if (chkMultiInstance.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "MULTI_INSTANCE", "1");
+                config.SetValue("GENERAL", "MULTI_INSTANCE", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "MULTI_INSTANCE", "0");
+                config.SetValue("GENERAL", "MULTI_INSTANCE", "0");
 			}
 			if (chkAlwaysOnTop.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "ALWAYSONTOP", "1");
+                config.SetValue("GENERAL", "ALWAYSONTOP", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "ALWAYSONTOP", "0");
+                config.SetValue("GENERAL", "ALWAYSONTOP", "0");
 			}
 			if (chkShowInTray.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "SHOWINTRAY", "1");
+                config.SetValue("GENERAL", "SHOWINTRAY", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "SHOWINTRAY", "0");
+                config.SetValue("GENERAL", "SHOWINTRAY", "0");
 			}
 			if (chkSearchAny.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "SEARCHANY", "1");
+                config.SetValue("GENERAL", "SEARCHANY", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "SEARCHANY", "0");
+                config.SetValue("GENERAL", "SEARCHANY", "0");
 			}
 			if (chkDescriptionColumns.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "DESCRIPTIONCOLUMNS", "1");
+                config.SetValue("GENERAL", "DESCRIPTIONCOLUMNS", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "DESCRIPTIONCOLUMNS", "0");
+                config.SetValue("GENERAL", "DESCRIPTIONCOLUMNS", "0");
 			}
 			if (chkResizeColumns.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "RESIZECOLUMNS", "1");
+                config.SetValue("GENERAL", "RESIZECOLUMNS", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "RESIZECOLUMNS", "0");
+                config.SetValue("GENERAL", "RESIZECOLUMNS", "0");
 			}
 			string text;
 			if ((text = cmbStartTab.Text) != null)
 			{
 				if (text == "Function")
 				{
-                    ini.IniWriteValue("GENERAL", "START_TAB", "FCT_TAB");
+                    config.SetValue("GENERAL", "START_TAB", "FCT_TAB");
 					goto IL_3B5;
 				}
 				if (text == "Totalizer")
 				{
-                    ini.IniWriteValue("GENERAL", "START_TAB", "TLZ_TAB");
+                    config.SetValue("GENERAL", "START_TAB", "TLZ_TAB");
 					goto IL_3B5;
 				}
 				if (text == "Fields")
 				{
-                    ini.IniWriteValue("GENERAL", "START_TAB", "FIELDS");
+                    config.SetValue("GENERAL", "START_TAB", "FIELDS");
 					goto IL_3B5;
 				}
 			}
-            ini.IniWriteValue("GENERAL", "START_TAB", "FCT_TAB");
+            config.SetValue("GENERAL", "START_TAB", "FCT_TAB");
 			IL_3B5:
 			string text2;
 			if ((text2 = cmbTableLookup.Text) != null)
 			{
 				if (text2 == "Show Fields")
 				{
-                    ini.IniWriteValue("GENERAL", "TABLE_LOOKUP", "FIELDS");
+                    config.SetValue("GENERAL", "TABLE_LOOKUP", "FIELDS");
 					goto IL_432;
 				}
 				if (text2 == "Show Records")
 				{
-                    ini.IniWriteValue("GENERAL", "TABLE_LOOKUP", "RECORDS");
+                    config.SetValue("GENERAL", "TABLE_LOOKUP", "RECORDS");
 					goto IL_432;
 				}
 			}
-            ini.IniWriteValue("GENERAL", "TABLE_LOOKUP", "FIELDS");
+            config.SetValue("GENERAL", "TABLE_LOOKUP", "FIELDS");
 			IL_432:
 			if (chkCopyCleanSql.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "COPYCLEANSQL", "1");
+                config.SetValue("GENERAL", "COPYCLEANSQL", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "COPYCLEANSQL", "0");
+                config.SetValue("GENERAL", "COPYCLEANSQL", "0");
 			}
 			if (chkCheckUpdate.Checked)
 			{
-                ini.IniWriteValue("GENERAL", "CHECKUPDATE", "1");
+                config.SetValue("GENERAL", "CHECKUPDATE", "1");
 			}
 			else
 			{
-                ini.IniWriteValue("GENERAL", "CHECKUPDATE", "0");
+                config.SetValue("GENERAL", "CHECKUPDATE", "0");
 			}
-            ini.IniWriteValue("QUERY", "FUNCTION", txtQryFct.Text);
-            ini.IniWriteValue("QUERY", "TOTALIZER", txtQryTlz.Text);
+            config.SetValue("QUERY", "FUNCTION", txtQryFct.Text);
+            config.SetValue("QUERY", "TOTALIZER", txtQryTlz.Text);
 			if (chkUnarchiveTarget.Checked)
 			{
-                ini.IniWriteValue("UNARCHIVE", "SHOWTARGET", "1");
-				return;
-			}
-            ini.IniWriteValue("UNARCHIVE", "SHOWTARGET", "0");
+                config.SetValue("UNARCHIVE", "SHOWTARGET", "1");
+			} else {
+                config.SetValue("UNARCHIVE", "SHOWTARGET", "0");
+            }
+            config.Save();
 		}
 		private void btnCancel_Click(object sender, EventArgs e)
 		{
