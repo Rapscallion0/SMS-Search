@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Rapscallion Tools")]
 [assembly: AssemblyProduct("Properties")]
-[assembly: AssemblyCopyright("© 2013-2023 Rapscallion Tools")]
+[assembly: AssemblyCopyright("© 2013-2026 Rapscallion Tools")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.6.0.23353")]
-[assembly: AssemblyFileVersion("1.6.0.23353")]
+[assembly: AssemblyVersion("1.6.1.26023")]
+[assembly: AssemblyFileVersion("1.6.1.26023")]
 
-[assembly: AssemblyInformationalVersion("1.6.0.23353")]
+[assembly: AssemblyInformationalVersion("1.6.1.26023")]
