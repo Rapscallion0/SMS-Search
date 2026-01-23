@@ -1,4 +1,5 @@
-using Ini;
+// using Ini;
+using SMS_Search;
 using System;
 using System.Globalization;
 using System.IO;
@@ -9,9 +10,9 @@ namespace Log
 	{
 		public void Logger(int level, string message)
 		{
-			string iNIPath = ".\\SMS Search.ini";
-			IniFile iniFile = new IniFile(iNIPath);
-			if (iniFile.IniReadValue("GENERAL", "DEBUG_LOG") == "1")
+			string configPath = ".\\SMS Search.json";
+			ConfigManager config = new ConfigManager(configPath);
+			if (config.GetValue("GENERAL", "DEBUG_LOG") == "1")
 			{
 				string arg = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
 				string arg2 = Application.StartupPath.ToString();

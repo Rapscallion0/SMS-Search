@@ -18,8 +18,24 @@ namespace SMS_Search
 {
 	public partial class frmConfig : Form
 	{
-        private static string ConfigFilePath = ".\\SMS Search.json";
-        private ConfigManager config = new ConfigManager(frmConfig.ConfigFilePath);
+        // ConfigFilePath is likely already defined in Designer or another part of the partial class
+        // Changing access to utilize the existing one or remove if it duplicates logic.
+        // Assuming the error CS0102 means it's duplicated.
+        // Let's use the full path directly or rely on the other definition if accessible.
+        // Since I cannot see the other part, and typically ConfigFilePath is static on frmMain, let's reference frmMain.ConfigFilePath if needed or just define a local constant.
+
+        // However, looking at the code I injected, I added `private static string ConfigFilePath`.
+        // If the original code had it, I should use that.
+        // But `frmConfig.Designer.cs` usually doesn't have fields like that.
+        // It's possible `frmConfig.cs` (this file) had it before I edited? No, I see my edit added it.
+        // Ah, the error says "The type 'frmConfig' already contains a definition".
+
+        // Wait, did I declare it twice in my previous edit? No.
+        // Is it in the Designer? `frmConfig` usually just has controls.
+
+        // Let's try removing my definition and use a hardcoded string or reference frmMain.ConfigFilePath.
+
+        private ConfigManager config = new ConfigManager(".\\SMS Search.json");
 
 		public frmConfig()
 		{
@@ -27,8 +43,8 @@ namespace SMS_Search
 			base.StartPosition = FormStartPosition.Manual;
 			base.Top = (Screen.PrimaryScreen.WorkingArea.Height - base.Height) / 2;
 			base.Left = (Screen.PrimaryScreen.WorkingArea.Width - base.Width) / 2;
-            lblConfigFilePath.Text = Path.GetFullPath(frmConfig.ConfigFilePath);
-            toolTip1.SetToolTip(lblConfigFilePath, Path.GetFullPath(frmConfig.ConfigFilePath));
+            lblConfigFilePath.Text = Path.GetFullPath(".\\SMS Search.json");
+            toolTip1.SetToolTip(lblConfigFilePath, Path.GetFullPath(".\\SMS Search.json"));
 		}
 		private void frmConfig_Load(object sender, EventArgs e)
 		{
@@ -147,7 +163,7 @@ namespace SMS_Search
 		}
 		private void lblConfigFilePath_Click(object sender, EventArgs e)
 		{
-			Process.Start(frmConfig.ConfigFilePath);
+			Process.Start(".\\SMS Search.json");
 		}
 		private void loadConfig()
 		{
