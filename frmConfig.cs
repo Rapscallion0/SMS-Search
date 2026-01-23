@@ -46,13 +46,9 @@ namespace SMS_Search
             lblConfigFilePath.Text = Path.GetFullPath(".\\SMS Search.json");
             toolTip1.SetToolTip(lblConfigFilePath, Path.GetFullPath(".\\SMS Search.json"));
 		}
-        private DataGridView dgvCleanSqlRules;
-        private Button btnResetCleanSql;
-        private TabPage tabCleanSql;
 
 		private void frmConfig_Load(object sender, EventArgs e)
 		{
-            InitializeCleanSqlTab();
             loadConfig();
 		}
 		private async void frmConfig_Shown(object sender, EventArgs e)
@@ -346,57 +342,6 @@ namespace SMS_Search
 
             LoadCleanSqlGrid(false);
 		}
-        private void InitializeCleanSqlTab()
-        {
-            this.tabCleanSql = new TabPage();
-            this.dgvCleanSqlRules = new DataGridView();
-            this.btnResetCleanSql = new Button();
-            this.tabCleanSql.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).BeginInit();
-
-            //
-            // tabCleanSql
-            //
-            this.tabCleanSql.Controls.Add(this.dgvCleanSqlRules);
-            this.tabCleanSql.Controls.Add(this.btnResetCleanSql);
-            this.tabCleanSql.Location = new System.Drawing.Point(4, 22);
-            this.tabCleanSql.Name = "tabCleanSql";
-            this.tabCleanSql.Padding = new Padding(3);
-            this.tabCleanSql.Size = new Size(539, 227);
-            this.tabCleanSql.TabIndex = 5;
-            this.tabCleanSql.Text = "Clean SQL";
-            this.tabCleanSql.UseVisualStyleBackColor = true;
-
-            //
-            // dgvCleanSqlRules
-            //
-            this.dgvCleanSqlRules.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvCleanSqlRules.Columns.AddRange(new DataGridViewColumn[] {
-            new DataGridViewTextBoxColumn { HeaderText = "Regex Pattern", Name = "Regex", Width = 250 },
-            new DataGridViewTextBoxColumn { HeaderText = "Replacement", Name = "Replacement", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill }
-            });
-            this.dgvCleanSqlRules.Location = new Point(6, 6);
-            this.dgvCleanSqlRules.Name = "dgvCleanSqlRules";
-            this.dgvCleanSqlRules.Size = new Size(527, 185);
-            this.dgvCleanSqlRules.TabIndex = 0;
-            this.dgvCleanSqlRules.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-
-            //
-            // btnResetCleanSql
-            //
-            this.btnResetCleanSql.Location = new Point(448, 198);
-            this.btnResetCleanSql.Name = "btnResetCleanSql";
-            this.btnResetCleanSql.Size = new Size(85, 23);
-            this.btnResetCleanSql.TabIndex = 1;
-            this.btnResetCleanSql.Text = "Reset Defaults";
-            this.btnResetCleanSql.UseVisualStyleBackColor = true;
-            this.btnResetCleanSql.Click += new EventHandler(this.btnResetCleanSql_Click);
-            this.btnResetCleanSql.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-
-            this.tabCtlConfig.Controls.Add(this.tabCleanSql);
-            this.tabCleanSql.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).EndInit();
-        }
 
         private void btnResetCleanSql_Click(object sender, EventArgs e)
         {
@@ -436,8 +381,44 @@ namespace SMS_Search
 
             foreach (var rule in rules)
             {
-                dgvCleanSqlRules.Rows.Add(rule.Pattern, rule.Replacement);
+                dgvCleanSqlRules.Rows.Add(EscapeForDisplay(rule.Pattern), EscapeForDisplay(rule.Replacement));
             }
+        }
+
+        private string EscapeForDisplay(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            return input.Replace("\\", "\\\\")
+                        .Replace("\r", "\\r")
+                        .Replace("\n", "\\n")
+                        .Replace("\t", "\\t");
+        }
+
+        private string UnescapeFromDisplay(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (input[i] == '\\' && i + 1 < input.Length)
+                {
+                    char next = input[i + 1];
+                    switch (next)
+                    {
+                        case 'r': sb.Append('\r'); i++; break;
+                        case 'n': sb.Append('\n'); i++; break;
+                        case 't': sb.Append('\t'); i++; break;
+                        case '\\': sb.Append('\\'); i++; break;
+                        default: sb.Append('\\'); break;
+                    }
+                }
+                else
+                {
+                    sb.Append(input[i]);
+                }
+            }
+            return sb.ToString();
         }
 
 		private void btnOk_Click(object sender, EventArgs e)
@@ -603,8 +584,8 @@ namespace SMS_Search
             foreach (DataGridViewRow row in dgvCleanSqlRules.Rows)
             {
                 if (row.IsNewRow) continue;
-                string pattern = row.Cells[0].Value?.ToString();
-                string replacement = row.Cells[1].Value?.ToString() ?? ""; // Replacement can be empty
+                string pattern = UnescapeFromDisplay(row.Cells[0].Value?.ToString());
+                string replacement = UnescapeFromDisplay(row.Cells[1].Value?.ToString() ?? "");
 
                 if (!string.IsNullOrEmpty(pattern))
                 {
