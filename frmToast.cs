@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,11 +14,13 @@ namespace SMS_Search
     {
         int toastX, toastY;
         int toastTimerDuration = 300;
+        private Screen _targetScreen;
 
-        public frmToast(int type, string message, string title)
+        public frmToast(int type, string message, string title, Screen screen = null)
         {
             InitializeComponent();
             
+            _targetScreen = screen ?? Screen.PrimaryScreen;
 
             lblToastMessage.Text = message;
 
@@ -79,11 +81,10 @@ namespace SMS_Search
 
         private void Position()
         {
-            int ScreenWidth = Screen.PrimaryScreen.WorkingArea.Width;
-            int ScreenHeight = Screen.PrimaryScreen.WorkingArea.Height;
+            Rectangle workingArea = _targetScreen.WorkingArea;
 
-            toastX = ScreenWidth - this.Width - 5;
-            toastY = ScreenHeight - this.Height + 70;
+            toastX = workingArea.Right - this.Width - 5;
+            toastY = workingArea.Bottom;
 
             this.Location = new Point(toastX, toastY);
         }
@@ -93,9 +94,9 @@ namespace SMS_Search
             toastTimerDuration--;
             if (toastTimerDuration <= 0)
             {
-                toastY += 1;
-                this.Location = new Point(toastX, toastY += 10);
-                if (toastY > Screen.PrimaryScreen.WorkingArea.Height - this.Height + 20)
+                toastY += 10;
+                this.Location = new Point(toastX, toastY);
+                if (toastY > _targetScreen.WorkingArea.Bottom)
                 {
                     tmrToastHide.Stop();
                     toastTimerDuration = 100;
@@ -114,7 +115,7 @@ namespace SMS_Search
             toastY -= 10;
             this.Location = new Point(toastX, toastY);
 
-            if (toastY <= Screen.PrimaryScreen.WorkingArea.Height - this.Height - 20)
+            if (toastY <= _targetScreen.WorkingArea.Bottom - this.Height - 20)
             {
                 tmrToastShow.Stop();
                 tmrToastHide.Start();

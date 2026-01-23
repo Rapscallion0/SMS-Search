@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SMS_Search
 {
@@ -18,9 +19,22 @@ namespace SMS_Search
         /// 3: Warning</param>
         /// <param name="message">Message detail</param>
         /// <param name="title">Optional - Override default type title</param>
-        public static void showToast(int type, string message, string title = "Message")
+        /// <param name="screen">Optional - Target screen for the toast</param>
+        public static void showToast(int type, string message, string title = "Message", Screen screen = null)
         { 
-            frmToast toast = new frmToast(type, message, title);
+            if (screen == null)
+            {
+                if (Form.ActiveForm != null)
+                {
+                    screen = Screen.FromControl(Form.ActiveForm);
+                }
+                else
+                {
+                    screen = Screen.FromPoint(Cursor.Position);
+                }
+            }
+
+            frmToast toast = new frmToast(type, message, title, screen);
             toast.Show();
         }
     }

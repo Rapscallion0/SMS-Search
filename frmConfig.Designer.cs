@@ -1,4 +1,4 @@
-﻿using DbConn;
+using DbConn;
 // using Ini;
 using System;
 using System.Collections;
@@ -139,6 +139,7 @@ namespace SMS_Search
             this.colRegex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colReplace = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnResetCleanSql = new System.Windows.Forms.Button();
+            this.btnTestToast = new System.Windows.Forms.Button();
             this.tabGeneral.SuspendLayout();
             this.tabCtlConfig.SuspendLayout();
             this.tabAdvanced.SuspendLayout();
@@ -500,6 +501,7 @@ namespace SMS_Search
             // 
             this.tabAdvanced.BackColor = System.Drawing.SystemColors.Control;
             this.tabAdvanced.Controls.Add(this.btnChkUpdate);
+            this.tabAdvanced.Controls.Add(this.btnTestToast);
             this.tabAdvanced.Controls.Add(this.chkCheckUpdate);
             this.tabAdvanced.Controls.Add(this.groupBox1);
             this.tabAdvanced.Controls.Add(this.chkLogging);
@@ -569,6 +571,16 @@ namespace SMS_Search
             this.btnChkUpdate.UseVisualStyleBackColor = true;
             this.btnChkUpdate.Click += new System.EventHandler(this.btnChkUpdate_Click);
             // 
+            // btnTestToast
+            //
+            this.btnTestToast.Location = new System.Drawing.Point(452, 140);
+            this.btnTestToast.Name = "btnTestToast";
+            this.btnTestToast.Size = new System.Drawing.Size(75, 23);
+            this.btnTestToast.TabIndex = 11;
+            this.btnTestToast.Text = "Test Toast";
+            this.btnTestToast.UseVisualStyleBackColor = true;
+            this.btnTestToast.Click += new System.EventHandler(this.btnTestToast_Click);
+            //
             // chkCheckUpdate
             // 
             this.chkCheckUpdate.AutoSize = true;
@@ -712,5 +724,6 @@ namespace SMS_Search
         private DataGridViewTextBoxColumn colRegex;
         private DataGridViewTextBoxColumn colReplace;
         private Button btnResetCleanSql;
+        private Button btnTestToast;
     }
 }
