@@ -44,37 +44,7 @@ namespace SMS_Search
 			public string Replacement;
 		}
 
-		private static readonly ReplacementRule[] CleanSqlRules;
-
-		static frmMain()
-		{
-			string[,] cleanArray = new string[,]
-			{
-				{"&amp;", "&"},
-				{"<(/|)(((logsql|sql|prm|msg|errsql|logurl|).*?)|(pre|p|(br(( |)/|))))>", ""},
-				{"&lt;", "<"},
-				{"&gt;", ">"},
-				{@"\[", "("},
-				{@"\]", ")"},
-				{"&quot;", "'"},
-				{@"( |)\b(JOIN|WHEN)\b", "\r\n\t$2"},
-				{@"\{09\}", ""},
-				{@"( |)\b(FROM|WHERE|GROUP BY|ORDER BY|HAVING|DECLARE)\b", "\r\n$2"},
-				{@"\b(UNION)\b ", "\r\n$1\r\n"},
-				{@"( |)\b(ON)\b", "\r\n\t\t$2"},
-				{"( AND | OR )","$1\r\n\t"}
-			};
-
-			CleanSqlRules = new ReplacementRule[cleanArray.GetLength(0)];
-			for (int i = 0; i < cleanArray.GetLength(0); i++)
-			{
-				CleanSqlRules[i] = new ReplacementRule
-				{
-					Regex = new Regex(cleanArray[i, 0], RegexOptions.Compiled | RegexOptions.IgnoreCase),
-					Replacement = cleanArray[i, 1]
-				};
-			}
-		}
+		private List<ReplacementRule> _cleanSqlRules = new List<ReplacementRule>();
 
 		private BackgroundWorker backgroundWorker;
 		private int FormHeightMin = 275 + SystemInformation.FrameBorderSize.Height * 2;
@@ -320,8 +290,51 @@ namespace SMS_Search
 				TlzFields = config.GetValue("QUERY", "TOTALIZER");
 			}
 
+            LoadCleanSqlRules();
+
 			Cursor = Cursors.Default;
 		}
+
+        private void LoadCleanSqlRules()
+        {
+            _cleanSqlRules.Clear();
+            string countStr = config.GetValue("CLEAN_SQL", "Count");
+            int count = 0;
+            List<SqlCleaningRule> rulesToLoad = new List<SqlCleaningRule>();
+
+            if (!string.IsNullOrEmpty(countStr) && int.TryParse(countStr, out count) && count > 0)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    string pattern = config.GetValue("CLEAN_SQL", "Rule_" + i + "_Regex");
+                    string replacement = config.GetValue("CLEAN_SQL", "Rule_" + i + "_Replace");
+                    if (!string.IsNullOrEmpty(pattern))
+                    {
+                        rulesToLoad.Add(new SqlCleaningRule { Pattern = pattern, Replacement = replacement });
+                    }
+                }
+            }
+            else
+            {
+                rulesToLoad = SqlCleaner.DefaultRules;
+            }
+
+            foreach (var rule in rulesToLoad)
+            {
+                try
+                {
+                    _cleanSqlRules.Add(new ReplacementRule
+                    {
+                        Regex = new Regex(rule.Pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase),
+                        Replacement = rule.Replacement
+                    });
+                }
+                catch (Exception ex)
+                {
+                    log.Logger(1, "Error compiling regex for Clean SQL rule: " + rule.Pattern + " - " + ex.Message);
+                }
+            }
+        }
 
         private void CreateConfigFile()
 		{
@@ -1393,9 +1406,9 @@ namespace SMS_Search
             _scriptGen = new Sql110ScriptGenerator(options);
 			*/
 
-			for (int i = 0; i < CleanSqlRules.Length; i++)
+			foreach (var rule in _cleanSqlRules)
 			{
-				toClean = CleanSqlRules[i].Regex.Replace(toClean, CleanSqlRules[i].Replacement);
+				toClean = rule.Regex.Replace(toClean, rule.Replacement);
 			}
 
             /*

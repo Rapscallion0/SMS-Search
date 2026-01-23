@@ -46,8 +46,13 @@ namespace SMS_Search
             lblConfigFilePath.Text = Path.GetFullPath(".\\SMS Search.json");
             toolTip1.SetToolTip(lblConfigFilePath, Path.GetFullPath(".\\SMS Search.json"));
 		}
+        private DataGridView dgvCleanSqlRules;
+        private Button btnResetCleanSql;
+        private TabPage tabCleanSql;
+
 		private void frmConfig_Load(object sender, EventArgs e)
 		{
+            InitializeCleanSqlTab();
             loadConfig();
 		}
 		private async void frmConfig_Shown(object sender, EventArgs e)
@@ -333,10 +338,108 @@ namespace SMS_Search
 			if (config.GetValue("UNARCHIVE", "SHOWTARGET") == "1")
 			{
                 chkUnarchiveTarget.Checked = true;
-				return;
 			}
-            chkUnarchiveTarget.Checked = false;
+            else
+            {
+                chkUnarchiveTarget.Checked = false;
+            }
+
+            LoadCleanSqlGrid(false);
 		}
+        private void InitializeCleanSqlTab()
+        {
+            this.tabCleanSql = new TabPage();
+            this.dgvCleanSqlRules = new DataGridView();
+            this.btnResetCleanSql = new Button();
+            this.tabCleanSql.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).BeginInit();
+
+            //
+            // tabCleanSql
+            //
+            this.tabCleanSql.Controls.Add(this.dgvCleanSqlRules);
+            this.tabCleanSql.Controls.Add(this.btnResetCleanSql);
+            this.tabCleanSql.Location = new System.Drawing.Point(4, 22);
+            this.tabCleanSql.Name = "tabCleanSql";
+            this.tabCleanSql.Padding = new Padding(3);
+            this.tabCleanSql.Size = new Size(539, 227);
+            this.tabCleanSql.TabIndex = 5;
+            this.tabCleanSql.Text = "Clean SQL";
+            this.tabCleanSql.UseVisualStyleBackColor = true;
+
+            //
+            // dgvCleanSqlRules
+            //
+            this.dgvCleanSqlRules.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvCleanSqlRules.Columns.AddRange(new DataGridViewColumn[] {
+            new DataGridViewTextBoxColumn { HeaderText = "Regex Pattern", Name = "Regex", Width = 250 },
+            new DataGridViewTextBoxColumn { HeaderText = "Replacement", Name = "Replacement", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill }
+            });
+            this.dgvCleanSqlRules.Location = new Point(6, 6);
+            this.dgvCleanSqlRules.Name = "dgvCleanSqlRules";
+            this.dgvCleanSqlRules.Size = new Size(527, 185);
+            this.dgvCleanSqlRules.TabIndex = 0;
+            this.dgvCleanSqlRules.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+
+            //
+            // btnResetCleanSql
+            //
+            this.btnResetCleanSql.Location = new Point(448, 198);
+            this.btnResetCleanSql.Name = "btnResetCleanSql";
+            this.btnResetCleanSql.Size = new Size(85, 23);
+            this.btnResetCleanSql.TabIndex = 1;
+            this.btnResetCleanSql.Text = "Reset Defaults";
+            this.btnResetCleanSql.UseVisualStyleBackColor = true;
+            this.btnResetCleanSql.Click += new EventHandler(this.btnResetCleanSql_Click);
+            this.btnResetCleanSql.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            this.tabCtlConfig.Controls.Add(this.tabCleanSql);
+            this.tabCleanSql.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).EndInit();
+        }
+
+        private void btnResetCleanSql_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to reset the Clean SQL rules to defaults?", "Reset Defaults", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                LoadCleanSqlGrid(true);
+            }
+        }
+
+        private void LoadCleanSqlGrid(bool useDefaults)
+        {
+            dgvCleanSqlRules.Rows.Clear();
+            List<SqlCleaningRule> rules = new List<SqlCleaningRule>();
+
+            if (!useDefaults)
+            {
+                string countStr = config.GetValue("CLEAN_SQL", "Count");
+                int count;
+                if (!string.IsNullOrEmpty(countStr) && int.TryParse(countStr, out count) && count > 0)
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        string pattern = config.GetValue("CLEAN_SQL", "Rule_" + i + "_Regex");
+                        string replacement = config.GetValue("CLEAN_SQL", "Rule_" + i + "_Replace");
+                         if (!string.IsNullOrEmpty(pattern))
+                        {
+                            rules.Add(new SqlCleaningRule { Pattern = pattern, Replacement = replacement });
+                        }
+                    }
+                }
+            }
+
+            if (rules.Count == 0)
+            {
+                rules = SqlCleaner.DefaultRules;
+            }
+
+            foreach (var rule in rules)
+            {
+                dgvCleanSqlRules.Rows.Add(rule.Pattern, rule.Replacement);
+            }
+        }
+
 		private void btnOk_Click(object sender, EventArgs e)
 		{
 			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true))
@@ -493,6 +596,25 @@ namespace SMS_Search
 			} else {
                 config.SetValue("UNARCHIVE", "SHOWTARGET", "0");
             }
+
+            // Save Clean SQL Rules
+            config.ClearSection("CLEAN_SQL");
+            int ruleCount = 0;
+            foreach (DataGridViewRow row in dgvCleanSqlRules.Rows)
+            {
+                if (row.IsNewRow) continue;
+                string pattern = row.Cells[0].Value?.ToString();
+                string replacement = row.Cells[1].Value?.ToString() ?? ""; // Replacement can be empty
+
+                if (!string.IsNullOrEmpty(pattern))
+                {
+                     config.SetValue("CLEAN_SQL", "Rule_" + ruleCount + "_Regex", pattern);
+                     config.SetValue("CLEAN_SQL", "Rule_" + ruleCount + "_Replace", replacement);
+                     ruleCount++;
+                }
+            }
+            config.SetValue("CLEAN_SQL", "Count", ruleCount.ToString());
+
             config.Save();
 		}
 		private void btnCancel_Click(object sender, EventArgs e)

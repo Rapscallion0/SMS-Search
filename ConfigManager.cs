@@ -92,6 +92,14 @@ namespace SMS_Search
             _config[section][key] = value;
         }
 
+        public void ClearSection(string section)
+        {
+            if (_config.ContainsKey(section))
+            {
+                _config.Remove(section);
+            }
+        }
+
         private void ImportFromIni()
         {
             // Read all sections
