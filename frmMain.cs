@@ -90,6 +90,20 @@ namespace SMS_Search
 				frmEula.ShowDialog();
 			}
 
+            string lastRunVersion = config.GetValue("GENERAL", "LAST_RUN_VERSION");
+            string currentVersion = Application.ProductVersion;
+
+            if (lastRunVersion != currentVersion)
+            {
+                if (!string.IsNullOrEmpty(lastRunVersion))
+                {
+                    frmToast toast = new frmToast(0, "Updated from v" + lastRunVersion + " to v" + currentVersion, "Update");
+                    toast.Show();
+                }
+                config.SetValue("GENERAL", "LAST_RUN_VERSION", currentVersion);
+                config.Save();
+            }
+
             if (config.GetValue("GENERAL", "CHECKUPDATE") == "1")
             {
                 CheckUpdateAsync();
