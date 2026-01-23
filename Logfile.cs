@@ -10,7 +10,7 @@ namespace Log
 	{
 		public void Logger(int level, string message)
 		{
-			string configPath = ".\\SMS Search.json";
+			string configPath = Path.Combine(Application.StartupPath, "SMS Search.json");
 			ConfigManager config = new ConfigManager(configPath);
 			if (config.GetValue("GENERAL", "DEBUG_LOG") == "1")
 			{

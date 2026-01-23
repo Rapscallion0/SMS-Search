@@ -11,7 +11,7 @@ namespace SMS_Search
 {
 	public partial class frmUnarchive : Form
 	{
-		private static string ConfigFilePath = ".\\SMS Search.json";
+		private static string ConfigFilePath = Path.Combine(Application.StartupPath, "SMS Search.json");
 		private ConfigManager config = new ConfigManager(frmUnarchive.ConfigFilePath);
 		private Logfile log = new Logfile();
 
