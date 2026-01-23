@@ -26,6 +26,25 @@ try {
         Throw "Could not find AssemblyVersion in $AssemblyInfoPath"
     }
 
+    # Commit and Push AssemblyInfo.cs if changed
+    $gitStatus = git status "$AssemblyInfoPath" --porcelain
+    if ($gitStatus) {
+        Write-Host "Changes detected in AssemblyInfo.cs. Committing and pushing..."
+
+        git add "$AssemblyInfoPath"
+        if ($LASTEXITCODE -ne 0) { Throw "Failed to git add $AssemblyInfoPath" }
+
+        git commit -m "Bump version to $version"
+        if ($LASTEXITCODE -ne 0) { Throw "Failed to git commit" }
+
+        git push origin HEAD
+        if ($LASTEXITCODE -ne 0) { Throw "Failed to git push" }
+
+        Write-Host "Successfully committed and pushed version bump."
+    } else {
+        Write-Host "No changes detected in AssemblyInfo.cs."
+    }
+
     # Check if release already exists using gh CLI
     # We allow the error stream to go to null, we just care about the exit code.
     # Note: running an external command like gh inside PowerShell updates $LASTEXITCODE
