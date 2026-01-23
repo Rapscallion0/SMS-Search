@@ -174,8 +174,11 @@ namespace SMS_Search
             }
 		}
 
-        private void frmMain_Shown(object sender, EventArgs e)
+        protected override void OnShown(EventArgs e)
 		{
+            base.OnShown(e);
+            log.Logger(0, "frmMain_OnShown: Executing");
+
             string lastRunVersion = config.GetValue("GENERAL", "LAST_RUN_VERSION");
             string currentVersion = Application.ProductVersion;
 
