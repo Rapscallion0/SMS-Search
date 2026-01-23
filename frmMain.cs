@@ -150,9 +150,6 @@ namespace SMS_Search
 				frmUnarchive.Show();
 				btnShowTarget.Checked = true;
 			}
-			Show();
-			Focus();
-			BringToFront();
 		}
 
 		private static async void CheckUpdateAsync()
