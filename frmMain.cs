@@ -186,8 +186,7 @@ namespace SMS_Search
             {
                 if (!string.IsNullOrEmpty(lastRunVersion))
                 {
-                    frmToast toast = new frmToast(0, "Updated from v" + lastRunVersion + " to v" + currentVersion, "Update");
-                    toast.Show();
+                    Utils.showToast(0, "Updated from v" + lastRunVersion + " to v" + currentVersion, "Update", Screen.FromControl(this));
                 }
                 config.SetValue("GENERAL", "LAST_RUN_VERSION", currentVersion);
                 config.Save();
