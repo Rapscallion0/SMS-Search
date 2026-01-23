@@ -45,6 +45,13 @@ try {
         Write-Host "No changes detected in AssemblyInfo.cs."
     }
 
+    # Check if gh CLI is available
+    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+        Write-Warning "GitHub CLI ('gh') is not found in the system PATH. Skipping release creation."
+        Write-Warning "Current PATH: $env:PATH"
+        exit 0
+    }
+
     # Check if release already exists using gh CLI
     # We allow the error stream to go to null, we just care about the exit code.
     # Note: running an external command like gh inside PowerShell updates $LASTEXITCODE
