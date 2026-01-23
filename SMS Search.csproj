@@ -204,10 +204,10 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <PropertyGroup>
-    <PostBuildEvent>if "$(Configuration)" == "Release" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(ProjectDir)publish_release.ps1" -AssemblyInfoPath "$(ProjectDir)Properties\AssemblyInfo.cs" -ExePath "$(TargetPath)"</PostBuildEvent>
-  </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if "$(Configuration)" == "Release" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(MSBuildProjectDirectory)\publish_release.ps1" -AssemblyInfoPath "$(MSBuildProjectDirectory)\Properties\AssemblyInfo.cs" -ExePath "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_DetectChanges="False" BuildVersion_ConfigurationName="Release" BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.Increment.YearDayOfYearStamp" BuildVersion_StartDate="2000/1/1" BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" BuildVersion_UseUniversalClock="True" />
