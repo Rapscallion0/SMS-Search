@@ -150,6 +150,9 @@ namespace SMS_Search
 				frmUnarchive.Show();
 				btnShowTarget.Checked = true;
 			}
+			//Show();
+			//Focus();
+			//BringToFront();
 		}
 
 		private static async void CheckUpdateAsync()
@@ -171,8 +174,11 @@ namespace SMS_Search
             }
 		}
 
-        private void frmMain_Shown(object sender, EventArgs e)
+        protected override void OnShown(EventArgs e)
 		{
+            base.OnShown(e);
+            log.Logger(0, "frmMain_OnShown: Executing");
+
             string lastRunVersion = config.GetValue("GENERAL", "LAST_RUN_VERSION");
             string currentVersion = Application.ProductVersion;
 
@@ -180,8 +186,7 @@ namespace SMS_Search
             {
                 if (!string.IsNullOrEmpty(lastRunVersion))
                 {
-                    frmToast toast = new frmToast(0, "Updated from v" + lastRunVersion + " to v" + currentVersion, "Update");
-                    toast.Show();
+                    Utils.showToast(0, "Updated from v" + lastRunVersion + " to v" + currentVersion, "Update", Screen.FromControl(this));
                 }
                 config.SetValue("GENERAL", "LAST_RUN_VERSION", currentVersion);
                 config.Save();

@@ -748,5 +748,10 @@ namespace SMS_Search
             lblDbPassword.Visible = true;
 			base.Height = MaximumSize.Height;
 		}
+
+        private void btnTestToast_Click(object sender, EventArgs e)
+        {
+            Utils.showToast(0, "This is a test toast notification", "Test Toast");
+        }
     }
 }
