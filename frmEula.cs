@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 namespace SMS_Search
 {
@@ -15,7 +16,7 @@ namespace SMS_Search
 		private Label label1;
 		private Label label2;
 		private Panel panel1;
-		private static string ConfigFilePath = ".\\SMS Search.json";
+		private static string ConfigFilePath = Path.Combine(Application.StartupPath, "SMS Search.json");
 		private ConfigManager config = new ConfigManager(frmEula.ConfigFilePath);
 		protected override void Dispose(bool disposing)
 		{

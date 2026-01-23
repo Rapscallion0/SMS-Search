@@ -1,6 +1,7 @@
 // using Ini;
 using SingleInstance;
 using System;
+using System.IO;
 using System.Windows.Forms;
 namespace SMS_Search
 {
@@ -13,7 +14,7 @@ namespace SMS_Search
 			Program.Params = args;
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			ConfigManager config = new ConfigManager(".\\SMS Search.json");
+			ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search.json"));
 			if (config.GetValue("GENERAL", "MULTI_INSTANCE") == "1")
 			{
 				Application.Run(new frmMain(Program.Params));

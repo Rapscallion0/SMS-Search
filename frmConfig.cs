@@ -34,7 +34,7 @@ namespace SMS_Search
 
         // Let's try removing my definition and use a hardcoded string or reference frmMain.ConfigFilePath.
 
-        private ConfigManager config = new ConfigManager(".\\SMS Search.json");
+        private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search.json"));
 
 		public frmConfig()
 		{
@@ -42,8 +42,8 @@ namespace SMS_Search
 			base.StartPosition = FormStartPosition.Manual;
 			base.Top = (Screen.PrimaryScreen.WorkingArea.Height - base.Height) / 2;
 			base.Left = (Screen.PrimaryScreen.WorkingArea.Width - base.Width) / 2;
-            lblConfigFilePath.Text = Path.GetFullPath(".\\SMS Search.json");
-            toolTip1.SetToolTip(lblConfigFilePath, Path.GetFullPath(".\\SMS Search.json"));
+            lblConfigFilePath.Text = Path.Combine(Application.StartupPath, "SMS Search.json");
+            toolTip1.SetToolTip(lblConfigFilePath, Path.Combine(Application.StartupPath, "SMS Search.json"));
 		}
 
 		private void frmConfig_Load(object sender, EventArgs e)
@@ -160,7 +160,7 @@ namespace SMS_Search
 		}
 		private void lblConfigFilePath_Click(object sender, EventArgs e)
 		{
-			Process.Start(".\\SMS Search.json");
+			Process.Start(Path.Combine(Application.StartupPath, "SMS Search.json"));
 		}
 		private void loadConfig()
 		{
