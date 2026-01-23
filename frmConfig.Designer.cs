@@ -139,10 +139,17 @@ namespace SMS_Search
             this.chkLogging = new System.Windows.Forms.CheckBox();
             this.cmbStartupLocation = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
+            this.tabCleanSql = new System.Windows.Forms.TabPage();
+            this.dgvCleanSqlRules = new System.Windows.Forms.DataGridView();
+            this.colRegex = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colReplace = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnResetCleanSql = new System.Windows.Forms.Button();
             this.tabGeneral.SuspendLayout();
             this.tabCtlConfig.SuspendLayout();
             this.tabAdvanced.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.tabCleanSql.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).BeginInit();
             this.SuspendLayout();
             // 
             // btnResetConfig
@@ -487,6 +494,7 @@ namespace SMS_Search
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabCtlConfig.Controls.Add(this.tabGeneral);
             this.tabCtlConfig.Controls.Add(this.tabAdvanced);
+            this.tabCtlConfig.Controls.Add(this.tabCleanSql);
             this.tabCtlConfig.Location = new System.Drawing.Point(11, 145);
             this.tabCtlConfig.Name = "tabCtlConfig";
             this.tabCtlConfig.SelectedIndex = 0;
@@ -509,6 +517,55 @@ namespace SMS_Search
             this.tabAdvanced.TabIndex = 4;
             this.tabAdvanced.Text = "Advanced";
             // 
+            // tabCleanSql
+            //
+            this.tabCleanSql.Controls.Add(this.dgvCleanSqlRules);
+            this.tabCleanSql.Controls.Add(this.btnResetCleanSql);
+            this.tabCleanSql.Location = new System.Drawing.Point(4, 22);
+            this.tabCleanSql.Name = "tabCleanSql";
+            this.tabCleanSql.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCleanSql.Size = new System.Drawing.Size(539, 227);
+            this.tabCleanSql.TabIndex = 5;
+            this.tabCleanSql.Text = "Clean SQL";
+            this.tabCleanSql.UseVisualStyleBackColor = true;
+            //
+            // dgvCleanSqlRules
+            //
+            this.dgvCleanSqlRules.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvCleanSqlRules.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvCleanSqlRules.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colRegex,
+            this.colReplace});
+            this.dgvCleanSqlRules.Location = new System.Drawing.Point(6, 6);
+            this.dgvCleanSqlRules.Name = "dgvCleanSqlRules";
+            this.dgvCleanSqlRules.Size = new System.Drawing.Size(527, 185);
+            this.dgvCleanSqlRules.TabIndex = 0;
+            //
+            // colRegex
+            //
+            this.colRegex.HeaderText = "Regex Pattern";
+            this.colRegex.Name = "colRegex";
+            this.colRegex.Width = 250;
+            //
+            // colReplace
+            //
+            this.colReplace.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colReplace.HeaderText = "Replacement";
+            this.colReplace.Name = "colReplace";
+            //
+            // btnResetCleanSql
+            //
+            this.btnResetCleanSql.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnResetCleanSql.Location = new System.Drawing.Point(448, 198);
+            this.btnResetCleanSql.Name = "btnResetCleanSql";
+            this.btnResetCleanSql.Size = new System.Drawing.Size(85, 23);
+            this.btnResetCleanSql.TabIndex = 1;
+            this.btnResetCleanSql.Text = "Reset Defaults";
+            this.btnResetCleanSql.UseVisualStyleBackColor = true;
+            this.btnResetCleanSql.Click += new System.EventHandler(this.btnResetCleanSql_Click);
+            //
             // btnChkUpdate
             // 
             this.btnChkUpdate.Location = new System.Drawing.Point(452, 92);
@@ -667,6 +724,8 @@ namespace SMS_Search
             this.tabAdvanced.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.tabCleanSql.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -675,5 +734,10 @@ namespace SMS_Search
 
         private ComboBox cmbStartupLocation;
         private Label label8;
+        private TabPage tabCleanSql;
+        private DataGridView dgvCleanSqlRules;
+        private DataGridViewTextBoxColumn colRegex;
+        private DataGridViewTextBoxColumn colReplace;
+        private Button btnResetCleanSql;
     }
 }
