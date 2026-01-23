@@ -205,7 +205,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Release powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(ProjectDir)publish_release.ps1" -AssemblyInfoPath "$(ProjectDir)Properties\AssemblyInfo.cs" -ExePath "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>if "$(Configuration)" == "Release" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(ProjectDir)publish_release.ps1" -AssemblyInfoPath "$(ProjectDir)Properties\AssemblyInfo.cs" -ExePath "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
