@@ -1,5 +1,5 @@
 ﻿using DbConn;
-using Ini;
+// using Ini;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,8 +34,8 @@ namespace SMS_Search
 		
         private const string MenuName = "*\\shell\\UnArchiver";
         private const string Command = "*\\shell\\UnArchiver\\command";
-        private static string ConfigFilePath = ".\\SMS Search.ini";
-        private IniFile ini = new IniFile(frmConfig.ConfigFilePath);
+        // private static string ConfigFilePath = ".\\SMS Search.ini";
+        // private IniFile ini = new IniFile(frmConfig.ConfigFilePath);
         private GetVersion Versions = new GetVersion();
         private dbConnector dbConn = new dbConnector();
         private ArrayList ServerNames = new ArrayList();

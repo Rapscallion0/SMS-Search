@@ -1,4 +1,4 @@
-using Ini;
+// using Ini;
 using Log;
 using SMS_Search.Properties;
 using System;
@@ -11,8 +11,8 @@ namespace SMS_Search
 {
 	public partial class frmUnarchive : Form
 	{
-		private static string ConfigFilePath = ".\\SMS Search.ini";
-		private IniFile ini = new IniFile(frmUnarchive.ConfigFilePath);
+		private static string ConfigFilePath = ".\\SMS Search.json";
+		private ConfigManager config = new ConfigManager(frmUnarchive.ConfigFilePath);
 		private Logfile log = new Logfile();
 
 		[DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -40,7 +40,7 @@ namespace SMS_Search
 					flag = true;
 				}
 			}
-			if (ini.IniReadValue("UNARCHIVE", "LOCATIONY") == "" || ini.IniReadValue("UNARCHIVE", "LOCATIONX") == "" || !flag)
+			if (config.GetValue("UNARCHIVE", "LOCATIONY") == "" || config.GetValue("UNARCHIVE", "LOCATIONX") == "" || !flag)
 			{
 				Top = 100;
 				Left = 100;
@@ -52,10 +52,10 @@ namespace SMS_Search
 			}
 			else
 			{
-				Top = Convert.ToInt32(ini.IniReadValue("UNARCHIVE", "LOCATIONY"));
-				Left = Convert.ToInt32(ini.IniReadValue("UNARCHIVE", "LOCATIONX"));
+				Top = Convert.ToInt32(config.GetValue("UNARCHIVE", "LOCATIONY"));
+				Left = Convert.ToInt32(config.GetValue("UNARCHIVE", "LOCATIONX"));
 			}
-			log.Logger(0, "Target initialized at X: " + ini.IniReadValue("UNARCHIVE", "LOCATIONX") + "; Y: " + ini.IniReadValue("UNARCHIVE", "LOCATIONY"));
+			log.Logger(0, "Target initialized at X: " + config.GetValue("UNARCHIVE", "LOCATIONX") + "; Y: " + config.GetValue("UNARCHIVE", "LOCATIONY"));
 		}
 		
         private void picTarget_MouseDown(object sender, MouseEventArgs e)
@@ -111,9 +111,10 @@ namespace SMS_Search
 		
         private void frmUnarchive_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			ini.IniWriteValue("UNARCHIVE", "LOCATIONX", Location.X.ToString());
-			ini.IniWriteValue("UNARCHIVE", "LOCATIONY", Location.Y.ToString());
-			log.Logger(0, "Target terminated at X: " + ini.IniReadValue("UNARCHIVE", "LOCATIONX") + "; Y: " + ini.IniReadValue("UNARCHIVE", "LOCATIONY"));
+			config.SetValue("UNARCHIVE", "LOCATIONX", Location.X.ToString());
+			config.SetValue("UNARCHIVE", "LOCATIONY", Location.Y.ToString());
+            config.Save();
+            log.Logger(0, "Target terminated at X: " + config.GetValue("UNARCHIVE", "LOCATIONX") + "; Y: " + config.GetValue("UNARCHIVE", "LOCATIONY"));
 		}
 
 	}

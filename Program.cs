@@ -1,4 +1,4 @@
-using Ini;
+// using Ini;
 using SingleInstance;
 using System;
 using System.Windows.Forms;
@@ -13,8 +13,8 @@ namespace SMS_Search
 			Program.Params = args;
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			IniFile iniFile = new IniFile(".\\SMS Search.ini");
-			if (iniFile.IniReadValue("GENERAL", "MULTI_INSTANCE") == "1")
+			ConfigManager config = new ConfigManager(".\\SMS Search.json");
+			if (config.GetValue("GENERAL", "MULTI_INSTANCE") == "1")
 			{
 				Application.Run(new frmMain(Program.Params));
 				return;

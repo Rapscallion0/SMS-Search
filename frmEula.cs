@@ -1,4 +1,4 @@
-using Ini;
+// using Ini;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -15,8 +15,8 @@ namespace SMS_Search
 		private Label label1;
 		private Label label2;
 		private Panel panel1;
-		private static string ConfigFilePath = ".\\SMS Search.ini";
-		private IniFile ini = new IniFile(frmEula.ConfigFilePath);
+		private static string ConfigFilePath = ".\\SMS Search.json";
+		private ConfigManager config = new ConfigManager(frmEula.ConfigFilePath);
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing && components != null)
@@ -121,7 +121,8 @@ namespace SMS_Search
 		}
 		private void btnOk_Click(object sender, EventArgs e)
 		{
-            ini.IniWriteValue("GENERAL", "EULA", "1");
+            config.SetValue("GENERAL", "EULA", "1");
+            config.Save();
 			base.Close();
 		}
 		private void chkAgree_CheckedChanged(object sender, EventArgs e)
