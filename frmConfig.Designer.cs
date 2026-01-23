@@ -125,8 +125,6 @@ namespace SMS_Search
             this.tabCtlConfig = new System.Windows.Forms.TabControl();
             this.tabAdvanced = new System.Windows.Forms.TabPage();
             this.btnChkUpdate = new System.Windows.Forms.Button();
-            this.txtUpdateUrl = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.chkCheckUpdate = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.txtQryFct = new System.Windows.Forms.TextBox();
