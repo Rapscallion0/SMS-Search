@@ -112,11 +112,8 @@ namespace SMS_Search
 			{
 				SqlDataSourceEnumerator instance = SqlDataSourceEnumerator.Instance;
 				DataTable dataSources = instance.GetDataSources();
-				DataRow[] array3 = dataSources.Select("");
-				DataRow[] array4 = array3;
-				for (int j = 0; j < array4.Length; j++)
+				foreach (DataRow dataRow in dataSources.Rows)
 				{
-					DataRow dataRow = array4[j];
 					if (dataRow["InstanceName"] is string)
 					{
                         list.Add(dataRow["ServerName"] + "\\" + dataRow["InstanceName"]);
