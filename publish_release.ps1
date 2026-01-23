@@ -55,9 +55,18 @@ try {
     # Check if release already exists using gh CLI
     # We allow the error stream to go to null, we just care about the exit code.
     # Note: running an external command like gh inside PowerShell updates $LASTEXITCODE
-    gh release view $version 2>&1 | Out-Null
+    $releaseExists = $false
+    try {
+        gh release view $version 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            $releaseExists = $true
+        }
+    } catch {
+        # If gh release view fails, it usually means the release doesn't exist.
+        # We proceed to create it.
+    }
 
-    if ($LASTEXITCODE -eq 0) {
+    if ($releaseExists) {
         Write-Warning "Release $version already exists. Skipping creation."
         exit 0
     }
