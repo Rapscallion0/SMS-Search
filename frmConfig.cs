@@ -934,19 +934,33 @@ namespace SMS_Search
             }
         }
 
-        private void btnUnregister_Click(object sender, EventArgs e)
+        private async void btnUnregister_Click(object sender, EventArgs e)
         {
             try
             {
-                RemoveStartupShortcut();
-                KillLauncher();
-                DeleteLauncher();
+                Cursor = Cursors.WaitCursor;
+                lblLauncherStatus.Text = "Status: Unregistering...";
+                DrawStatusLight(Color.Orange);
+                btnRegister.Enabled = false;
+                btnUnregister.Enabled = false;
+
+                await Task.Run(() =>
+                {
+                    RemoveStartupShortcut();
+                    KillLauncher();
+                    DeleteLauncher();
+                });
+
                 MessageBox.Show("Launcher service unregistered and stopped.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                UpdateLauncherStatusUI();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error unregistering launcher: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                UpdateLauncherStatusUI();
+                Cursor = Cursors.Default;
             }
         }
 
@@ -995,13 +1009,24 @@ namespace SMS_Search
             string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
             if (File.Exists(targetPath))
             {
-                try
+                int retries = 5;
+                while (retries >= 0)
                 {
-                    File.Delete(targetPath);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Failed to delete launcher executable: " + ex.Message);
+                    try
+                    {
+                        File.Delete(targetPath);
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        bool isRetryable = ex is IOException || ex is UnauthorizedAccessException;
+                        if (retries == 0 || !isRetryable)
+                        {
+                            throw new Exception("Failed to delete launcher executable: " + ex.Message);
+                        }
+                        retries--;
+                        System.Threading.Thread.Sleep(200);
+                    }
                 }
             }
         }
@@ -1063,7 +1088,12 @@ namespace SMS_Search
                 Process[] processes = Process.GetProcessesByName(name);
                 foreach (Process p in processes)
                 {
-                    try { p.Kill(); } catch { }
+                    try
+                    {
+                        p.Kill();
+                        p.WaitForExit(5000);
+                    }
+                    catch { }
                 }
             }
         }
@@ -1084,11 +1114,15 @@ namespace SMS_Search
 
         private void DrawStatusLight(bool isGreen)
         {
+            DrawStatusLight(isGreen ? Color.Green : Color.Red);
+        }
+
+        private void DrawStatusLight(Color c)
+        {
             Bitmap bmp = new Bitmap(16, 16);
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                Color c = isGreen ? Color.Green : Color.Red;
                 using (Brush b = new SolidBrush(c))
                 {
                     g.FillEllipse(b, 1, 1, 14, 14);
