@@ -7,7 +7,7 @@ namespace DbConn
 {
 	public class dbConnector
 	{
-		public bool TestDbConn(string DbServer, string DbDatabase, bool DispError)
+		public bool TestDbConn(string DbServer, string DbDatabase, bool DispError, string dbUser = null, string dbPassword = null)
 		{
 			// Validate input
 			if (string.IsNullOrWhiteSpace(DbServer) || string.IsNullOrWhiteSpace(DbDatabase))
@@ -19,7 +19,16 @@ namespace DbConn
 				return false;
 			}
 
-			string connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
+			string connectionString;
+            if (!string.IsNullOrEmpty(dbUser))
+            {
+                connectionString = "Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase + ";User ID=" + dbUser + ";Password=" + dbPassword + ";Persist Security Info=False;";
+            }
+            else
+            {
+                connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
+            }
+
 			try
 			{
 				using (var sqlConnection = new SqlConnection(connectionString))
@@ -39,9 +48,18 @@ namespace DbConn
 			}
 		}
 
-        public async Task<bool> TestDbConnAsync(string DbServer, string DbDatabase)
+        public async Task<bool> TestDbConnAsync(string DbServer, string DbDatabase, string dbUser = null, string dbPassword = null)
         {
-            string connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
+            string connectionString;
+            if (!string.IsNullOrEmpty(dbUser))
+            {
+                connectionString = "Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase + ";User ID=" + dbUser + ";Password=" + dbPassword + ";Persist Security Info=False;";
+            }
+            else
+            {
+                connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
+            }
+
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
                 try
