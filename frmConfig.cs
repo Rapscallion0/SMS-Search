@@ -816,11 +816,28 @@ namespace SMS_Search
             string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
             try
             {
-                using (Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("SMS_Search.Resources.SMS Search Launcher.exe"))
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                string resourceName = "SMS_Search.Resources.SMS Search Launcher.exe";
+
+                // Diagnostic: Check if resource exists or find partial match
+                var resources = assembly.GetManifestResourceNames();
+                var foundResource = Array.Find(resources, r => r.EndsWith("SMS Search Launcher.exe", StringComparison.OrdinalIgnoreCase));
+
+                if (foundResource != null)
+                {
+                    resourceName = foundResource;
+                }
+                else
+                {
+                    string availableResources = string.Join(Environment.NewLine, resources);
+                    throw new Exception("Embedded launcher resource not found.\nAvailable resources:\n" + availableResources);
+                }
+
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
                 {
                     if (stream == null)
                     {
-                        throw new Exception("Embedded launcher resource not found.");
+                        throw new Exception("Embedded launcher resource stream is null for '" + resourceName + "'.");
                     }
                     using (FileStream fileStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
                     {
