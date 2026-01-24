@@ -130,7 +130,15 @@ namespace SMS_Search
 			if (DbNames.Count < 1)
 			{
                 cmbDbDatabase.Items.Clear();
-				string connectionString = "Data Source=" + cmbDbServer.Text + "; Integrated Security=True;";
+				string connectionString;
+                if (!chkWindowsAuth.Checked)
+                {
+                    connectionString = "Data Source=" + cmbDbServer.Text + ";User ID=" + txtDbUser.Text + ";Password=" + txtDbPassword.Text + ";";
+                }
+                else
+                {
+                    connectionString = "Data Source=" + cmbDbServer.Text + "; Integrated Security=True;";
+                }
 				try
 				{
                     Cursor = Cursors.WaitCursor;
@@ -199,7 +207,7 @@ namespace SMS_Search
 				base.Height = MaximumSize.Height;
 			}
             txtDbUser.Text = config.GetValue("CONNECTION", "SQLUSER");
-            txtDbPassword.Text = config.GetValue("CONNECTION", "SQLPASSWORD");
+            txtDbPassword.Text = Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 			if (config.GetValue("GENERAL", "DEBUG_LOG") == "1")
 			{
                 chkLogging.Checked = true;
@@ -443,7 +451,7 @@ namespace SMS_Search
 
 		private void btnOk_Click(object sender, EventArgs e)
 		{
-			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true))
+			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true, chkWindowsAuth.Checked ? null : txtDbUser.Text, chkWindowsAuth.Checked ? null : txtDbPassword.Text))
 			{
                 SaveEdits();
 				base.Close();
@@ -451,7 +459,7 @@ namespace SMS_Search
 		}
 		private void btnApplyConfig_Click(object sender, EventArgs e)
 		{
-			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true))
+			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true, chkWindowsAuth.Checked ? null : txtDbUser.Text, chkWindowsAuth.Checked ? null : txtDbPassword.Text))
 			{
                 SaveEdits();
 			}
@@ -471,14 +479,14 @@ namespace SMS_Search
 			if (chkWindowsAuth.Checked)
 			{
                 config.SetValue("CONNECTION", "WINDOWSAUTH", "1");
-                config.SetValue("CONNECTION", "SQLUSER", txtDbUser.Text);
-                config.SetValue("CONNECTION", "SQLPASSWORD", txtDbPassword.Text);
+                config.SetValue("CONNECTION", "SQLUSER", "");
+                config.SetValue("CONNECTION", "SQLPASSWORD", "");
 			}
 			else
 			{
                 config.SetValue("CONNECTION", "WINDOWSAUTH", "0");
-                config.SetValue("CONNECTION", "SQLUSER", "");
-                config.SetValue("CONNECTION", "SQLPASSWORD", "");
+                config.SetValue("CONNECTION", "SQLUSER", txtDbUser.Text);
+                config.SetValue("CONNECTION", "SQLPASSWORD", Utils.Encrypt(txtDbPassword.Text));
 			}
 			if (chkLogging.Checked)
 			{
@@ -710,7 +718,7 @@ namespace SMS_Search
 		}
 		private void btnTestConn_Click(object sender, EventArgs e)
 		{
-			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true))
+			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true, chkWindowsAuth.Checked ? null : txtDbUser.Text, chkWindowsAuth.Checked ? null : txtDbPassword.Text))
 			{
 				MessageBox.Show("Database connection passed.", "Test DB Connection", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 			}

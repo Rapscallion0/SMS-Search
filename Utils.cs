@@ -37,5 +37,39 @@ namespace SMS_Search
             frmToast toast = new frmToast(type, message, title, screen);
             toast.Show();
         }
+
+        public static string Encrypt(string sLine)
+        {
+            // Return an empty string for empty or null inputs
+            if (string.IsNullOrEmpty(sLine))
+                return "";
+
+            Encoding encoding = Encoding.GetEncoding("Windows-1252");
+
+            byte[] bytes = encoding.GetBytes(sLine);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = (byte)(~bytes[i]); // Apply bitwise NOT
+            }
+
+            // Prefix the result with '#' for non-empty inputs
+            return "#" + encoding.GetString(bytes);
+        }
+
+        public static string Decrypt(string sLine)
+        {
+            if (string.IsNullOrEmpty(sLine) || sLine[0] != '#')
+                return sLine;
+
+            Encoding encoding = Encoding.GetEncoding("Windows-1252");
+
+            byte[] bytes = encoding.GetBytes(sLine.Substring(1));
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = (byte)(~bytes[i]); // Apply bitwise NOT
+            }
+
+            return encoding.GetString(bytes);
+        }
     }
 }

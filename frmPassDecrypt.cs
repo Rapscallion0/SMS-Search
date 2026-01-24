@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -25,7 +25,7 @@ namespace SMS_Search
 
             // To be enabled once Encryption is figured out
             /*
-            txtEncrypted.Text = SmallEncrypt(txtDecrypted.Text);
+            txtEncrypted.Text = Utils.Encrypt(txtDecrypted.Text);
             
             if (txtEncrypted.Text != "")
             {
@@ -40,7 +40,7 @@ namespace SMS_Search
 
         private void btnDecrypt_Click(object sender, EventArgs e)
         {
-            txtDecrypted.Text = SmallDecrypt(txtEncrypted.Text);
+            txtDecrypted.Text = Utils.Decrypt(txtEncrypted.Text);
 
             if (txtDecrypted.Text != "")
             {
@@ -52,41 +52,6 @@ namespace SMS_Search
             }
             txtEncrypted.Focus();
         }
-
-        public static string SmallEncrypt(string sLine)
-        {
-            // Return an empty string for empty or null inputs
-            if (string.IsNullOrEmpty(sLine))
-                return "";
-
-            Encoding encoding = Encoding.GetEncoding("Windows-1252");
-
-            byte[] bytes = encoding.GetBytes(sLine);
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes[i] = (byte)(~bytes[i]); // Apply bitwise NOT
-            }
-
-            // Prefix the result with '#' for non-empty inputs
-            return "#" + encoding.GetString(bytes);
-        }
-
-        public static string SmallDecrypt(string sLine)
-        {
-            if (string.IsNullOrEmpty(sLine) || sLine[0] != '#')
-                return sLine;
-
-            Encoding encoding = Encoding.GetEncoding("Windows-1252");
-
-            byte[] bytes = encoding.GetBytes(sLine.Substring(1));
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes[i] = (byte)(~bytes[i]); // Apply bitwise NOT
-            }
-
-            return encoding.GetString(bytes);
-        }
-
 
         private void txtDecrypted_KeyDown(object sender, KeyEventArgs e)
         {

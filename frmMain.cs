@@ -95,7 +95,11 @@ namespace SMS_Search
                 CheckUpdateAsync();
             }
 
-            if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), false) || !File.Exists(frmMain.ConfigFilePath))
+            bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+            string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+            string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
+            if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), false, user, pass) || !File.Exists(frmMain.ConfigFilePath))
             {
                 frmConfig frmConfig = new frmConfig();
                 frmConfig.ShowDialog();
@@ -197,7 +201,16 @@ namespace SMS_Search
 
         public string GetConnString(string DbServer, string DbDatabase)
 		{
-			return "Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=" + DbDatabase + ";Data Source=" + DbServer;
+            if (config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH")))
+            {
+			    return "Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=" + DbDatabase + ";Data Source=" + DbServer;
+            }
+            else
+            {
+                string user = config.GetValue("CONNECTION", "SQLUSER");
+                string pass = Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+                return "Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase + ";User ID=" + user + ";Password=" + pass + ";Persist Security Info=False;";
+            }
 		}
 
         /// <summary>
@@ -224,8 +237,12 @@ namespace SMS_Search
 			string server = config.GetValue("CONNECTION", "SERVER");
 			string database = config.GetValue("CONNECTION", "DATABASE");
 
+            bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+            string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+            string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
 			// If connection test fails or config file missing, show config dialog
-			if (!dbConn.TestDbConn(server, database, true) || !File.Exists(frmMain.ConfigFilePath))
+			if (!dbConn.TestDbConn(server, database, true, user, pass) || !File.Exists(frmMain.ConfigFilePath))
 			{
 				using (var cfg = new frmConfig())
 				{
@@ -1159,7 +1176,11 @@ namespace SMS_Search
 				frmConfig.StartPosition = FormStartPosition.CenterParent;
 				frmConfig.ShowDialog();
 
-				if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), true) || !File.Exists(frmMain.ConfigFilePath))
+                bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+                string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
+				if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), true, user, pass) || !File.Exists(frmMain.ConfigFilePath))
 				{
 					//frmConfig frmConfig = new frmConfig();
 					frmConfig.ShowDialog();
@@ -1623,7 +1644,7 @@ namespace SMS_Search
                         case "getDbNames":
                             try
                             {
-                                string connectionString = "Data Source=" + tuple2.Item2 + "; Integrated Security=True;";
+                                string connectionString = GetConnString(tuple2.Item2, "master");
                                 using (SqlConnection sqlConnection = new SqlConnection(connectionString))
                                 {
                                     sqlConnection.Open();
