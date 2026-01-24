@@ -110,6 +110,9 @@ namespace SMS_Search
             Keys keyCode = keyData & ~Keys.Modifiers;
             if (keyCode == Keys.None) return false;
 
+            // Ensure the key itself is not a modifier key
+            if (keyCode == Keys.ControlKey || keyCode == Keys.ShiftKey || keyCode == Keys.Menu) return false;
+
             return true;
         }
 
