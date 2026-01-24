@@ -212,7 +212,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EmbedLauncher" BeforeTargets="CoreCompile">
+  <Target Name="EmbedLauncher" BeforeTargets="PrepareResources">
+    <Error Condition="!Exists('Launcher\bin\$(Configuration)\SMS Search Launcher.exe')" Text="Launcher executable not found at Launcher\bin\$(Configuration)\SMS Search Launcher.exe. Build Launcher project first." />
     <ItemGroup>
       <EmbeddedResource Include="Launcher\bin\$(Configuration)\SMS Search Launcher.exe">
         <LogicalName>SMS_Search.Resources.SMS Search Launcher.exe</LogicalName>
