@@ -52,7 +52,9 @@
       <Link>HotkeyUtils.cs</Link>
     </Compile>
     <Compile Include="AppSwitcher.cs" />
-    <Compile Include="HiddenWindow.cs" />
+    <Compile Include="HiddenWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="HotKeyManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -143,7 +143,7 @@ namespace SMS_Search
                 case Keys.OemCloseBrackets: return "]";
                 case Keys.Oem5: return "\\";
                 case Keys.OemMinus: return "-";
-                case Keys.OemPlus: return "=";
+                case Keys.Oemplus: return "=";
                 // Add more as needed
             }
 
