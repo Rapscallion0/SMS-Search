@@ -100,6 +100,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Launcher\Launcher.csproj">
+      <Project>{D8557993-9423-4240-81A1-E7227D6F4125}</Project>
+      <Name>Launcher</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="ConfigManager.cs" />
     <Compile Include="dbConnector.cs" />
     <Compile Include="frmConfig.Designer.cs">
@@ -205,6 +212,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EmbedLauncher" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <EmbeddedResource Include="Launcher\bin\$(Configuration)\SMS Search Launcher.exe">
+        <LogicalName>SMS_Search.Resources.SMS Search Launcher.exe</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+  </Target>
   <PropertyGroup>
     <PostBuildEvent>if "$(Configuration)" == "Release" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(MSBuildProjectDirectory)\publish_release.ps1" -AssemblyInfoPath "$(MSBuildProjectDirectory)\Properties\AssemblyInfo.cs" -ExePath "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
