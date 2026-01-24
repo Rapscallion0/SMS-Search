@@ -6,15 +6,15 @@ namespace SMS_Search_Launcher
 {
     public static class HotKeyManager
     {
-        [DllImport("user32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        [DllImport("user32.dll", EntryPoint = "RegisterHotKey")]
+        private static extern bool RegisterHotKeyInternal(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
-        [DllImport("user32.dll")]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        [DllImport("user32.dll", EntryPoint = "UnregisterHotKey")]
+        private static extern bool UnregisterHotKeyInternal(IntPtr hWnd, int id);
 
         public static void RegisterHotKey(IntPtr handle, int id, KeyModifiers modifiers, Keys key)
         {
-            if (!RegisterHotKey(handle, id, (uint)modifiers, (uint)key))
+            if (!RegisterHotKeyInternal(handle, id, (uint)modifiers, (uint)key))
             {
                 // Handle error if needed, or silent fail
             }
@@ -22,7 +22,7 @@ namespace SMS_Search_Launcher
 
         public static void UnregisterHotKey(IntPtr handle, int id)
         {
-            UnregisterHotKey(handle, id);
+            UnregisterHotKeyInternal(handle, id);
         }
 
         [Flags]
