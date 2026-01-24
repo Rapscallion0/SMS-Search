@@ -153,7 +153,9 @@ namespace SMS_Search
             this.btnRegister = new System.Windows.Forms.Button();
             this.btnUnregister = new System.Windows.Forms.Button();
             this.lblLauncherStatus = new System.Windows.Forms.Label();
+            this.pbLauncherStatus = new System.Windows.Forms.PictureBox();
             this.tabLauncher.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLauncherStatus)).BeginInit();
             this.SuspendLayout();
             // 
             // btnResetConfig
@@ -593,6 +595,7 @@ namespace SMS_Search
             // tabLauncher
             //
             this.tabLauncher.BackColor = System.Drawing.SystemColors.Control;
+            this.tabLauncher.Controls.Add(this.pbLauncherStatus);
             this.tabLauncher.Controls.Add(this.lblLauncherStatus);
             this.tabLauncher.Controls.Add(this.btnUnregister);
             this.tabLauncher.Controls.Add(this.btnRegister);
@@ -655,10 +658,18 @@ namespace SMS_Search
             // lblLauncherStatus
             //
             this.lblLauncherStatus.AutoSize = true;
-            this.lblLauncherStatus.Location = new System.Drawing.Point(19, 130);
+            this.lblLauncherStatus.Location = new System.Drawing.Point(40, 132);
             this.lblLauncherStatus.Name = "lblLauncherStatus";
             this.lblLauncherStatus.Size = new System.Drawing.Size(0, 13);
             this.lblLauncherStatus.TabIndex = 5;
+            //
+            // pbLauncherStatus
+            //
+            this.pbLauncherStatus.Location = new System.Drawing.Point(19, 130);
+            this.pbLauncherStatus.Name = "pbLauncherStatus";
+            this.pbLauncherStatus.Size = new System.Drawing.Size(16, 16);
+            this.pbLauncherStatus.TabIndex = 6;
+            this.pbLauncherStatus.TabStop = false;
             //
             // chkCheckUpdate
             // 
@@ -792,6 +803,7 @@ namespace SMS_Search
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).EndInit();
             this.tabLauncher.ResumeLayout(false);
             this.tabLauncher.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLauncherStatus)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -813,5 +825,6 @@ namespace SMS_Search
         private Button btnRegister;
         private Button btnUnregister;
         private Label lblLauncherStatus;
+        private PictureBox pbLauncherStatus;
     }
 }

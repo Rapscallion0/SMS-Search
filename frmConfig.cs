@@ -46,6 +46,7 @@ namespace SMS_Search
             txtHotkey.KeyUp += txtHotkey_KeyUp;
             txtHotkey.Leave += txtHotkey_Leave;
             loadConfig();
+            UpdateLauncherStatusUI();
 		}
 		private async void frmConfig_Shown(object sender, EventArgs e)
 		{
@@ -925,7 +926,7 @@ namespace SMS_Search
                 CreateStartupShortcut();
                 StartLauncher();
                 MessageBox.Show("Launcher service registered and started.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                lblLauncherStatus.Text = "Status: Registered and Running";
+                UpdateLauncherStatusUI();
             }
             catch (Exception ex)
             {
@@ -941,7 +942,7 @@ namespace SMS_Search
                 KillLauncher();
                 DeleteLauncher();
                 MessageBox.Show("Launcher service unregistered and stopped.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                lblLauncherStatus.Text = "Status: Unregistered and Stopped";
+                UpdateLauncherStatusUI();
             }
             catch (Exception ex)
             {
@@ -1078,6 +1079,54 @@ namespace SMS_Search
             {
                 KillLauncher();
                 StartLauncher();
+            }
+        }
+
+        private void DrawStatusLight(bool isGreen)
+        {
+            Bitmap bmp = new Bitmap(16, 16);
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                Color c = isGreen ? Color.Green : Color.Red;
+                using (Brush b = new SolidBrush(c))
+                {
+                    g.FillEllipse(b, 1, 1, 14, 14);
+                }
+            }
+            if (pbLauncherStatus.Image != null) pbLauncherStatus.Image.Dispose();
+            pbLauncherStatus.Image = bmp;
+        }
+
+        private void UpdateLauncherStatusUI()
+        {
+            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string shortcutPath = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
+            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
+
+            bool isRegistered = File.Exists(shortcutPath) && File.Exists(targetPath);
+
+            DrawStatusLight(isRegistered);
+
+            if (isRegistered)
+            {
+                 btnRegister.Enabled = false;
+                 btnUnregister.Enabled = true;
+
+                 if (IsLauncherRunning())
+                 {
+                      lblLauncherStatus.Text = "Status: Registered - Service Running";
+                 }
+                 else
+                 {
+                      lblLauncherStatus.Text = "Status: Registered - Service Stopped";
+                 }
+            }
+            else
+            {
+                 lblLauncherStatus.Text = "Status: Not Registered";
+                 btnRegister.Enabled = true;
+                 btnUnregister.Enabled = false;
             }
         }
     }
