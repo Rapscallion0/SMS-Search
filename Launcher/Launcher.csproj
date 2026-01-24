@@ -48,6 +48,9 @@
     <Compile Include="..\ConfigManager.cs">
       <Link>ConfigManager.cs</Link>
     </Compile>
+    <Compile Include="..\HotkeyUtils.cs">
+      <Link>HotkeyUtils.cs</Link>
+    </Compile>
     <Compile Include="AppSwitcher.cs" />
     <Compile Include="HiddenWindow.cs" />
     <Compile Include="HotKeyManager.cs" />

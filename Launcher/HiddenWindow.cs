@@ -39,8 +39,11 @@ namespace SMS_Search_Launcher
             {
                 try
                 {
-                    var keyData = (Keys)Enum.Parse(typeof(Keys), hotkeyStr);
-                    RegisterHotKeyFromKeys(keyData);
+                    var keyData = HotkeyUtils.Parse(hotkeyStr);
+                    if (keyData != Keys.None)
+                    {
+                        RegisterHotKeyFromKeys(keyData);
+                    }
                 }
                 catch
                 {
