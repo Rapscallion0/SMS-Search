@@ -917,20 +917,32 @@ namespace SMS_Search
             }
         }
 
-        private void btnRegister_Click(object sender, EventArgs e)
+        private async void btnRegister_Click(object sender, EventArgs e)
         {
             try
             {
-                KillLauncher();
-                ExtractLauncher();
-                CreateStartupShortcut();
-                StartLauncher();
-                MessageBox.Show("Launcher service registered and started.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                UpdateLauncherStatusUI();
+                Cursor = Cursors.WaitCursor;
+                lblLauncherStatus.Text = "Status: Registering...";
+                DrawStatusLight(Color.Orange);
+                btnRegister.Enabled = false;
+                btnUnregister.Enabled = false;
+
+                await Task.Run(() =>
+                {
+                    KillLauncher();
+                    ExtractLauncher();
+                    CreateStartupShortcut();
+                    StartLauncher();
+                });
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error registering launcher: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                UpdateLauncherStatusUI();
+                Cursor = Cursors.Default;
             }
         }
 
@@ -950,8 +962,6 @@ namespace SMS_Search
                     KillLauncher();
                     DeleteLauncher();
                 });
-
-                MessageBox.Show("Launcher service unregistered and stopped.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
