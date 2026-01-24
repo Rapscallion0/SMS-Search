@@ -35,7 +35,7 @@ namespace SMS_Search
         // Let's try removing my definition and use a hardcoded string or reference frmMain.ConfigFilePath.
 
         private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search.json"));
-        private const string LauncherExe = "Launcher.exe";
+        private const string LauncherExe = "SMS Search Launcher.exe";
 
 		public frmConfig()
 		{
@@ -782,6 +782,8 @@ namespace SMS_Search
         {
             try
             {
+                KillLauncher();
+                ExtractLauncher();
                 CreateStartupShortcut();
                 StartLauncher();
                 MessageBox.Show("Launcher service registered and started.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -799,12 +801,52 @@ namespace SMS_Search
             {
                 RemoveStartupShortcut();
                 KillLauncher();
+                DeleteLauncher();
                 MessageBox.Show("Launcher service unregistered and stopped.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 lblLauncherStatus.Text = "Status: Unregistered and Stopped";
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error unregistering launcher: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ExtractLauncher()
+        {
+            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
+            try
+            {
+                using (Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("SMS_Search.Resources.SMS Search Launcher.exe"))
+                {
+                    if (stream == null)
+                    {
+                        throw new Exception("Embedded launcher resource not found.");
+                    }
+                    using (FileStream fileStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+                    {
+                        stream.CopyTo(fileStream);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to extract launcher: " + ex.Message);
+            }
+        }
+
+        private void DeleteLauncher()
+        {
+            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
+            if (File.Exists(targetPath))
+            {
+                try
+                {
+                    File.Delete(targetPath);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Failed to delete launcher executable: " + ex.Message);
+                }
             }
         }
 
@@ -860,17 +902,19 @@ namespace SMS_Search
 
         private void KillLauncher()
         {
-            Process[] processes = Process.GetProcessesByName("Launcher");
-            foreach (Process p in processes)
+            foreach (var name in new[] { "Launcher", "SMS Search Launcher" })
             {
-                try { p.Kill(); } catch { }
+                Process[] processes = Process.GetProcessesByName(name);
+                foreach (Process p in processes)
+                {
+                    try { p.Kill(); } catch { }
+                }
             }
         }
 
         private bool IsLauncherRunning()
         {
-            Process[] processes = Process.GetProcessesByName("Launcher");
-            return processes.Length > 0;
+            return Process.GetProcessesByName("Launcher").Length > 0 || Process.GetProcessesByName("SMS Search Launcher").Length > 0;
         }
 
         private void ReloadLauncherIfRunning()
