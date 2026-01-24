@@ -35,6 +35,7 @@ namespace SMS_Search
         // Let's try removing my definition and use a hardcoded string or reference frmMain.ConfigFilePath.
 
         private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search.json"));
+        private const string LauncherExe = "Launcher.exe";
 
 		public frmConfig()
 		{
@@ -336,6 +337,7 @@ namespace SMS_Search
                 chkUnarchiveTarget.Checked = false;
             }
 
+            txtHotkey.Text = config.GetValue("LAUNCHER", "HOTKEY");
             LoadCleanSqlGrid(false);
 		}
 
@@ -592,7 +594,9 @@ namespace SMS_Search
             }
             config.SetValue("CLEAN_SQL", "Count", ruleCount.ToString());
 
+            config.SetValue("LAUNCHER", "HOTKEY", txtHotkey.Text);
             config.Save();
+            ReloadLauncherIfRunning();
 		}
 		private void btnCancel_Click(object sender, EventArgs e)
 		{
@@ -752,6 +756,130 @@ namespace SMS_Search
         private void btnTestToast_Click(object sender, EventArgs e)
         {
             Utils.showToast(0, "This is a test toast notification", "Test Toast");
+        }
+
+        private void txtHotkey_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.SuppressKeyPress = true; // Prevent default typing
+
+            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
+            {
+                txtHotkey.Text = "";
+                return;
+            }
+
+            // Ignorer modifier keys when pressed alone
+            if (e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.Menu)
+            {
+                return;
+            }
+
+            // Use KeyData which includes modifiers
+            txtHotkey.Text = e.KeyData.ToString();
+        }
+
+        private void btnRegister_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                CreateStartupShortcut();
+                StartLauncher();
+                MessageBox.Show("Launcher service registered and started.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                lblLauncherStatus.Text = "Status: Registered and Running";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error registering launcher: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnUnregister_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                RemoveStartupShortcut();
+                KillLauncher();
+                MessageBox.Show("Launcher service unregistered and stopped.", "Launcher", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                lblLauncherStatus.Text = "Status: Unregistered and Stopped";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error unregistering launcher: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CreateStartupShortcut()
+        {
+            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string shortcutPath = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
+            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
+
+            if (!File.Exists(targetPath))
+            {
+                throw new FileNotFoundException("Launcher executable not found at: " + targetPath);
+            }
+
+            // Create shortcut using PowerShell to avoid COM references
+            string script = String.Format("$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('{0}'); $Shortcut.TargetPath = '{1}'; $Shortcut.WorkingDirectory = '{2}'; $Shortcut.Save()",
+                shortcutPath, targetPath, Application.StartupPath);
+
+            ProcessStartInfo psi = new ProcessStartInfo();
+            psi.FileName = "powershell.exe";
+            psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"" + script + "\"";
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
+            psi.CreateNoWindow = true;
+            using (Process p = Process.Start(psi))
+            {
+                p.WaitForExit();
+            }
+        }
+
+        private void RemoveStartupShortcut()
+        {
+            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string shortcutPath = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
+
+            if (File.Exists(shortcutPath))
+            {
+                File.Delete(shortcutPath);
+            }
+        }
+
+        private void StartLauncher()
+        {
+            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
+            if (File.Exists(targetPath))
+            {
+                // Check if already running
+                if (!IsLauncherRunning())
+                {
+                    Process.Start(targetPath);
+                }
+            }
+        }
+
+        private void KillLauncher()
+        {
+            Process[] processes = Process.GetProcessesByName("Launcher");
+            foreach (Process p in processes)
+            {
+                try { p.Kill(); } catch { }
+            }
+        }
+
+        private bool IsLauncherRunning()
+        {
+            Process[] processes = Process.GetProcessesByName("Launcher");
+            return processes.Length > 0;
+        }
+
+        private void ReloadLauncherIfRunning()
+        {
+            if (IsLauncherRunning())
+            {
+                KillLauncher();
+                StartLauncher();
+            }
         }
     }
 }
