@@ -13,29 +13,23 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+
 namespace SMS_Search
 {
 	public partial class frmConfig : Form
 	{
-        // ConfigFilePath is likely already defined in Designer or another part of the partial class
-        // Changing access to utilize the existing one or remove if it duplicates logic.
-        // Assuming the error CS0102 means it's duplicated.
-        // Let's use the full path directly or rely on the other definition if accessible.
-        // Since I cannot see the other part, and typically ConfigFilePath is static on frmMain, let's reference frmMain.ConfigFilePath if needed or just define a local constant.
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
-        // However, looking at the code I injected, I added `private static string ConfigFilePath`.
-        // If the original code had it, I should use that.
-        // But `frmConfig.Designer.cs` usually doesn't have fields like that.
-        // It's possible `frmConfig.cs` (this file) had it before I edited? No, I see my edit added it.
-        // Ah, the error says "The type 'frmConfig' already contains a definition".
-
-        // Wait, did I declare it twice in my previous edit? No.
-        // Is it in the Designer? `frmConfig` usually just has controls.
-
-        // Let's try removing my definition and use a hardcoded string or reference frmMain.ConfigFilePath.
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search.json"));
         private const string LauncherExe = "SMS Search Launcher.exe";
+        private string _lastValidHotkey = "";
+        private string _currentValidHotkey = "";
+        private bool _isCurrentHotkeyValid = false;
 
 		public frmConfig()
 		{
@@ -49,6 +43,8 @@ namespace SMS_Search
 
 		private void frmConfig_Load(object sender, EventArgs e)
 		{
+            txtHotkey.KeyUp += txtHotkey_KeyUp;
+            txtHotkey.Leave += txtHotkey_Leave;
             loadConfig();
 		}
 		private async void frmConfig_Shown(object sender, EventArgs e)
@@ -337,7 +333,32 @@ namespace SMS_Search
                 chkUnarchiveTarget.Checked = false;
             }
 
-            txtHotkey.Text = config.GetValue("LAUNCHER", "HOTKEY");
+            // Load Hotkey
+            string savedHotkey = config.GetValue("LAUNCHER", "HOTKEY");
+            if (string.IsNullOrEmpty(savedHotkey))
+            {
+                // Default
+                Keys defaultKey = HotkeyUtils.GetDefaultHotkey();
+                _lastValidHotkey = HotkeyUtils.ToString(defaultKey);
+            }
+            else
+            {
+                // Parse potentially legacy format and standardize
+                Keys k = HotkeyUtils.Parse(savedHotkey);
+                if (k == Keys.None)
+                {
+                     Keys defaultKey = HotkeyUtils.GetDefaultHotkey();
+                     _lastValidHotkey = HotkeyUtils.ToString(defaultKey);
+                }
+                else
+                {
+                     _lastValidHotkey = HotkeyUtils.ToString(k);
+                }
+            }
+            txtHotkey.Text = _lastValidHotkey;
+            _currentValidHotkey = _lastValidHotkey;
+            _isCurrentHotkeyValid = true;
+
             LoadCleanSqlGrid(false);
 		}
 
@@ -594,7 +615,13 @@ namespace SMS_Search
             }
             config.SetValue("CLEAN_SQL", "Count", ruleCount.ToString());
 
-            config.SetValue("LAUNCHER", "HOTKEY", txtHotkey.Text);
+            // Save Hotkey (if valid)
+            if (_isCurrentHotkeyValid)
+            {
+                 config.SetValue("LAUNCHER", "HOTKEY", txtHotkey.Text);
+            }
+            // else ignore or save last valid? The UI shouldn't allow invalid state on OK.
+
             config.Save();
             ReloadLauncherIfRunning();
 		}
@@ -762,20 +789,131 @@ namespace SMS_Search
         {
             e.SuppressKeyPress = true; // Prevent default typing
 
+            // If user deletes, we might want to reset to empty or default?
+            // User requirement: "Do not allow an empty shortcut".
+            // So Delete/Back resets to default? Or does nothing?
+            // Let's make it reset to Default if they try to clear it.
             if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
-                txtHotkey.Text = "";
-                return;
+                 // Resetting to default behavior or just ignoring.
+                 // Let's reset to default.
+                 Keys def = HotkeyUtils.GetDefaultHotkey();
+                 txtHotkey.Text = HotkeyUtils.ToString(def);
+                 _currentValidHotkey = txtHotkey.Text;
+                 _isCurrentHotkeyValid = true;
+                 return;
             }
 
-            // Ignorer modifier keys when pressed alone
-            if (e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.Menu)
+            // Build visual shortcut
+            string hotkeyStr = HotkeyUtils.ToString(e.KeyData);
+            txtHotkey.Text = hotkeyStr;
+            txtHotkey.SelectionStart = txtHotkey.Text.Length;
+
+            // Validate
+            if (HotkeyUtils.IsValid(e.KeyData))
             {
-                return;
+                if (HotkeyUtils.IsStandard(e.KeyData))
+                {
+                    // Invalid (Standard)
+                    txtHotkey.BackColor = Color.MistyRose;
+                    _isCurrentHotkeyValid = false;
+                    toolTip1.SetToolTip(txtHotkey, "This shortcut is a standard system shortcut and cannot be used.");
+                }
+                else
+                {
+                    // Check availability
+                    if (CheckHotkeyAvailability(e.KeyData))
+                    {
+                        txtHotkey.BackColor = SystemColors.Window;
+                        _currentValidHotkey = hotkeyStr;
+                        _isCurrentHotkeyValid = true;
+                        toolTip1.SetToolTip(txtHotkey, "");
+                    }
+                    else
+                    {
+                        txtHotkey.BackColor = Color.MistyRose;
+                        _isCurrentHotkeyValid = false;
+                         toolTip1.SetToolTip(txtHotkey, "This shortcut is already in use by another application.");
+                    }
+                }
+            }
+            else
+            {
+                // Incomplete
+                txtHotkey.BackColor = SystemColors.Window;
+                _isCurrentHotkeyValid = false;
+            }
+        }
+
+        private void txtHotkey_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.None || (e.KeyData & Keys.Modifiers) == Keys.None)
+            {
+                // All keys released. If current text is not valid, revert.
+                if (!_isCurrentHotkeyValid)
+                {
+                    txtHotkey.Text = _lastValidHotkey;
+                    _currentValidHotkey = _lastValidHotkey;
+                    _isCurrentHotkeyValid = true;
+                    txtHotkey.BackColor = SystemColors.Window;
+                }
+                else
+                {
+                    // It was valid, store it as the new last valid
+                    _lastValidHotkey = _currentValidHotkey;
+                }
+            }
+        }
+
+        private void txtHotkey_Leave(object sender, EventArgs e)
+        {
+            // Ensure we leave with a valid hotkey
+             if (!_isCurrentHotkeyValid)
+            {
+                txtHotkey.Text = _lastValidHotkey;
+                _currentValidHotkey = _lastValidHotkey;
+                _isCurrentHotkeyValid = true;
+                txtHotkey.BackColor = SystemColors.Window;
+            }
+        }
+
+        private bool CheckHotkeyAvailability(Keys keyData)
+        {
+            // If the hotkey is the same as currently registered/running one, it IS available (to us).
+            // But we don't know the running one easily here without querying config, but we are editing config.
+            // If the user types the SAME hotkey as before, it is valid.
+            // If the launcher is running, it holds the hotkey.
+            // So if Launcher is running AND key matches saved config, return true.
+
+            string saved = config.GetValue("LAUNCHER", "HOTKEY");
+            if (!string.IsNullOrEmpty(saved))
+            {
+                Keys savedKey = HotkeyUtils.Parse(saved);
+                if (savedKey == keyData) return true;
             }
 
-            // Use KeyData which includes modifiers
-            txtHotkey.Text = e.KeyData.ToString();
+            // Try to register
+            // We need a unique ID. 0x9000
+            int id = 0x9000;
+            uint modifiers = 0;
+            if ((keyData & Keys.Control) == Keys.Control) modifiers |= 0x0002;
+            if ((keyData & Keys.Alt) == Keys.Alt) modifiers |= 0x0001;
+            if ((keyData & Keys.Shift) == Keys.Shift) modifiers |= 0x0004;
+            // Win key? Not supported by Keys usually, but HotKeyManager supports it.
+
+            uint vk = (uint)(keyData & ~Keys.Modifiers);
+
+            bool success = RegisterHotKey(this.Handle, id, modifiers, vk);
+            if (success)
+            {
+                UnregisterHotKey(this.Handle, id);
+                return true;
+            }
+            else
+            {
+                // Failed to register -> In use
+                return false;
+            }
         }
 
         private void btnRegister_Click(object sender, EventArgs e)
