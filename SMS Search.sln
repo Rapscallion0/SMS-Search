@@ -5,21 +5,48 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMS Search", "SMS Search.csproj", "{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "Launcher\Launcher.csproj", "{D8557993-9423-4240-81A1-E7227D6F4125}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Debug|x64.Build.0 = Debug|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Debug|x86.Build.0 = Debug|Any CPU
 		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Release|x64.ActiveCfg = Release|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Release|x64.Build.0 = Release|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Release|x86.ActiveCfg = Release|Any CPU
+		{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}.Release|x86.Build.0 = Release|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Debug|x64.Build.0 = Debug|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Debug|x86.Build.0 = Debug|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Release|x64.ActiveCfg = Release|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Release|x64.Build.0 = Release|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8557993-9423-4240-81A1-E7227D6F4125}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {04A8DF77-6EFE-41A4-8764-05D5C6DC1CA8}
 		BuildVersion_BuildAction = Both
 		BuildVersion_AssemblyInfoFilename = Properties\AssemblyInfo.cs
 		BuildVersion_StartDate = 2000/1/1
@@ -29,7 +56,6 @@ Global
 		BuildVersion_DetectChanges = True
 		BuildVersion_UpdateAssemblyVersion = True
 		BuildVersion_UpdateFileVersion = True
-		SolutionGuid = {04A8DF77-6EFE-41A4-8764-05D5C6DC1CA8}
 		BuildVersion_UseUniversalClock = True
 	EndGlobalSection
 EndGlobal

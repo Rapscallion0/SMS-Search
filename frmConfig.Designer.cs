@@ -146,6 +146,14 @@ namespace SMS_Search
             this.groupBox1.SuspendLayout();
             this.tabCleanSql.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).BeginInit();
+            this.tabLauncher = new System.Windows.Forms.TabPage();
+            this.lblLauncherInfo = new System.Windows.Forms.Label();
+            this.lblHotkey = new System.Windows.Forms.Label();
+            this.txtHotkey = new System.Windows.Forms.TextBox();
+            this.btnRegister = new System.Windows.Forms.Button();
+            this.btnUnregister = new System.Windows.Forms.Button();
+            this.lblLauncherStatus = new System.Windows.Forms.Label();
+            this.tabLauncher.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnResetConfig
@@ -491,6 +499,7 @@ namespace SMS_Search
             this.tabCtlConfig.Controls.Add(this.tabGeneral);
             this.tabCtlConfig.Controls.Add(this.tabAdvanced);
             this.tabCtlConfig.Controls.Add(this.tabCleanSql);
+            this.tabCtlConfig.Controls.Add(this.tabLauncher);
             this.tabCtlConfig.Location = new System.Drawing.Point(11, 145);
             this.tabCtlConfig.Name = "tabCtlConfig";
             this.tabCtlConfig.SelectedIndex = 0;
@@ -580,6 +589,76 @@ namespace SMS_Search
             this.btnTestToast.Text = "Test Toast";
             this.btnTestToast.UseVisualStyleBackColor = true;
             this.btnTestToast.Click += new System.EventHandler(this.btnTestToast_Click);
+            //
+            // tabLauncher
+            //
+            this.tabLauncher.BackColor = System.Drawing.SystemColors.Control;
+            this.tabLauncher.Controls.Add(this.lblLauncherStatus);
+            this.tabLauncher.Controls.Add(this.btnUnregister);
+            this.tabLauncher.Controls.Add(this.btnRegister);
+            this.tabLauncher.Controls.Add(this.txtHotkey);
+            this.tabLauncher.Controls.Add(this.lblHotkey);
+            this.tabLauncher.Controls.Add(this.lblLauncherInfo);
+            this.tabLauncher.Location = new System.Drawing.Point(4, 22);
+            this.tabLauncher.Name = "tabLauncher";
+            this.tabLauncher.Padding = new System.Windows.Forms.Padding(3);
+            this.tabLauncher.Size = new System.Drawing.Size(539, 227);
+            this.tabLauncher.TabIndex = 6;
+            this.tabLauncher.Text = "Launcher";
+            //
+            // lblLauncherInfo
+            //
+            this.lblLauncherInfo.AutoSize = true;
+            this.lblLauncherInfo.Location = new System.Drawing.Point(16, 16);
+            this.lblLauncherInfo.Name = "lblLauncherInfo";
+            this.lblLauncherInfo.Size = new System.Drawing.Size(400, 13);
+            this.lblLauncherInfo.TabIndex = 0;
+            this.lblLauncherInfo.Text = "Configure the hidden launcher service to switch to SMS Search via global hotkey.";
+            //
+            // lblHotkey
+            //
+            this.lblHotkey.AutoSize = true;
+            this.lblHotkey.Location = new System.Drawing.Point(16, 50);
+            this.lblHotkey.Name = "lblHotkey";
+            this.lblHotkey.Size = new System.Drawing.Size(44, 13);
+            this.lblHotkey.TabIndex = 1;
+            this.lblHotkey.Text = "Hotkey:";
+            //
+            // txtHotkey
+            //
+            this.txtHotkey.Location = new System.Drawing.Point(66, 47);
+            this.txtHotkey.Name = "txtHotkey";
+            this.txtHotkey.Size = new System.Drawing.Size(200, 20);
+            this.txtHotkey.TabIndex = 2;
+            this.txtHotkey.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtHotkey_KeyDown);
+            //
+            // btnRegister
+            //
+            this.btnRegister.Location = new System.Drawing.Point(19, 90);
+            this.btnRegister.Name = "btnRegister";
+            this.btnRegister.Size = new System.Drawing.Size(120, 23);
+            this.btnRegister.TabIndex = 3;
+            this.btnRegister.Text = "Register Service";
+            this.btnRegister.UseVisualStyleBackColor = true;
+            this.btnRegister.Click += new System.EventHandler(this.btnRegister_Click);
+            //
+            // btnUnregister
+            //
+            this.btnUnregister.Location = new System.Drawing.Point(150, 90);
+            this.btnUnregister.Name = "btnUnregister";
+            this.btnUnregister.Size = new System.Drawing.Size(120, 23);
+            this.btnUnregister.TabIndex = 4;
+            this.btnUnregister.Text = "Unregister Service";
+            this.btnUnregister.UseVisualStyleBackColor = true;
+            this.btnUnregister.Click += new System.EventHandler(this.btnUnregister_Click);
+            //
+            // lblLauncherStatus
+            //
+            this.lblLauncherStatus.AutoSize = true;
+            this.lblLauncherStatus.Location = new System.Drawing.Point(19, 130);
+            this.lblLauncherStatus.Name = "lblLauncherStatus";
+            this.lblLauncherStatus.Size = new System.Drawing.Size(0, 13);
+            this.lblLauncherStatus.TabIndex = 5;
             //
             // chkCheckUpdate
             // 
@@ -711,6 +790,8 @@ namespace SMS_Search
             this.groupBox1.PerformLayout();
             this.tabCleanSql.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).EndInit();
+            this.tabLauncher.ResumeLayout(false);
+            this.tabLauncher.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -725,5 +806,12 @@ namespace SMS_Search
         private DataGridViewTextBoxColumn colReplace;
         private Button btnResetCleanSql;
         private Button btnTestToast;
+        private TabPage tabLauncher;
+        private Label lblLauncherInfo;
+        private Label lblHotkey;
+        private TextBox txtHotkey;
+        private Button btnRegister;
+        private Button btnUnregister;
+        private Label lblLauncherStatus;
     }
 }
