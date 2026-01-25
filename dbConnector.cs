@@ -1,6 +1,7 @@
 using Log;
 using System;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -39,9 +40,11 @@ namespace DbConn
 			{
 				using (var sqlConnection = new SqlConnection(connectionString))
 				{
+                    Stopwatch sw = Stopwatch.StartNew();
 					sqlConnection.Open();
+                    sw.Stop();
+                    log.Logger(LogLevel.Info, $"TestDbConn: Connection successful ({sw.ElapsedMilliseconds}ms)");
 				}
-                log.Logger(LogLevel.Info, "TestDbConn: Connection successful");
 				return true;
 			}
 			catch (Exception ex)
@@ -78,8 +81,10 @@ namespace DbConn
                     {
                         throw new ArgumentException("Cannot connect to Database when a blank 'Server Name' or 'Database Name' is specified.");
                     }
+                    Stopwatch sw = Stopwatch.StartNew();
                     await sqlConnection.OpenAsync();
-                    log.Logger(LogLevel.Info, "TestDbConnAsync: Connection successful");
+                    sw.Stop();
+                    log.Logger(LogLevel.Info, $"TestDbConnAsync: Connection successful ({sw.ElapsedMilliseconds}ms)");
                     return true;
                 }
                 catch (Exception ex)
