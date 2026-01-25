@@ -31,6 +31,7 @@ namespace SMS_Search
         private string _lastValidHotkey = "";
         private string _currentValidHotkey = "";
         private bool _isCurrentHotkeyValid = false;
+        private bool _hasDbError = false;
         private Logfile log = new Logfile();
         private DataRepository _repo = new DataRepository();
 
@@ -50,9 +51,38 @@ namespace SMS_Search
             txtHotkey.KeyUp += txtHotkey_KeyUp;
             txtHotkey.Leave += txtHotkey_Leave;
             chkLogging.CheckedChanged += chkLogging_CheckedChanged;
+
+            // Validation wiring
+            this.Paint += frmConfig_Paint;
+            cmbDbDatabase.TextChanged += cmbDbDatabase_TextChanged;
+            cmbDbDatabase.SelectedIndexChanged += cmbDbDatabase_TextChanged;
+
             loadConfig();
             UpdateLauncherStatusUI();
 		}
+
+        private void frmConfig_Paint(object sender, PaintEventArgs e)
+        {
+            if (_hasDbError)
+            {
+                // Draw red border around cmbDbDatabase
+                Rectangle r = cmbDbDatabase.Bounds;
+                r.Inflate(2, 2);
+                using (Pen p = new Pen(Color.Red, 2))
+                {
+                    e.Graphics.DrawRectangle(p, r);
+                }
+            }
+        }
+
+        private void cmbDbDatabase_TextChanged(object sender, EventArgs e)
+        {
+            if (_hasDbError)
+            {
+                _hasDbError = false;
+                this.Invalidate(); // Trigger repaint to remove border
+            }
+        }
 
         private void chkLogging_CheckedChanged(object sender, EventArgs e)
         {
@@ -87,6 +117,11 @@ namespace SMS_Search
 
             if (this.IsDisposed || cmbDbServer.IsDisposed) return;
 
+            string currentServer = cmbDbServer.Text;
+
+            // Detach event to prevent unwanted triggering during binding update
+            cmbDbServer.TextChanged -= cmbDbServer_TextChanged;
+
             ServerNames.Clear();
             foreach (var server in servers)
             {
@@ -96,6 +131,18 @@ namespace SMS_Search
 
             cmbDbServer.DataSource = null;
             cmbDbServer.DataSource = ServerNames;
+
+            // Restore text
+            if (!string.IsNullOrEmpty(currentServer))
+            {
+                cmbDbServer.Text = currentServer;
+            }
+
+            // Re-attach
+            cmbDbServer.TextChanged += cmbDbServer_TextChanged;
+
+            // Ensure validation runs once with the final state
+            validateServer();
         }
 
 		private List<string> GetDbServersList(bool scanNetwork)
@@ -144,10 +191,12 @@ namespace SMS_Search
 		{
 			if (DbNames.Count < 1)
 			{
+                // Capture current selection to restore after loading
+                string currentDb = cmbDbDatabase.Text;
+
                 cmbDbDatabase.Items.Clear();
                 cmbDbDatabase.Items.Add("Loading...");
-                cmbDbDatabase.SelectedIndex = 0;
-                cmbDbDatabase.Enabled = false;
+                // Do not disable control or set index to 0 to preserve user interaction and text
 
                 string user = chkWindowsAuth.Checked ? null : txtDbUser.Text;
                 string pass = chkWindowsAuth.Checked ? null : txtDbPassword.Text;
@@ -158,10 +207,33 @@ namespace SMS_Search
                     var dbs = await _repo.GetDatabasesAsync(cmbDbServer.Text, user, pass);
 
                     cmbDbDatabase.Items.Clear();
+                    bool foundCurrent = false;
 					foreach (var db in dbs)
 					{
                         cmbDbDatabase.Items.Add(db);
+                        if (!string.IsNullOrEmpty(currentDb) && string.Equals(db, currentDb, StringComparison.OrdinalIgnoreCase))
+                        {
+                            foundCurrent = true;
+                        }
 					}
+
+                    // Restore selection or prompt
+                    if (foundCurrent)
+                    {
+                        cmbDbDatabase.Text = currentDb;
+                    }
+                    else if (!string.IsNullOrEmpty(currentDb) && currentDb != "Loading..." && currentDb != "Select a valid Server")
+                    {
+                        // User might have typed a custom DB or it's a legacy valid one not in list?
+                        // Or we should clear it if it's invalid?
+                        // If it is not in the list, it's likely invalid for this server, but let's leave it
+                        // if it's not one of our placeholder strings.
+                        cmbDbDatabase.Text = currentDb;
+                    }
+                    else
+                    {
+                         cmbDbDatabase.Text = "Select Database";
+                    }
 				}
 				catch (Exception ex)
 				{
@@ -171,7 +243,6 @@ namespace SMS_Search
 				finally
 				{
                     Cursor = Cursors.Default;
-                    cmbDbDatabase.Enabled = true;
 				}
 			}
             DbNames.Sort();
@@ -478,6 +549,8 @@ namespace SMS_Search
 
 		private void btnOk_Click(object sender, EventArgs e)
 		{
+            if (!ValidateDbSelection()) return;
+
 			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true, chkWindowsAuth.Checked ? null : txtDbUser.Text, chkWindowsAuth.Checked ? null : txtDbPassword.Text))
 			{
                 SaveEdits();
@@ -486,11 +559,29 @@ namespace SMS_Search
 		}
 		private void btnApplyConfig_Click(object sender, EventArgs e)
 		{
+            if (!ValidateDbSelection()) return;
+
 			if (dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true, chkWindowsAuth.Checked ? null : txtDbUser.Text, chkWindowsAuth.Checked ? null : txtDbPassword.Text))
 			{
                 SaveEdits();
 			}
 		}
+
+        private bool ValidateDbSelection()
+        {
+            string db = cmbDbDatabase.Text;
+            if (string.IsNullOrEmpty(db) ||
+                db == "Select Database" ||
+                db == "Loading..." ||
+                db == "Select a valid Server")
+            {
+                _hasDbError = true;
+                this.Invalidate();
+                MessageBox.Show("Please select a valid database.", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
+        }
 		private void SaveEdits()
 		{
 			if (chkScanNetwork.Checked)
