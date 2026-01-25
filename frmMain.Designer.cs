@@ -196,7 +196,6 @@ namespace SMS_Search
             this.bindingSourceTbl = new System.Windows.Forms.BindingSource(this.components);
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.chkToggleDesc = new System.Windows.Forms.CheckBox();
-            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -1097,10 +1096,6 @@ namespace SMS_Search
             this.chkToggleDesc.Text = "Show Desc.";
             this.chkToggleDesc.UseVisualStyleBackColor = true;
             this.chkToggleDesc.CheckedChanged += new System.EventHandler(this.chkToggleDesc_CheckedChanged);
-            // 
-            // backgroundWorker
-            // 
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
             // 
             // frmMain
             // 

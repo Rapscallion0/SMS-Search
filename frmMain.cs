@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -46,7 +47,6 @@ namespace SMS_Search
 
 		private List<ReplacementRule> _cleanSqlRules = new List<ReplacementRule>();
 
-		private BackgroundWorker backgroundWorker;
 		private int FormHeightMin = 275 + SystemInformation.FrameBorderSize.Height * 2;
 		private int FormHeightExpanded = 600;
 		private int FormWidthMin = 600 + SystemInformation.FrameBorderSize.Width * 2;
@@ -54,13 +54,12 @@ namespace SMS_Search
 		private bool minimize = true;
 		private bool keyPressHandled;
 		private Logfile log = new Logfile();
-		private SqlDataAdapter dataAdapter = new SqlDataAdapter();
 		private static string ConfigFilePath = Path.Combine(Application.StartupPath, "SMS Search.json");
 		private ConfigManager config = new ConfigManager(frmMain.ConfigFilePath);
 		private static UpdateChecker Versions = new UpdateChecker();
 		private dbConnector dbConn = new dbConnector();
-		private string FctFields = "";
-		private string TlzFields = "";
+        private DataRepository _repo = new DataRepository();
+        private QueryBuilder _queryBuilder;
 		private ArrayList arrayGrdFld = new ArrayList();
 		private ArrayList arrayGrdDesc = new ArrayList();
 
@@ -226,14 +225,53 @@ namespace SMS_Search
         /// <summary>
         /// 
         /// </summary>
-        private void PopulateTableList()
+        private async void PopulateTableList()
 		{
-			if (backgroundWorker.IsBusy) return;
 			string text = cmbTableFld.Text.ToString();
+            string server = tscmbDbServer.Text;
+            string database = tscmbDbDatabase.Text;
+
 			Cursor = Cursors.WaitCursor;
-            backgroundWorker.RunWorkerCompleted += PopulateTableList_RunWorkerCompleted;
-            backgroundWorker.RunWorkerAsync(new Tuple<string, string, string, string>("PopulateTableList", tscmbDbServer.Text, tscmbDbDatabase.Text, text));
-			setTabTextFocus();
+
+            try
+            {
+                bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+                string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
+                var tables = await _repo.GetTablesAsync(server, database, user, pass);
+
+                DataTable dt = new DataTable();
+                dt.Columns.Add("NAME");
+                foreach (var t in tables) dt.Rows.Add(t);
+
+                bindingSourceTbl.DataSource = dt;
+                cmbTableFld.DataSource = bindingSourceTbl;
+                cmbTableFld.DisplayMember = "NAME";
+                cmbTableFld.ValueMember = "NAME";
+
+                int num = cmbTableFld.FindString(text);
+                if (num != -1)
+                {
+                    cmbTableFld.Text = text;
+                }
+                else
+                {
+                    if (cmbTableFld.Items.Count > 0) cmbTableFld.SelectedIndex = 0;
+                }
+                log.Logger(LogLevel.Info, $"PopulateTableList: Loaded {tables.Count()} tables");
+            }
+            catch (Exception ex)
+            {
+                log.Logger(LogLevel.Error, "PopulateTableList: error - " + ex.Message);
+                // MessageBox.Show(ex.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                // Suppress error message box during auto-populate? The original code showed it.
+            }
+            finally
+            {
+			    setTabTextFocus();
+                Cursor = Cursors.Default;
+            }
 		}
 
         /// <summary>
@@ -321,23 +359,9 @@ namespace SMS_Search
 				chkToggleDesc.Checked = false;
 			}
 
-			if (config.GetValue("QUERY", "FUNCTION") == "")
-			{
-				FctFields = "F1063, F1064, F1051, F1050, F1081";
-			}
-			else
-			{
-				FctFields = config.GetValue("QUERY", "FUNCTION");
-			}
-
-			if (config.GetValue("QUERY", "TOTALIZER") == "")
-			{
-				TlzFields = "F1034, F1039, F1128, F1129, F1179, F1253, F1710, F1131, F1048, F1709";
-			}
-			else
-			{
-				TlzFields = config.GetValue("QUERY", "TOTALIZER");
-			}
+            string fctFields = config.GetValue("QUERY", "FUNCTION");
+            string tlzFields = config.GetValue("QUERY", "TOTALIZER");
+            _queryBuilder = new QueryBuilder(fctFields, tlzFields);
 
             LoadCleanSqlRules();
 
@@ -402,7 +426,11 @@ namespace SMS_Search
             string server = tscmbDbServer.Text;
             string database = tscmbDbDatabase.Text;
 
-			bool SQLConnected = await dbConn.TestDbConnAsync(server, database);
+            bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+            string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+            string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
+			bool SQLConnected = await _repo.TestConnectionAsync(server, database, user, pass);
 			arrayGrdDesc.Clear();
 			arrayGrdDesc.TrimToSize();
 			arrayGrdFld.Clear();
@@ -412,50 +440,31 @@ namespace SMS_Search
 
 			if (SQLConnected)
 			{
-				string text = CompileSqlSelect();
+                var criteria = GetSearchCriteriaFromUI();
+                var queryResult = _queryBuilder.Build(criteria);
+
 				bool SQLError = false;
 				dGrd.DataSource = bindingSource;
-                DataTable dataTable = new DataTable();
-                dataTable.Locale = CultureInfo.InvariantCulture;
                 Stopwatch sw = Stopwatch.StartNew();
+                int rowCount = 0;
 
 				try
 				{
-                    string connString = GetConnString(server, database);
-
-                    await Task.Run(() =>
-                    {
-					    dataAdapter = new SqlDataAdapter(text, connString);
-					    new SqlCommandBuilder(dataAdapter);
-					    dataAdapter.Fill(dataTable);
-                    });
+                    var dataTable = await _repo.ExecuteQueryAsync(server, database, user, pass, queryResult.Sql, queryResult.Parameters);
                     sw.Stop();
-
+                    rowCount = dataTable.Rows.Count;
 					bindingSource.DataSource = dataTable;
-                    log.LogSql(text, sw.ElapsedMilliseconds, dataTable.Rows.Count, true);
+                    log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, rowCount, true);
 				}
 				catch (Exception ex)
 				{
                     sw.Stop();
-                    // Unwrap AggregateException if present, though Task.Run with await usually throws the inner exception.
-                    Exception inner = ex;
-                    if (ex is AggregateException ae) inner = ae.InnerException;
-
-                    if (inner is SqlException sqlEx)
-                    {
-					    SQLError = true;
-					    MessageBox.Show(sqlEx.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                        log.LogSql(text, sw.ElapsedMilliseconds, 0, false, sqlEx.Message);
-                    }
-                    else
-                    {
-                        log.LogSql(text, sw.ElapsedMilliseconds, 0, false, inner.Message);
-                        throw;
-                    }
+				    SQLError = true;
+				    MessageBox.Show(ex.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                    log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, 0, false, ex.Message);
 				}
 				finally
 				{
-					dataAdapter.Dispose();
 					dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 					if (dGrd.RowCount > 0 && !SQLError)
 					{
@@ -488,288 +497,54 @@ namespace SMS_Search
 			Cursor = Cursors.Default;
 		}
 
-        #region Compile SQL Select
-        /// <summary>
-        /// Compile SQL select from parameters provided
-        /// </summary>
-        /// <returns>SQL Select</returns>
-		private string CompileSqlSelect()
-		{
-			string sqlConditionOperator = " = ";
-			string tabName;
-			string sqlResult;
-			if ((tabName = tabCtl.SelectedTab.Name) != null)
-			{
-				if (!(tabName == "tabFct"))
-				{
-					if (!(tabName == "tabTlz"))
-					{
-						if (tabName == "tabFields")
-						{
-                            string fldSelect = "SELECT \r\n\tCOL.name AS 'Field', \r\n\tRBF.F1454 AS 'Description', \r\n\tTAB.name AS 'Table', \r\n\tREPLACE (RBF.F1458,'dt','') AS 'Type', \r\n\t(CASE WHEN PKEY.COLUMN_NAME IS NOT NULL THEN '1' ELSE '0' END) AS 'Key', \r\n\tCOL.max_length AS 'Size', \r\n\tCOL.scale AS 'Dec', \r\n\t(CASE WHEN COL.is_nullable = 0 THEN 1 ELSE 0 END) AS 'Required', \r\n\tTAB.create_date AS 'Created' \r\nFROM sys.columns COL \r\nJOIN sys.tables TAB ON \r\n\tCOL.object_id = TAB.object_id \r\nJOIN RB_FIELDS RBF ON \r\n\tCOL.name = RBF.F1453 AND\r\n\tRBF.F1452 = TAB.name_ADDED_JOIN_\r\nLEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKEY ON \r\n\tPKEY.COLUMN_NAME = COL.name AND \r\n\tTAB.name=PKEY.TABLE_NAME";
-							string sqlOrderBy = " \r\nGROUP BY \r\n\tCOL.name, \r\n\tRBF.F1454, \r\n\tTAB.name, \r\n\tRBF.F1458, \r\n\tpkey.COLUMN_NAME, \r\n\tCOL.max_length, \r\n\tCOL.scale, \r\n\tCOL.is_nullable, \r\n\tTAB.create_date";
-							sqlResult = fldSelect; 
-							if (rdbNumFld.Checked && txtNumFld.Text != "")
-							{
-								string FldNumber;
-								if (txtNumFld.Text.Contains("*") || txtNumFld.Text.Contains("?"))
-								{
-									FldNumber = txtNumFld.Text.Replace("*", "%");
-									FldNumber = FldNumber.Replace("?", "_");
-									sqlConditionOperator = " LIKE ";
-								}
-								else
-								{
-									FldNumber = txtNumFld.Text;
-								}
-								FldNumber = "F" + FldNumber;
-								sqlResult = string.Concat(new string[]
-								{
-									sqlResult,
-									" \r\nWHERE col.name",
-									sqlConditionOperator,
-									"'",
-									FldNumber,
-									"'",
-									sqlOrderBy,
-									" \r\nORDER BY \r\n\tTAB.name"
-								});
-								sqlResult = sqlResult.Replace("_ADDED_JOIN_", "");
-								sqlResult = sqlResult.Replace("_CONDITION_", sqlConditionOperator);
-								sqlResult = sqlResult.Replace("_SEARCH_TABLE_", FldNumber);
-								return sqlResult;
-							}
-							if (rdbDescFld.Checked && txtDescFld.Text != "")
-							{
-								string FldDescriptor;
-								if (txtDescFld.Text.Contains("*") || txtDescFld.Text.Contains("?"))
-								{
-									FldDescriptor = txtDescFld.Text.Replace("*", "%");
-									FldDescriptor = FldDescriptor.Replace("?", "_");
-									sqlConditionOperator = " LIKE ";
-								}
-								else
-								{
-									FldDescriptor = txtDescFld.Text;
-								}
-								if (chkSearchAnyFld.Checked)
-								{
-									FldDescriptor = "%" + FldDescriptor + "%";
-									sqlConditionOperator = " LIKE ";
-								}
-								sqlResult = string.Concat(new string[]
-								{
-									sqlResult,
-									" WHERE RBF.F1454",
-									sqlConditionOperator,
-									"'",
-									FldDescriptor,
-									"'",
-									sqlOrderBy,
-									" \r\nORDER BY \r\n\tCAST(SUBSTRING(COL.name,2,255) AS INT), \r\n\tTAB.name"
-								});
-								sqlResult = sqlResult.Replace("_ADDED_JOIN_", "");
-								sqlResult = sqlResult.Replace("_CONDITION_", sqlConditionOperator);
-								sqlResult = sqlResult.Replace("_SEARCH_TABLE_", FldDescriptor);
-								return sqlResult;
-							}
-							if (rdbTableFld.Checked && cmbTableFld.Text != "")
-							{
-								string FldTable;
-								if (cmbTableFld.Text.Contains("*") || cmbTableFld.Text.Contains("?"))
-								{
-									FldTable = cmbTableFld.Text.Replace("*", "%");
-									FldTable = FldTable.Replace("?", "_");
-									sqlConditionOperator = " LIKE ";
-								}
-								else
-								{
-									FldTable = cmbTableFld.Text;
-								}
-								if (rdbShowFields.Checked)
-								{
-									sqlResult = string.Concat(new string[]
-									{
-										sqlResult,
-										" WHERE TAB.name",
-										sqlConditionOperator,
-										"'",
-										FldTable,
-										"' ",
-										sqlOrderBy,
-										" \r\nORDER BY \r\n\tCAST(SUBSTRING(COL.name,2,255) AS INT)"
-									});
-                                    sqlResult = sqlResult.Replace("AND\r\n\tRBF.F1452 = TAB.name_ADDED_JOIN_", "AND \r\n\tRBF.F1452 _CONDITION_ '_SEARCH_TABLE_'");
-									sqlResult = sqlResult.Replace("_CONDITION_", sqlConditionOperator);
-									sqlResult = sqlResult.Replace("_SEARCH_TABLE_", FldTable);
-									return sqlResult;
-								}
-								sqlResult = "SELECT * FROM " + cmbTableFld.Text;
-								if (chkLastTransaction.Checked && chkLastTransaction.Visible)
-								{
-									sqlResult = sqlResult + " WHERE F1032 = (SELECT DISTINCT TOP 1 F1032 FROM " + cmbTableFld.Text + " ORDER BY F1032 DESC)";
-									return sqlResult;
-								}
-								return sqlResult;
-							}
-							else
-							{
-								if (!rdbCustSqlFld.Checked || !(txtCustSqlFld.Text != ""))
-								{
-									return sqlResult;
-								}
-								if (txtCustSqlFld.SelectedText != "")
-								{
-									sqlResult = txtCustSqlFld.SelectedText;
-									return sqlResult;
-								}
-								sqlResult = txtCustSqlFld.Text;
-								return sqlResult;
-							}
-						}
-					}
-					else
-					{
-						sqlResult = "Select " + TlzFields + " FROM TLZ_TAB";
-						if (rdbNumTlz.Checked && txtNumTlz.Text != "")
-						{
-							string TlzNumber;
-							if (txtNumTlz.Text.Contains("*") || txtNumTlz.Text.Contains("?"))
-							{
-								TlzNumber = txtNumTlz.Text.Replace("*", "%");
-								TlzNumber = TlzNumber.Replace("?", "_");
-								sqlConditionOperator = " LIKE ";
-							}
-							else
-							{
-								TlzNumber = txtNumTlz.Text;
-							}
-							sqlResult = string.Concat(new string[]
-							{
-								sqlResult,
-								" WHERE F1034",
-								sqlConditionOperator,
-								"'",
-								TlzNumber,
-								"'"
-							});
-							return sqlResult;
-						}
-						if (rdbDescTlz.Checked && txtDescTlz.Text != "")
-						{
-							string TLZDescriptor;
-							if (txtDescTlz.Text.Contains("*") || txtDescTlz.Text.Contains("?"))
-							{
-								TLZDescriptor = txtDescTlz.Text.Replace("*", "%");
-								TLZDescriptor = TLZDescriptor.Replace("?", "_");
-								sqlConditionOperator = " LIKE ";
-							}
-							else
-							{
-								TLZDescriptor = txtDescTlz.Text;
-							}
-							if (chkSearchAnyTlz.Checked)
-							{
-								TLZDescriptor = "%" + TLZDescriptor + "%";
-							 sqlConditionOperator = " LIKE ";
-							}
-							sqlResult = string.Concat(new string[]
-							{
-								sqlResult,
-								" WHERE F1039",
-								sqlConditionOperator,
-								"'",
-								TLZDescriptor,
-								"'"
-							});
-							return sqlResult;
-						}
-						if (!rdbCustSqlTlz.Checked || !(txtCustSqlTlz.Text != ""))
-						{
-							return sqlResult;
-						}
-						if (txtCustSqlTlz.SelectedText != "")
-						{
-							sqlResult = txtCustSqlTlz.SelectedText;
-							return sqlResult;
-						}
-						sqlResult = txtCustSqlTlz.Text;
-						return sqlResult;
-					}
-				}
-				else
-				{
-					sqlResult = "Select " + FctFields + " FROM FCT_TAB";
-					if (rdbNumFct.Checked && txtNumFct.Text != "")
-					{
-						string FctNumber;
-						if (txtNumFct.Text.Contains("*") || txtNumFct.Text.Contains("?"))
-						{
-							FctNumber = txtNumFct.Text.Replace("*", "%");
-							FctNumber = FctNumber.Replace("?", "_");
-						 sqlConditionOperator = " LIKE ";
-						}
-						else
-						{
-							FctNumber = txtNumFct.Text;
-						}
-						sqlResult = string.Concat(new string[]
-						{
-							sqlResult,
-							" WHERE F1063",
-							sqlConditionOperator,
-							"'",
-							FctNumber,
-							"'"
-						});
-						return sqlResult;
-					}
-					if (rdbDescFct.Checked && txtDescFct.Text != "")
-					{
-						string FctDescriptor;
-						if (txtDescFct.Text.Contains("*") || txtDescFct.Text.Contains("?"))
-						{
-							FctDescriptor = txtDescFct.Text.Replace("*", "%");
-							FctDescriptor = FctDescriptor.Replace("?", "_");
-							sqlConditionOperator = " LIKE ";
-						}
-						else
-						{
-							FctDescriptor = txtDescFct.Text;
-						}
-						if (chkSearchAnyFct.Checked)
-						{
-							FctDescriptor = "%" + FctDescriptor + "%";
-							sqlConditionOperator = " LIKE ";
-						}
-						sqlResult = string.Concat(new string[]
-						{
-							sqlResult,
-							" WHERE F1064",
-							sqlConditionOperator,
-							"'",
-							FctDescriptor,
-							"'"
-						});
-						return sqlResult;
-					}
-					if (!rdbCustSqlFct.Checked || !(txtCustSqlFct.Text != ""))
-					{
-						return sqlResult;
-					}
-					if (txtCustSqlFct.SelectedText != "")
-					{
-						sqlResult = txtCustSqlFct.SelectedText;
-						return sqlResult;
-					}
-					sqlResult = txtCustSqlFct.Text;
-					return sqlResult;
-				}
-			}
-			sqlResult = "SELECT * FROM SYS_TAB";
-			return sqlResult;
-		}
-        #endregion
+        private SearchCriteria GetSearchCriteriaFromUI()
+        {
+            var criteria = new SearchCriteria();
+            string tabName = tabCtl.SelectedTab.Name;
+
+            if (tabName == "tabFct")
+            {
+                criteria.Mode = SearchMode.Function;
+                if (rdbNumFct.Checked) { criteria.Type = SearchType.Number; criteria.Value = txtNumFct.Text; }
+                else if (rdbDescFct.Checked) { criteria.Type = SearchType.Description; criteria.Value = txtDescFct.Text; criteria.AnyMatch = chkSearchAnyFct.Checked; }
+                else if (rdbCustSqlFct.Checked) { criteria.Type = SearchType.CustomSql; criteria.Value = !string.IsNullOrEmpty(txtCustSqlFct.SelectedText) ? txtCustSqlFct.SelectedText : txtCustSqlFct.Text; }
+            }
+            else if (tabName == "tabTlz")
+            {
+                criteria.Mode = SearchMode.Totalizer;
+                if (rdbNumTlz.Checked) { criteria.Type = SearchType.Number; criteria.Value = txtNumTlz.Text; }
+                else if (rdbDescTlz.Checked) { criteria.Type = SearchType.Description; criteria.Value = txtDescTlz.Text; criteria.AnyMatch = chkSearchAnyTlz.Checked; }
+                else if (rdbCustSqlTlz.Checked) { criteria.Type = SearchType.CustomSql; criteria.Value = !string.IsNullOrEmpty(txtCustSqlTlz.SelectedText) ? txtCustSqlTlz.SelectedText : txtCustSqlTlz.Text; }
+            }
+            else if (tabName == "tabFields")
+            {
+                criteria.Mode = SearchMode.Field;
+                if (rdbNumFld.Checked) { criteria.Type = SearchType.Number; criteria.Value = txtNumFld.Text; }
+                else if (rdbDescFld.Checked) { criteria.Type = SearchType.Description; criteria.Value = txtDescFld.Text; criteria.AnyMatch = chkSearchAnyFld.Checked; }
+                else if (rdbTableFld.Checked)
+                {
+                    criteria.Type = SearchType.Table;
+                    criteria.Value = cmbTableFld.Text;
+                    criteria.ShowFields = rdbShowFields.Checked;
+                    criteria.LastTransaction = chkLastTransaction.Checked && chkLastTransaction.Visible;
+                }
+                else if (rdbCustSqlFld.Checked) { criteria.Type = SearchType.CustomSql; criteria.Value = !string.IsNullOrEmpty(txtCustSqlFld.SelectedText) ? txtCustSqlFld.SelectedText : txtCustSqlFld.Text; }
+            }
+
+            return criteria;
+        }
+
+        private string GetInterpolatedSql(QueryResult query)
+        {
+            // Simple helper to visualize SQL for the Build buttons
+            string sql = query.Sql;
+            foreach (var name in query.Parameters.ParameterNames)
+            {
+                var val = query.Parameters.Get<object>(name);
+                sql = sql.Replace("@" + name, $"'{val}'"); // Very basic interpolation for display only
+            }
+            return sql;
+        }
 
         #region Radio Button Control and Focus
         private void txtDescFct_Enter(object sender, EventArgs e)
@@ -944,22 +719,25 @@ namespace SMS_Search
         #region Build query buttons
         private void btnBuildQryFct_Click(object sender, EventArgs e)
 		{
-			string text = CompileSqlSelect();
-			txtCustSqlFct.Text = text;
+            var criteria = GetSearchCriteriaFromUI();
+            var res = _queryBuilder.Build(criteria);
+			txtCustSqlFct.Text = GetInterpolatedSql(res);
 			setTabTextFocus();
 		}
 
 		private void btnBuildQryTlz_Click(object sender, EventArgs e)
 		{
-			string text = CompileSqlSelect();
-			txtCustSqlTlz.Text = text;
+            var criteria = GetSearchCriteriaFromUI();
+            var res = _queryBuilder.Build(criteria);
+			txtCustSqlTlz.Text = GetInterpolatedSql(res);
 			setTabTextFocus();
 		}
 
 		private void btnBuildQryFld_Click(object sender, EventArgs e)
 		{
-			string text = CompileSqlSelect();
-			txtCustSqlFld.Text = text;
+            var criteria = GetSearchCriteriaFromUI();
+            var res = _queryBuilder.Build(criteria);
+			txtCustSqlFld.Text = GetInterpolatedSql(res);
 			setTabTextFocus();
 		}
         #endregion
@@ -1203,119 +981,45 @@ namespace SMS_Search
 			}
 		}
 
-		private void setColumnArray()
-		{
-			List<string> headers = new List<string>();
-			foreach (DataGridViewColumn col in dGrd.Columns)
-			{
-				if (col.HeaderText != null)
-				{
-					headers.Add(col.HeaderText);
-				}
-			}
-
-			Dictionary<string, string> descriptions = new Dictionary<string, string>();
-
-			if (headers.Count > 0)
-			{
-				HashSet<string> uniqueHeaders = new HashSet<string>(headers);
-				StringBuilder sb = new StringBuilder();
-				sb.Append("SELECT F1453, F1454 FROM RB_FIELDS WHERE F1453 IN (");
-				bool first = true;
-				foreach (string h in uniqueHeaders)
-				{
-					if (!first) sb.Append(",");
-					sb.Append("'");
-					sb.Append(h.Replace("'", "''"));
-					sb.Append("'");
-					first = false;
-				}
-				sb.Append(")");
-
-				try
-				{
-					using (SqlConnection sqlConnection = new SqlConnection(GetConnString(tscmbDbServer.Text, tscmbDbDatabase.Text)))
-					{
-						using (SqlCommand sqlCommand = new SqlCommand(sb.ToString(), sqlConnection))
-						{
-							sqlConnection.Open();
-							using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-							{
-								while (sqlDataReader.Read())
-								{
-									string key = sqlDataReader["F1453"].ToString();
-									string val = sqlDataReader["F1454"].ToString();
-									if (!descriptions.ContainsKey(key))
-									{
-										descriptions[key] = val;
-									}
-								}
-							}
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					log.Logger(LogLevel.Error, "Error in setColumnArray: " + ex.Message);
-				}
-			}
-
-			foreach (DataGridViewColumn dataGridViewColumn in dGrd.Columns)
-			{
-				string value = "";
-				if (dataGridViewColumn.HeaderText != null && descriptions.ContainsKey(dataGridViewColumn.HeaderText))
-				{
-					value = descriptions[dataGridViewColumn.HeaderText];
-				}
-				arrayGrdFld.Add(dataGridViewColumn.Name);
-				arrayGrdDesc.Add(value);
-			}
-		}
 
         private async Task setColumnArrayAsync()
 		{
             var columns = new List<string>();
             foreach (DataGridViewColumn col in dGrd.Columns)
             {
-                columns.Add(col.HeaderText);
+                if (col.HeaderText != null) columns.Add(col.HeaderText);
             }
 
-            var connString = GetConnString(tscmbDbServer.Text, tscmbDbDatabase.Text);
+            arrayGrdFld.Clear();
+            arrayGrdDesc.Clear();
 
-            // Fetch all descriptions in background
-            var results = await Task.Run(() =>
+            string server = tscmbDbServer.Text;
+            string database = tscmbDbDatabase.Text;
+            bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+            string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+            string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
+            try
             {
-                var descList = new List<string>();
-                using (var sqlConnection = new SqlConnection(connString))
-                {
-                    sqlConnection.Open();
-                    foreach (var headerText in columns)
+                var descriptions = await _repo.GetColumnDescriptionsAsync(server, database, user, pass, columns);
+
+			    foreach (DataGridViewColumn dataGridViewColumn in dGrd.Columns)
+			    {
+				    arrayGrdFld.Add(dataGridViewColumn.Name);
+                    if (dataGridViewColumn.Index < descriptions.Count)
                     {
-                        string cmdText = "Select top(1) F1454 from RB_FIELDS where F1453 = @headerText";
-                        string value = "";
-
-                        using(var sqlCommand = new SqlCommand(cmdText, sqlConnection))
-                        {
-                            sqlCommand.Parameters.AddWithValue("@headerText", headerText);
-                            using(var reader = sqlCommand.ExecuteReader())
-                            {
-                                if (reader.Read())
-                                {
-                                    value = reader[0].ToString();
-                                }
-                            }
-                        }
-                        descList.Add(value);
+				        arrayGrdDesc.Add(descriptions[dataGridViewColumn.Index]);
                     }
-                }
-                return descList;
-            });
-
-			foreach (DataGridViewColumn dataGridViewColumn in dGrd.Columns)
-			{
-				arrayGrdFld.Add(dataGridViewColumn.Name);
-				arrayGrdDesc.Add(results[dataGridViewColumn.Index]);
-			}
+                    else
+                    {
+                        arrayGrdDesc.Add("");
+                    }
+			    }
+            }
+            catch (Exception ex)
+            {
+                log.Logger(LogLevel.Error, "setColumnArrayAsync error: " + ex.Message);
+            }
 		}
 
 		private void setHeaders()
@@ -1434,13 +1138,35 @@ namespace SMS_Search
 			PopulateTableList();
 		}
 
-		private void getDbNames()
+		private async void getDbNames()
 		{
-			if (backgroundWorker.IsBusy) return;
 			tscmbDbDatabase.Items.Clear();
 			Cursor = Cursors.WaitCursor;
-            backgroundWorker.RunWorkerCompleted += getDbNames_RunWorkerCompleted;
-            backgroundWorker.RunWorkerAsync(new Tuple<string, string>("getDbNames", tscmbDbServer.Text));
+
+            string server = tscmbDbServer.Text;
+
+            try
+            {
+                bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+                string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
+                var dbs = await _repo.GetDatabasesAsync(server, user, pass);
+                foreach(var db in dbs)
+                {
+                    tscmbDbDatabase.Items.Add(db);
+                }
+                log.Logger(LogLevel.Info, $"getDbNames: Loaded {dbs.Count()} databases");
+            }
+            catch (Exception ex)
+            {
+                 log.Logger(LogLevel.Error, "getDbNames error: " + ex.Message);
+                 MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
 		}
 
 		private string CleanSql(string toClean)
@@ -1613,161 +1339,6 @@ namespace SMS_Search
 		{
 			Activate();
 		}
-
-		private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-		{
-            log.Logger(LogLevel.Info, "backgroundWorker_DoWork: start");
-            try
-            {
-                if (e.Argument is Tuple<string, string, string, string> tuple4)
-                {
-                    log.Logger(LogLevel.Info, $"backgroundWorker_DoWork: action='{tuple4.Item1}' server='{tuple4.Item2}' database='{tuple4.Item3}' tableLike='{tuple4.Item4}'");
-                    switch (tuple4.Item1)
-                    {
-                        case "PopulateTableList":
-                            string selectCommandText = "SELECT NAME FROM sys.tables ORDER BY NAME";
-                            Stopwatch swTbl = Stopwatch.StartNew();
-                            try
-                            {
-                                dataAdapter = new SqlDataAdapter(selectCommandText, GetConnString(tuple4.Item2, tuple4.Item3));
-                                DataTable dataTable = new DataTable();
-                                dataTable.Locale = CultureInfo.InvariantCulture;
-                                dataTable.Clear();
-                                dataAdapter.Fill(dataTable);
-                                swTbl.Stop();
-
-                                e.Result = new Tuple<DataTable, string>(dataTable, tuple4.Item4);
-                                log.LogSql(selectCommandText, swTbl.ElapsedMilliseconds, dataTable.Rows.Count, true);
-                            }
-                            catch (Exception ex)
-                            {
-                                swTbl.Stop();
-                                e.Result = ex;
-                                log.LogSql(selectCommandText, swTbl.ElapsedMilliseconds, 0, false, ex.Message);
-                            }
-                            finally
-                            {
-                                dataAdapter.Dispose();
-                            }
-                            break;
-                    }
-                }
-                else if (e.Argument is Tuple<string, string> tuple2)
-                {
-                    log.Logger(LogLevel.Info, $"backgroundWorker_DoWork: action='{tuple2.Item1}' server='{tuple2.Item2}'");
-                    switch (tuple2.Item1)
-                    {
-                        case "getDbNames":
-                            Stopwatch swDb = Stopwatch.StartNew();
-                            try
-                            {
-                                string connectionString = GetConnString(tuple2.Item2, "master");
-                                using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-                                {
-                                    sqlConnection.Open();
-                                    DataTable schema = sqlConnection.GetSchema("Databases");
-                                    sqlConnection.Close();
-                                    swDb.Stop();
-                                    e.Result = schema;
-                                    log.LogSql("GetSchema(\"Databases\")", swDb.ElapsedMilliseconds, schema.Rows.Count, true);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                swDb.Stop();
-                                e.Result = ex;
-                                log.LogSql("GetSchema(\"Databases\")", swDb.ElapsedMilliseconds, 0, false, ex.Message);
-                            }
-                            break;
-                    }
-                }
-                else
-                {
-                    Thread.Sleep(1000);
-                    log.Logger(LogLevel.Info, "backgroundWorker_DoWork: no recognized argument");
-                }
-            }
-            catch (Exception ex)
-            {
-                e.Result = ex;
-                log.Logger(LogLevel.Error, "backgroundWorker_DoWork: unexpected error - " + ex.Message);
-            }
-            finally
-            {
-                log.Logger(LogLevel.Info, "backgroundWorker_DoWork: end");
-            }
-		}
-
-        private void getDbNames_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            log.Logger(LogLevel.Info, "getDbNames_RunWorkerCompleted: start");
-            try
-            {
-                if (e.Result is Exception ex)
-                {
-                    log.Logger(LogLevel.Error, "getDbNames_RunWorkerCompleted: error - " + ex.Message);
-                    MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                }
-                else if (e.Result is DataTable dt)
-                {
-                    log.Logger(LogLevel.Info, $"getDbNames_RunWorkerCompleted: received {dt.Rows.Count} databases");
-                    foreach (DataRow dataRow in dt.Rows)
-                    {
-                        tscmbDbDatabase.Items.Add(dataRow["database_name"]);
-                    }
-                }
-            }
-            catch (Exception ex2)
-            {
-                log.Logger(LogLevel.Error, "getDbNames_RunWorkerCompleted: exception - " + ex2.Message);
-            }
-            finally
-            {
-                backgroundWorker.RunWorkerCompleted -= getDbNames_RunWorkerCompleted;
-                Cursor = Cursors.Default;
-                log.Logger(LogLevel.Info, "getDbNames_RunWorkerCompleted: end");
-            }
-        }
-
-        private void PopulateTableList_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            log.Logger(LogLevel.Info, "PopulateTableList_RunWorkerCompleted: start");
-            try
-            {
-                if (e.Result is Exception ex)
-                {
-                    log.Logger(LogLevel.Error, "PopulateTableList_RunWorkerCompleted: error - " + ex.Message);
-                    MessageBox.Show(ex.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                }
-                else if (e.Result is Tuple<DataTable, string> tuple)
-                {
-                    log.Logger(LogLevel.Info, $"PopulateTableList_RunWorkerCompleted: received {tuple.Item1.Rows.Count} tables, requested selection '{tuple.Item2}'");
-                    bindingSourceTbl.DataSource = tuple.Item1;
-                    cmbTableFld.DataSource = bindingSourceTbl;
-                    cmbTableFld.DisplayMember = "NAME";
-                    cmbTableFld.ValueMember = "NAME";
-                    int num = cmbTableFld.FindString(tuple.Item2);
-                    if (num != -1)
-                    {
-                        cmbTableFld.Text = tuple.Item2;
-                    }
-                    else
-                    {
-                        cmbTableFld.SelectedIndex = 0;
-                    }
-                }
-            }
-            catch (Exception ex2)
-            {
-                log.Logger(LogLevel.Error, "PopulateTableList_RunWorkerCompleted: exception - " + ex2.Message);
-            }
-            finally
-            {
-                backgroundWorker.RunWorkerCompleted -= PopulateTableList_RunWorkerCompleted;
-                Cursor = Cursors.Default;
-                log.Logger(LogLevel.Info, "PopulateTableList_RunWorkerCompleted: end");
-            }
-        }
 
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
 		{
