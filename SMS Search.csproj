@@ -5,6 +5,7 @@
     <TargetFramework>net48</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <ApplicationIcon>SMS Search.ico</ApplicationIcon>
     <RootNamespace>SMS_Search</RootNamespace>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
@@ -38,10 +39,10 @@
   </ItemGroup>
 
   <Target Name="EmbedLauncher" BeforeTargets="BeforeBuild">
-    <Message Text="Embedding SMS Search Launcher from Launcher\bin\$(Configuration)\net48\SMS Search Launcher.exe" Importance="high" />
-    <Error Condition="!Exists('Launcher\bin\$(Configuration)\net48\SMS Search Launcher.exe')" Text="Launcher executable not found at Launcher\bin\$(Configuration)\net48\SMS Search Launcher.exe. Build Launcher project first." />
+    <Message Text="Embedding SMS Search Launcher from Launcher\bin\$(Configuration)\SMS Search Launcher.exe" Importance="high" />
+    <Error Condition="!Exists('Launcher\bin\$(Configuration)\SMS Search Launcher.exe')" Text="Launcher executable not found at Launcher\bin\$(Configuration)\SMS Search Launcher.exe. Build Launcher project first." />
     <ItemGroup>
-      <EmbeddedResource Include="Launcher\bin\$(Configuration)\net48\SMS Search Launcher.exe">
+      <EmbeddedResource Include="Launcher\bin\$(Configuration)\SMS Search Launcher.exe">
         <LogicalName>SMS_Search.Resources.SMS Search Launcher.exe</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
