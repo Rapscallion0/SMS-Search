@@ -1,7 +1,9 @@
 using SMS_Search;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace Log
@@ -16,34 +18,83 @@ namespace Log
 
 	public class Logfile
 	{
-		public void Logger(LogLevel level, string message)
-		{
-			string configPath = Path.Combine(Application.StartupPath, "SMS Search.json");
-			ConfigManager config = new ConfigManager(configPath);
-			if (config.GetValue("GENERAL", "DEBUG_LOG") == "1")
-			{
-                // Determine configured level
+        private static readonly object _lock = new object();
+        private bool _isConfigLoaded = false;
+        private bool _debugLogEnabled = false;
+        private LogLevel _configuredLogLevel = LogLevel.Info;
+        private string _source = "App";
+        private int _retentionDays = 14;
+
+        public Logfile(string source = "App")
+        {
+            _source = source;
+        }
+
+        public void ReloadConfig()
+        {
+            try
+            {
+                string configPath = Path.Combine(Application.StartupPath, "SMS Search.json");
+                ConfigManager config = new ConfigManager(configPath);
+
+                _debugLogEnabled = config.GetValue("GENERAL", "DEBUG_LOG") == "1";
+
                 string configLevelStr = config.GetValue("GENERAL", "LOG_LEVEL");
-                LogLevel configLevel = LogLevel.Info; // Default
+                _configuredLogLevel = LogLevel.Info; // Default
                 if (!string.IsNullOrEmpty(configLevelStr))
                 {
                     try
                     {
-                        configLevel = (LogLevel)Enum.Parse(typeof(LogLevel), configLevelStr, true);
+                        _configuredLogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), configLevelStr, true);
                     }
                     catch { }
                 }
 
-                // Check if we should log (Lower value = Higher importance)
-                if ((int)level <= (int)configLevel)
+                string retentionStr = config.GetValue("GENERAL", "LOG_RETENTION");
+                if (!int.TryParse(retentionStr, out _retentionDays))
                 {
-				    string arg = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
-				    string arg2 = Application.StartupPath.ToString();
+                    _retentionDays = 14;
+                }
 
+                _isConfigLoaded = true;
+            }
+            catch
+            {
+                // Fallback defaults
+                _debugLogEnabled = false;
+                _configuredLogLevel = LogLevel.Info;
+                _retentionDays = 14;
+            }
+        }
+
+		public void Logger(LogLevel level, string message)
+		{
+            if (!_isConfigLoaded)
+            {
+                ReloadConfig();
+            }
+
+            // Always log Errors, or if Debug Log is enabled and level is within range
+            if (level == LogLevel.Error || (_debugLogEnabled && (int)level <= (int)_configuredLogLevel))
+            {
+                string dateStr = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+                string startupPath = Application.StartupPath;
+                string logFilePath = Path.Combine(startupPath, string.Format("SMS_Search_{0}.log", dateStr));
+
+                lock (_lock)
+                {
                     try
                     {
-                        using (StreamWriter streamWriter = File.AppendText(string.Format("{0}\\SMS_Search_{1}.log", arg2, arg)))
+                        bool isNewFile = !File.Exists(logFilePath);
+
+                        using (StreamWriter streamWriter = File.AppendText(logFilePath))
                         {
+                            if (isNewFile)
+                            {
+                                WriteLogHeader(streamWriter);
+                            }
+
+                            string sourceTag = string.IsNullOrEmpty(_source) ? "" : "[" + _source + "] ";
                             streamWriter.WriteLine(string.Concat(new object[]
                             {
                                 "ts=\"",
@@ -51,6 +102,7 @@ namespace Log
                                 "\" lvl=\"",
                                 level.ToString().ToUpper(),
                                 "\" msg=\"",
+                                sourceTag,
                                 message,
                                 "\" "
                             }));
@@ -62,8 +114,53 @@ namespace Log
                         // If logging fails (e.g. file locked), we swallow it to prevent crashing the app
                     }
                 }
-			}
+            }
 		}
+
+        private void WriteLogHeader(StreamWriter writer)
+        {
+            try
+            {
+                writer.WriteLine(new string('=', 50));
+                writer.WriteLine("SMS Search Log File");
+                writer.WriteLine("Date: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                writer.WriteLine("Version: " + Application.ProductVersion);
+                writer.WriteLine("Machine: " + Environment.MachineName);
+                writer.WriteLine("User: " + Environment.UserName);
+                writer.WriteLine(new string('-', 50));
+                writer.WriteLine("Configuration Snapshot:");
+
+                string configPath = Path.Combine(Application.StartupPath, "SMS Search.json");
+                ConfigManager config = new ConfigManager(configPath);
+                var rawConfig = config.GetRawConfig();
+
+                foreach (var section in rawConfig)
+                {
+                    writer.WriteLine($"[{section.Key}]");
+                    foreach (var kvp in section.Value)
+                    {
+                        string val = kvp.Value;
+                        // Obfuscate potential passwords
+                        if (kvp.Key.ToUpper().Contains("PASSWORD") || kvp.Key.ToUpper().Contains("PWD"))
+                        {
+                            val = "********";
+                        }
+                        writer.WriteLine($"{kvp.Key}={val}");
+                    }
+                }
+                writer.WriteLine(new string('=', 50));
+            }
+            catch (Exception ex)
+            {
+                writer.WriteLine("Failed to write header: " + ex.Message);
+            }
+        }
+
+        public void CleanupLogs()
+        {
+            if (!_isConfigLoaded) ReloadConfig();
+            CleanupLogs(_retentionDays);
+        }
 
         public void CleanupLogs(int retentionDays)
         {

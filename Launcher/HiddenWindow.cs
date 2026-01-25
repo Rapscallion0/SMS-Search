@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using System.IO;
 using SMS_Search; // For ConfigManager
+using Log;
 
 namespace SMS_Search_Launcher
 {
@@ -10,6 +11,7 @@ namespace SMS_Search_Launcher
         private const int WM_HOTKEY = 0x0312;
         private const int HOTKEY_ID = 1;
         private ConfigManager _config;
+        private Logfile log = new Logfile("Launcher");
 
         public HiddenWindow()
         {
@@ -43,12 +45,21 @@ namespace SMS_Search_Launcher
                     if (keyData != Keys.None)
                     {
                         RegisterHotKeyFromKeys(keyData);
+                        log.Logger(LogLevel.Info, "Hotkey registered: " + hotkeyStr);
+                    }
+                    else
+                    {
+                         log.Logger(LogLevel.Warning, "Parsed hotkey is None for: " + hotkeyStr);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Invalid config, ignore
+                    log.Logger(LogLevel.Error, "Error parsing hotkey config: " + ex.Message);
                 }
+            }
+            else
+            {
+                log.Logger(LogLevel.Warning, "No hotkey configured in LAUNCHER section");
             }
         }
 
@@ -73,6 +84,7 @@ namespace SMS_Search_Launcher
         {
             if (m.Msg == WM_HOTKEY && m.WParam.ToInt32() == HOTKEY_ID)
             {
+                log.Logger(LogLevel.Info, "Hotkey triggered");
                 AppSwitcher.SwitchToOrStartApp();
             }
             base.WndProc(ref m);
@@ -80,6 +92,7 @@ namespace SMS_Search_Launcher
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            log.Logger(LogLevel.Info, "Unregistering hotkey and closing hidden window");
             HotKeyManager.UnregisterHotKey(this.Handle, HOTKEY_ID);
             base.OnFormClosing(e);
         }

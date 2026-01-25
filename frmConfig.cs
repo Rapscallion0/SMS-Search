@@ -1,5 +1,6 @@
 using DbConn;
 // using Ini;
+using Log;
 using Microsoft.Win32;
 using System;
 using System.Collections;
@@ -30,6 +31,7 @@ namespace SMS_Search
         private string _lastValidHotkey = "";
         private string _currentValidHotkey = "";
         private bool _isCurrentHotkeyValid = false;
+        private Logfile log = new Logfile();
 
 		public frmConfig()
 		{
@@ -43,6 +45,7 @@ namespace SMS_Search
 
 		private void frmConfig_Load(object sender, EventArgs e)
 		{
+            log.Logger(LogLevel.Info, "Configuration window opened");
             txtHotkey.KeyUp += txtHotkey_KeyUp;
             txtHotkey.Leave += txtHotkey_Leave;
             chkLogging.CheckedChanged += chkLogging_CheckedChanged;
@@ -400,6 +403,7 @@ namespace SMS_Search
         {
             if (MessageBox.Show("Are you sure you want to reset the Clean SQL rules to defaults?", "Reset Defaults", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
+                log.Logger(LogLevel.Info, "Resetting Clean SQL rules to default");
                 LoadCleanSqlGrid(true);
             }
         }
@@ -661,6 +665,8 @@ namespace SMS_Search
             // else ignore or save last valid? The UI shouldn't allow invalid state on OK.
 
             config.Save();
+            log.ReloadConfig();
+            log.Logger(LogLevel.Info, "Configuration saved");
             ReloadLauncherIfRunning();
 		}
 		private void btnCancel_Click(object sender, EventArgs e)
@@ -680,6 +686,7 @@ namespace SMS_Search
 		}
 		private void btnInstallArch_Click(object sender, EventArgs e)
 		{
+            log.Logger(LogLevel.Info, "Attempting to install UnArchiver context menu");
 			RegistryKey registryKey = null;
 			RegistryKey registryKey2 = null;
 			bool flag = true;
@@ -698,6 +705,7 @@ namespace SMS_Search
 			}
 			catch (Exception ex)
 			{
+                log.Logger(LogLevel.Error, "Install UnArchiver failed: " + ex.Message);
 				MessageBox.Show(ex.Message.ToString(), "Install UnArchiver", MessageBoxButtons.OK, MessageBoxIcon.Hand);
 				flag = false;
 			}
@@ -714,11 +722,13 @@ namespace SMS_Search
 			}
 			if (flag)
 			{
+                log.Logger(LogLevel.Info, "UnArchiver installed successfully");
 				MessageBox.Show("UnArchiver Installed successfully", "Install UnArchiver", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 			}
 		}
 		private void btnRemoveArch_Click(object sender, EventArgs e)
 		{
+            log.Logger(LogLevel.Info, "Attempting to remove UnArchiver context menu");
 			bool flag = true;
 			try
 			{
@@ -737,11 +747,13 @@ namespace SMS_Search
 			}
 			catch (Exception ex)
 			{
+                log.Logger(LogLevel.Error, "Remove UnArchiver failed: " + ex.Message);
 				MessageBox.Show(ex.Message.ToString(), "Uninstall UnArchiver", MessageBoxButtons.OK, MessageBoxIcon.Hand);
 				flag = false;
 			}
 			if (flag)
 			{
+                log.Logger(LogLevel.Info, "UnArchiver uninstalled successfully");
 				MessageBox.Show("UnArchiver uninstalled successfully", "Uninstall UnArchiver", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 			}
 		}
@@ -958,6 +970,7 @@ namespace SMS_Search
         {
             try
             {
+                log.Logger(LogLevel.Info, "Registering Launcher service");
                 Cursor = Cursors.WaitCursor;
                 lblLauncherStatus.Text = "Status: Registering...";
                 DrawStatusLight(Color.Orange);
@@ -974,6 +987,7 @@ namespace SMS_Search
             }
             catch (Exception ex)
             {
+                log.Logger(LogLevel.Error, "Error registering launcher: " + ex.Message);
                 MessageBox.Show("Error registering launcher: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -987,6 +1001,7 @@ namespace SMS_Search
         {
             try
             {
+                log.Logger(LogLevel.Info, "Unregistering Launcher service");
                 Cursor = Cursors.WaitCursor;
                 lblLauncherStatus.Text = "Status: Unregistering...";
                 DrawStatusLight(Color.Orange);
@@ -1002,6 +1017,7 @@ namespace SMS_Search
             }
             catch (Exception ex)
             {
+                log.Logger(LogLevel.Error, "Error unregistering launcher: " + ex.Message);
                 MessageBox.Show("Error unregistering launcher: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -1013,6 +1029,7 @@ namespace SMS_Search
 
         private void ExtractLauncher()
         {
+            log.Logger(LogLevel.Info, "Extracting Launcher executable");
             string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
             try
             {
@@ -1053,6 +1070,7 @@ namespace SMS_Search
 
         private void DeleteLauncher()
         {
+            log.Logger(LogLevel.Info, "Deleting Launcher executable");
             string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
             if (File.Exists(targetPath))
             {
@@ -1080,6 +1098,7 @@ namespace SMS_Search
 
         private void CreateStartupShortcut()
         {
+            log.Logger(LogLevel.Info, "Creating Startup shortcut");
             string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
             string shortcutPath = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
             string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
@@ -1106,6 +1125,7 @@ namespace SMS_Search
 
         private void RemoveStartupShortcut()
         {
+            log.Logger(LogLevel.Info, "Removing Startup shortcut");
             string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
             string shortcutPath = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
 
@@ -1123,6 +1143,7 @@ namespace SMS_Search
                 // Check if already running
                 if (!IsLauncherRunning())
                 {
+                    log.Logger(LogLevel.Info, "Starting Launcher");
                     Process.Start(targetPath);
                 }
             }
@@ -1137,6 +1158,7 @@ namespace SMS_Search
                 {
                     try
                     {
+                        log.Logger(LogLevel.Info, "Killing process: " + name);
                         p.Kill();
                         p.WaitForExit(5000);
                     }
