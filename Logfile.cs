@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using Serilog;
-using Serilog.Formatting.Compact;
+using Serilog.Formatting.Json;
 using Serilog.Events;
 
 namespace Log
@@ -107,13 +107,13 @@ namespace Log
                         }
                     }
 
-                    string logPath = Path.Combine(Application.StartupPath, "SMS_Search_.log");
+                    string logPath = Path.Combine(Application.StartupPath, "SMS_Search_.log.json");
 
                     _logger = new LoggerConfiguration()
                         .MinimumLevel.Is(minimumLevel)
                         .Enrich.FromLogContext()
                         .WriteTo.File(
-                            new CompactJsonFormatter(),
+                            new JsonFormatter(renderMessage: true),
                             logPath,
                             rollingInterval: RollingInterval.Day,
                             retainedFileCountLimit: retentionDays,

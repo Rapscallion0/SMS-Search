@@ -35,20 +35,20 @@ namespace SMS_Search
             }
             catch (Exception ex)
             {
-                log.Logger(LogLevel.Error, "Fatal Error in Main: " + ex.ToString());
+                log.Logger(LogLevel.Critical, "Fatal Error in Main: " + ex.ToString());
                 MessageBox.Show("A fatal error occurred. Check logs for details.\n" + ex.Message, "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 		}
 
         static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
-            log.Logger(LogLevel.Error, "Unhandled Thread Exception: " + e.Exception.ToString());
+            log.Logger(LogLevel.Critical, "Unhandled Thread Exception: " + e.Exception.ToString());
             MessageBox.Show("An unexpected error occurred. \n" + e.Exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            log.Logger(LogLevel.Error, "Unhandled Domain Exception: " + (e.ExceptionObject as Exception).ToString());
+            log.Logger(LogLevel.Critical, "Unhandled Domain Exception: " + (e.ExceptionObject as Exception).ToString());
             MessageBox.Show("A fatal error occurred. \n" + (e.ExceptionObject as Exception).Message, "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 	}

@@ -754,6 +754,7 @@ namespace SMS_Search
             this.cmbLogLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbLogLevel.FormattingEnabled = true;
             this.cmbLogLevel.Items.AddRange(new object[] {
+            "Critical",
             "Error",
             "Warning",
             "Info",
