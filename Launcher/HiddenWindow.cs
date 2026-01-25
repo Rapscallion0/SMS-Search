@@ -33,7 +33,7 @@ namespace SMS_Search_Launcher
 
         private void LoadConfigAndRegisterHotKey()
         {
-            string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SMS Search.json");
+            string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SMS Search_settings.json");
             _config = new ConfigManager(configPath);
 
             string hotkeyStr = _config.GetValue("LAUNCHER", "HOTKEY");

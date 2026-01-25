@@ -25,7 +25,7 @@ namespace SMS_Search
 
             try
             {
-                ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search.json"));
+                ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search_settings.json"));
 			    if (config.GetValue("GENERAL", "MULTI_INSTANCE") == "1")
 			    {
 				    Application.Run(new frmMain(Program.Params));

@@ -54,7 +54,7 @@ namespace SMS_Search
 		private bool minimize = true;
 		private bool keyPressHandled;
 		private Logfile log = new Logfile();
-		private static string ConfigFilePath = Path.Combine(Application.StartupPath, "SMS Search.json");
+		private static string ConfigFilePath = Path.Combine(Application.StartupPath, "SMS Search_settings.json");
 		private ConfigManager config = new ConfigManager(frmMain.ConfigFilePath);
 		private static UpdateChecker Versions = new UpdateChecker();
 		private dbConnector dbConn = new dbConnector();
