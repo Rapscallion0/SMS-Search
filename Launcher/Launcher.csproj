@@ -51,6 +51,9 @@
     <Compile Include="..\HotkeyUtils.cs">
       <Link>HotkeyUtils.cs</Link>
     </Compile>
+    <Compile Include="..\Logfile.cs">
+      <Link>Logfile.cs</Link>
+    </Compile>
     <Compile Include="AppSwitcher.cs" />
     <Compile Include="HiddenWindow.cs">
       <SubType>Form</SubType>

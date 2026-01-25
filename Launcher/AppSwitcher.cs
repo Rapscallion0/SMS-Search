@@ -1,3 +1,4 @@
+using Log;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -18,36 +19,52 @@ namespace SMS_Search_Launcher
         private static extern bool IsIconic(IntPtr hWnd);
 
         private const int SW_RESTORE = 9;
+        private static Logfile log = new Logfile("Launcher");
 
         public static void SwitchToOrStartApp()
         {
-            string appName = "SMS Search";
-            string exeName = "SMS Search.exe";
-
-            Process[] processes = Process.GetProcessesByName(appName);
-            if (processes.Length > 0)
+            try
             {
-                // Already running, bring to front
-                IntPtr handle = processes[0].MainWindowHandle;
+                string appName = "SMS Search";
+                string exeName = "SMS Search.exe";
 
-                // If the handle is zero, it might be hiding in the tray or just starting up.
-                // However, for WinForms apps in tray, MainWindowHandle might still be valid or we might need to find the window differently.
-                // Assuming standard behavior for now.
-
-                if (IsIconic(handle))
+                Process[] processes = Process.GetProcessesByName(appName);
+                if (processes.Length > 0)
                 {
-                    ShowWindow(handle, SW_RESTORE);
+                    log.Logger(LogLevel.Info, "AppSwitcher: Application is running. Switching focus.");
+                    // Already running, bring to front
+                    IntPtr handle = processes[0].MainWindowHandle;
+
+                    if (handle == IntPtr.Zero)
+                    {
+                         log.Logger(LogLevel.Warning, "AppSwitcher: Main window handle is zero.");
+                    }
+
+                    if (IsIconic(handle))
+                    {
+                        ShowWindow(handle, SW_RESTORE);
+                    }
+                    SetForegroundWindow(handle);
                 }
-                SetForegroundWindow(handle);
+                else
+                {
+                    // Not running, start it
+                    string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, exeName);
+                    log.Logger(LogLevel.Info, "AppSwitcher: Application not running. Starting: " + path);
+
+                    if (File.Exists(path))
+                    {
+                        Process.Start(path);
+                    }
+                    else
+                    {
+                        log.Logger(LogLevel.Error, "AppSwitcher: Executable not found at " + path);
+                    }
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Not running, start it
-                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, exeName);
-                if (File.Exists(path))
-                {
-                    Process.Start(path);
-                }
+                log.Logger(LogLevel.Error, "AppSwitcher: Error switching/starting app - " + ex.Message);
             }
         }
     }

@@ -100,6 +100,11 @@ namespace SMS_Search
             }
         }
 
+        public Dictionary<string, Dictionary<string, string>> GetRawConfig()
+        {
+            return _config;
+        }
+
         private void ImportFromIni()
         {
             // Read all sections

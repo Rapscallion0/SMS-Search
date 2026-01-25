@@ -258,6 +258,7 @@ namespace SMS_Search
 					cfg.ShowDialog();
 				}
                 config.Load(); // Re-load config in case it was changed
+                log.ReloadConfig();
 
 				// Re-read values in case the user updated configuration
 				server = config.GetValue("CONNECTION", "SERVER");
@@ -1195,6 +1196,7 @@ namespace SMS_Search
 					frmConfig.ShowDialog();
 				}
                 config.Load(); // Re-load config in case it was changed
+                log.ReloadConfig();
 
 				ValidateConfigFile();
 			}
