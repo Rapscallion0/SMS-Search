@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Runtime.InteropServices;
 
 namespace SMS_Search
@@ -48,7 +49,21 @@ namespace SMS_Search
                 try
                 {
                     string json = File.ReadAllText(_jsonFilePath);
-                    _config = SimpleJsonParser.Parse(json);
+                    var deserialized = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(json);
+
+                    if (deserialized != null)
+                    {
+                        // Rebuild dictionaries to ensure CaseInsensitive keys
+                        _config = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+                        foreach (var section in deserialized)
+                        {
+                            _config[section.Key] = new Dictionary<string, string>(section.Value, StringComparer.OrdinalIgnoreCase);
+                        }
+                    }
+                    else
+                    {
+                        _config = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+                    }
                 }
                 catch
                 {
@@ -65,7 +80,8 @@ namespace SMS_Search
         {
             try
             {
-                string json = SimpleJsonParser.Serialize(_config);
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(_config, options);
                 File.WriteAllText(_jsonFilePath, json);
             }
             catch (Exception)
@@ -185,161 +201,6 @@ namespace SMS_Search
                 Marshal.FreeCoTaskMem(pBuffer);
             }
             return data;
-        }
-    }
-
-    // Simple JSON Parser for Dictionary<string, Dictionary<string, string>> structure
-    public static class SimpleJsonParser
-    {
-        public static string Serialize(Dictionary<string, Dictionary<string, string>> data)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("{");
-            int sectionCount = 0;
-            foreach (var section in data)
-            {
-                sb.Append("  \"");
-                sb.Append(Escape(section.Key));
-                sb.AppendLine("\": {");
-
-                int keyCount = 0;
-                foreach (var item in section.Value)
-                {
-                    sb.Append("    \"");
-                    sb.Append(Escape(item.Key));
-                    sb.Append("\": \"");
-                    sb.Append(Escape(item.Value));
-                    sb.Append("\"");
-
-                    keyCount++;
-                    if (keyCount < section.Value.Count)
-                        sb.AppendLine(",");
-                    else
-                        sb.AppendLine();
-                }
-
-                sb.Append("  }");
-                sectionCount++;
-                if (sectionCount < data.Count)
-                    sb.AppendLine(",");
-                else
-                    sb.AppendLine();
-            }
-            sb.Append("}");
-            return sb.ToString();
-        }
-
-        private static string Escape(string s)
-        {
-            if (s == null) return "";
-            return s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t");
-        }
-
-        // Very basic parser that assumes the structure generated above
-        public static Dictionary<string, Dictionary<string, string>> Parse(string json)
-        {
-            var result = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
-            if (string.IsNullOrEmpty(json)) return result;
-
-            json = json.Trim();
-            if (!json.StartsWith("{") || !json.EndsWith("}")) return result;
-
-            // Remove outer braces
-            json = json.Substring(1, json.Length - 2);
-
-            int index = 0;
-            while (index < json.Length)
-            {
-                // Find section key
-                string sectionName = ParseString(json, ref index);
-                if (sectionName == null) break;
-
-                // Find colon
-                SkipWhitespace(json, ref index);
-                if (index < json.Length && json[index] == ':') index++;
-
-                // Find section object start
-                SkipWhitespace(json, ref index);
-                if (index < json.Length && json[index] == '{')
-                {
-                    index++;
-                    var sectionDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                    while (index < json.Length)
-                    {
-                        SkipWhitespace(json, ref index);
-                        if (index < json.Length && json[index] == '}')
-                        {
-                            index++; // End of section
-                            break;
-                        }
-
-                        string key = ParseString(json, ref index);
-                        if (key == null) break;
-
-                        SkipWhitespace(json, ref index);
-                        if (index < json.Length && json[index] == ':') index++;
-
-                        string value = ParseString(json, ref index);
-                        sectionDict[key] = value ?? "";
-
-                        SkipWhitespace(json, ref index);
-                        if (index < json.Length && json[index] == ',') index++;
-                    }
-                    result[sectionName] = sectionDict;
-                }
-
-                SkipWhitespace(json, ref index);
-                if (index < json.Length && json[index] == ',') index++;
-            }
-
-            return result;
-        }
-
-        private static void SkipWhitespace(string json, ref int index)
-        {
-            while (index < json.Length && char.IsWhiteSpace(json[index]))
-                index++;
-        }
-
-        private static string ParseString(string json, ref int index)
-        {
-            SkipWhitespace(json, ref index);
-            if (index >= json.Length || json[index] != '"') return null;
-
-            index++; // Skip opening quote
-            StringBuilder sb = new StringBuilder();
-
-            while (index < json.Length)
-            {
-                char c = json[index];
-                if (c == '"')
-                {
-                    index++; // Skip closing quote
-                    return sb.ToString();
-                }
-
-                if (c == '\\' && index + 1 < json.Length)
-                {
-                    index++;
-                    char next = json[index];
-                    switch (next)
-                    {
-                        case '"': sb.Append('"'); break;
-                        case '\\': sb.Append('\\'); break;
-                        case 'n': sb.Append('\n'); break;
-                        case 'r': sb.Append('\r'); break;
-                        case 't': sb.Append('\t'); break;
-                        default: sb.Append(next); break;
-                    }
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-                index++;
-            }
-            return sb.ToString();
         }
     }
 }

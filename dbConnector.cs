@@ -1,4 +1,5 @@
 using Log;
+using SMS_Search;
 using System;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ namespace DbConn
 	public class dbConnector
 	{
         private Logfile log = new Logfile();
+        private DataRepository _repo = new DataRepository();
 
 		public bool TestDbConn(string DbServer, string DbDatabase, bool DispError, string dbUser = null, string dbPassword = null)
 		{
@@ -26,15 +28,7 @@ namespace DbConn
 				return false;
 			}
 
-			string connectionString;
-            if (!string.IsNullOrEmpty(dbUser))
-            {
-                connectionString = "Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase + ";User ID=" + dbUser + ";Password=" + dbPassword + ";Persist Security Info=False;";
-            }
-            else
-            {
-                connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
-            }
+			string connectionString = _repo.GetConnectionString(DbServer, DbDatabase, dbUser, dbPassword);
 
 			try
 			{
@@ -63,35 +57,28 @@ namespace DbConn
         {
             log.Logger(LogLevel.Info, $"TestDbConnAsync: Testing connection to Server='{DbServer}' Database='{DbDatabase}'");
 
-            string connectionString;
-            if (!string.IsNullOrEmpty(dbUser))
+            try
             {
-                connectionString = "Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase + ";User ID=" + dbUser + ";Password=" + dbPassword + ";Persist Security Info=False;";
-            }
-            else
-            {
-                connectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase;
-            }
-
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            {
-                try
+                if (string.IsNullOrEmpty(DbServer) || string.IsNullOrEmpty(DbDatabase))
                 {
-                    if (string.IsNullOrEmpty(DbServer) || string.IsNullOrEmpty(DbDatabase))
-                    {
-                        throw new ArgumentException("Cannot connect to Database when a blank 'Server Name' or 'Database Name' is specified.");
-                    }
+                    throw new ArgumentException("Cannot connect to Database when a blank 'Server Name' or 'Database Name' is specified.");
+                }
+
+                string connectionString = _repo.GetConnectionString(DbServer, DbDatabase, dbUser, dbPassword);
+
+                using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+                {
                     Stopwatch sw = Stopwatch.StartNew();
                     await sqlConnection.OpenAsync();
                     sw.Stop();
                     log.Logger(LogLevel.Info, $"TestDbConnAsync: Connection successful ({sw.ElapsedMilliseconds}ms)");
                     return true;
                 }
-                catch (Exception ex)
-                {
-                    log.Logger(LogLevel.Error, "TestDbConnAsync: Connection failed - " + ex.Message);
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                log.Logger(LogLevel.Error, "TestDbConnAsync: Connection failed - " + ex.Message);
+                return false;
             }
         }
 	}

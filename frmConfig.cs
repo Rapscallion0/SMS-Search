@@ -32,6 +32,7 @@ namespace SMS_Search
         private string _currentValidHotkey = "";
         private bool _isCurrentHotkeyValid = false;
         private Logfile log = new Logfile();
+        private DataRepository _repo = new DataRepository();
 
 		public frmConfig()
 		{
@@ -139,32 +140,21 @@ namespace SMS_Search
             return list;
 		}
 
-		private void GetDbNames()
+		private async Task GetDbNames()
 		{
 			if (DbNames.Count < 1)
 			{
                 cmbDbDatabase.Items.Clear();
-				string connectionString;
-                if (!chkWindowsAuth.Checked)
-                {
-                    connectionString = "Data Source=" + cmbDbServer.Text + ";User ID=" + txtDbUser.Text + ";Password=" + txtDbPassword.Text + ";";
-                }
-                else
-                {
-                    connectionString = "Data Source=" + cmbDbServer.Text + "; Integrated Security=True;";
-                }
+                string user = chkWindowsAuth.Checked ? null : txtDbUser.Text;
+                string pass = chkWindowsAuth.Checked ? null : txtDbPassword.Text;
+
 				try
 				{
                     Cursor = Cursors.WaitCursor;
-					using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+                    var dbs = await _repo.GetDatabasesAsync(cmbDbServer.Text, user, pass);
+					foreach (var db in dbs)
 					{
-						sqlConnection.Open();
-						DataTable schema = sqlConnection.GetSchema("Databases");
-						sqlConnection.Close();
-						foreach (DataRow dataRow in schema.Rows)
-						{
-                            cmbDbDatabase.Items.Add(dataRow["database_name"]);
-						}
+                        cmbDbDatabase.Items.Add(db);
 					}
 				}
 				catch (Exception ex)
@@ -764,14 +754,14 @@ namespace SMS_Search
 				MessageBox.Show("Database connection passed.", "Test DB Connection", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 			}
 		}
-		private void validateServer()
+		private async void validateServer()
 		{
 			bool flag = false;
 			foreach (string b in ServerNames)
 			{
 				if (cmbDbServer.Text == b)
 				{
-                    GetDbNames();
+                    await GetDbNames();
                     cmbDbDatabase.Enabled = true;
 					flag = true;
 					break;

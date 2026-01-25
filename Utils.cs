@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 
 namespace SMS_Search
@@ -40,36 +38,37 @@ namespace SMS_Search
 
         public static string Encrypt(string sLine)
         {
-            // Return an empty string for empty or null inputs
-            if (string.IsNullOrEmpty(sLine))
-                return "";
-
-            Encoding encoding = Encoding.GetEncoding("Windows-1252");
-
-            byte[] bytes = encoding.GetBytes(sLine);
-            for (int i = 0; i < bytes.Length; i++)
+            if (string.IsNullOrEmpty(sLine)) return "";
+            try
             {
-                bytes[i] = (byte)(~bytes[i]); // Apply bitwise NOT
+                byte[] data = Encoding.UTF8.GetBytes(sLine);
+                byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
+                return Convert.ToBase64String(encrypted);
             }
-
-            // Prefix the result with '#' for non-empty inputs
-            return "#" + encoding.GetString(bytes);
+            catch
+            {
+                return "";
+            }
         }
 
         public static string Decrypt(string sLine)
         {
-            if (string.IsNullOrEmpty(sLine) || sLine[0] != '#')
-                return sLine;
+            if (string.IsNullOrEmpty(sLine)) return "";
 
-            Encoding encoding = Encoding.GetEncoding("Windows-1252");
+            // Legacy check: Old encryption started with #. Force re-entry.
+            if (sLine.StartsWith("#")) return "";
 
-            byte[] bytes = encoding.GetBytes(sLine.Substring(1));
-            for (int i = 0; i < bytes.Length; i++)
+            try
             {
-                bytes[i] = (byte)(~bytes[i]); // Apply bitwise NOT
+                byte[] data = Convert.FromBase64String(sLine);
+                byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
+                return Encoding.UTF8.GetString(decrypted);
             }
-
-            return encoding.GetString(bytes);
+            catch
+            {
+                // Decryption failed (invalid format or different user/machine)
+                return "";
+            }
         }
     }
 }
