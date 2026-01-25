@@ -144,11 +144,13 @@ namespace SMS_Search
 		{
 			if (DbNames.Count < 1)
 			{
-                string currentText = cmbDbDatabase.Text; // Preserve current text (e.g. from config)
+                bool wasEmpty = string.IsNullOrEmpty(cmbDbDatabase.Text);
                 cmbDbDatabase.Items.Clear();
                 cmbDbDatabase.Items.Add("Loading...");
-                // Do not select "Loading..." to avoid overwriting the Text property if it's already set
-                cmbDbDatabase.Enabled = false;
+
+                // If text was empty, show "Loading...".
+                // If text was present (e.g. from config), leave it alone (DropDown style allows this).
+                if (wasEmpty) cmbDbDatabase.SelectedIndex = 0;
 
                 string user = chkWindowsAuth.Checked ? null : txtDbUser.Text;
                 string pass = chkWindowsAuth.Checked ? null : txtDbPassword.Text;
@@ -179,15 +181,20 @@ namespace SMS_Search
 				finally
 				{
                     Cursor = Cursors.Default;
-                    cmbDbDatabase.Enabled = true;
-                    // Restore text if it matches an item, or if it was valid input
-                    if (!string.IsNullOrEmpty(currentText) && currentText != "Loading...")
+
+                    // If text is currently "Loading..." (because we set it, or user selected it),
+                    // replace it with the first available database or clear it.
+                    // If text is something else (e.g. valid DB name), leave it alone.
+                    if (cmbDbDatabase.Text == "Loading...")
                     {
-                         cmbDbDatabase.Text = currentText;
-                    }
-                    else if (cmbDbDatabase.Items.Count > 0)
-                    {
-                         cmbDbDatabase.SelectedIndex = 0;
+                        if (cmbDbDatabase.Items.Count > 0)
+                        {
+                             cmbDbDatabase.SelectedIndex = 0;
+                        }
+                        else
+                        {
+                             cmbDbDatabase.Text = "";
+                        }
                     }
 				}
 			}
