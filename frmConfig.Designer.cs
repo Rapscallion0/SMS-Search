@@ -77,6 +77,10 @@ namespace SMS_Search
         private TextBox txtQryFct;
         private CheckBox chkMultiInstance;
         private CheckBox chkLogging;
+        private ComboBox cmbLogLevel;
+        private Label lblLogLevel;
+        private NumericUpDown numRetention;
+        private Label lblRetention;
         private GroupBox groupBox1;
         private CheckBox chkDescriptionColumns;
         private CheckBox chkCheckUpdate;
@@ -132,6 +136,10 @@ namespace SMS_Search
             this.txtQryTlz = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.chkLogging = new System.Windows.Forms.CheckBox();
+            this.cmbLogLevel = new System.Windows.Forms.ComboBox();
+            this.lblLogLevel = new System.Windows.Forms.Label();
+            this.numRetention = new System.Windows.Forms.NumericUpDown();
+            this.lblRetention = new System.Windows.Forms.Label();
             this.cmbStartupLocation = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             this.tabCleanSql = new System.Windows.Forms.TabPage();
@@ -144,6 +152,7 @@ namespace SMS_Search
             this.tabCtlConfig.SuspendLayout();
             this.tabAdvanced.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numRetention)).BeginInit();
             this.tabCleanSql.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).BeginInit();
             this.tabLauncher = new System.Windows.Forms.TabPage();
@@ -516,6 +525,10 @@ namespace SMS_Search
             this.tabAdvanced.Controls.Add(this.chkCheckUpdate);
             this.tabAdvanced.Controls.Add(this.groupBox1);
             this.tabAdvanced.Controls.Add(this.chkLogging);
+            this.tabAdvanced.Controls.Add(this.lblLogLevel);
+            this.tabAdvanced.Controls.Add(this.cmbLogLevel);
+            this.tabAdvanced.Controls.Add(this.lblRetention);
+            this.tabAdvanced.Controls.Add(this.numRetention);
             this.tabAdvanced.Location = new System.Drawing.Point(4, 22);
             this.tabAdvanced.Name = "tabAdvanced";
             this.tabAdvanced.Padding = new System.Windows.Forms.Padding(3);
@@ -736,6 +749,60 @@ namespace SMS_Search
             this.chkLogging.Text = "Enable logging";
             this.chkLogging.UseVisualStyleBackColor = true;
             // 
+            // cmbLogLevel
+            //
+            this.cmbLogLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbLogLevel.FormattingEnabled = true;
+            this.cmbLogLevel.Items.AddRange(new object[] {
+            "Error",
+            "Warning",
+            "Info",
+            "Debug"});
+            this.cmbLogLevel.Location = new System.Drawing.Point(190, 170);
+            this.cmbLogLevel.Name = "cmbLogLevel";
+            this.cmbLogLevel.Size = new System.Drawing.Size(80, 21);
+            this.cmbLogLevel.TabIndex = 12;
+            //
+            // lblLogLevel
+            //
+            this.lblLogLevel.AutoSize = true;
+            this.lblLogLevel.Location = new System.Drawing.Point(130, 173);
+            this.lblLogLevel.Name = "lblLogLevel";
+            this.lblLogLevel.Size = new System.Drawing.Size(53, 13);
+            this.lblLogLevel.TabIndex = 13;
+            this.lblLogLevel.Text = "Log Level:";
+            //
+            // numRetention
+            //
+            this.numRetention.Location = new System.Drawing.Point(400, 171);
+            this.numRetention.Maximum = new decimal(new int[] {
+            365,
+            0,
+            0,
+            0});
+            this.numRetention.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numRetention.Name = "numRetention";
+            this.numRetention.Size = new System.Drawing.Size(50, 20);
+            this.numRetention.TabIndex = 14;
+            this.numRetention.Value = new decimal(new int[] {
+            14,
+            0,
+            0,
+            0});
+            //
+            // lblRetention
+            //
+            this.lblRetention.AutoSize = true;
+            this.lblRetention.Location = new System.Drawing.Point(290, 173);
+            this.lblRetention.Name = "lblRetention";
+            this.lblRetention.Size = new System.Drawing.Size(100, 13);
+            this.lblRetention.TabIndex = 15;
+            this.lblRetention.Text = "Retention (Days):";
+            //
             // cmbStartupLocation
             // 
             this.cmbStartupLocation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -799,6 +866,7 @@ namespace SMS_Search
             this.tabAdvanced.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numRetention)).EndInit();
             this.tabCleanSql.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).EndInit();
             this.tabLauncher.ResumeLayout(false);

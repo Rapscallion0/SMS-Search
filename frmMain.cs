@@ -66,7 +66,7 @@ namespace SMS_Search
 		public frmMain(string[] Params)
 		{
 			InitializeComponent();
-			log.Logger(0, "SMS Search V" + Application.ProductVersion + " initialized");
+			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " initialized");
 			MinimumSize = new Size(FormWidthMin, FormHeightMin);
 			Height = FormHeightMin;
 			Width = FormWidthMin;
@@ -89,6 +89,15 @@ namespace SMS_Search
 				frmEula frmEula = new frmEula();
 				frmEula.ShowDialog();
 			}
+
+            try
+            {
+                string retentionStr = config.GetValue("GENERAL", "LOG_RETENTION");
+                int retention = 14;
+                if (!string.IsNullOrEmpty(retentionStr) && int.TryParse(retentionStr, out int r)) retention = r;
+                log.CleanupLogs(retention);
+            }
+            catch { }
 
             if (config.GetValue("GENERAL", "CHECKUPDATE") == "1")
             {
@@ -181,7 +190,7 @@ namespace SMS_Search
         protected override void OnShown(EventArgs e)
 		{
             base.OnShown(e);
-            log.Logger(0, "frmMain_OnShown: Executing");
+            log.Logger(LogLevel.Info, "frmMain_OnShown: Executing");
 
             string lastRunVersion = config.GetValue("GENERAL", "LAST_RUN_VERSION");
             string currentVersion = Application.ProductVersion;
@@ -369,7 +378,7 @@ namespace SMS_Search
                 }
                 catch (Exception ex)
                 {
-                    log.Logger(1, "Error compiling regex for Clean SQL rule: " + rule.Pattern + " - " + ex.Message);
+                    log.Logger(LogLevel.Error, "Error compiling regex for Clean SQL rule: " + rule.Pattern + " - " + ex.Message);
                 }
             }
         }
@@ -419,8 +428,8 @@ namespace SMS_Search
                     });
 
 					bindingSource.DataSource = dataTable;
-					log.Logger(0, "SQL query executed");
-					log.Logger(0, text);
+					log.Logger(LogLevel.Info, "SQL query executed");
+					log.Logger(LogLevel.Info, text);
 				}
 				catch (Exception ex)
 				{
@@ -432,9 +441,9 @@ namespace SMS_Search
                     {
 					    SQLError = true;
 					    MessageBox.Show(sqlEx.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-					    log.Logger(0, "SQL query executed");
-					    log.Logger(0, text);
-					    log.Logger(1, sqlEx.Message);
+					    log.Logger(LogLevel.Info, "SQL query executed");
+					    log.Logger(LogLevel.Info, text);
+					    log.Logger(LogLevel.Error, sqlEx.Message);
                     }
                     else
                     {
@@ -448,7 +457,7 @@ namespace SMS_Search
 					if (dGrd.RowCount > 0 && !SQLError)
 					{
 						dGrd.CurrentCell = dGrd[0, 0];
-						log.Logger(0, "SQL records returned: " + dGrd.RowCount.ToString());
+						log.Logger(LogLevel.Info, "SQL records returned: " + dGrd.RowCount.ToString());
 					}
 				}
 
@@ -1030,7 +1039,7 @@ namespace SMS_Search
 			if ((e.KeyCode == Keys.Return || e.KeyCode == Keys.Return) && txtJulian.Focused)
 			{
 				setGregorianDate();
-				log.Logger(0, "Date converted: Julian \"" + txtJulian.Text + "\" to Gregorian \"" + dateGregorian.Text);
+				log.Logger(LogLevel.Info, "Date converted: Julian \"" + txtJulian.Text + "\" to Gregorian \"" + dateGregorian.Text);
 			}
 		}
 
@@ -1039,7 +1048,7 @@ namespace SMS_Search
 			if (dateGregorian.Focused)
 			{
 				setJulianDate();
-				log.Logger(0, "Date converted: Gregorian \"" + dateGregorian.Text + "\" to Julian \"" + txtJulian.Text);
+				log.Logger(LogLevel.Info, "Date converted: Gregorian \"" + dateGregorian.Text + "\" to Julian \"" + txtJulian.Text);
 			}
 		}
 
@@ -1244,7 +1253,7 @@ namespace SMS_Search
 				}
 				catch (Exception ex)
 				{
-					log.Logger(1, "Error in setColumnArray: " + ex.Message);
+					log.Logger(LogLevel.Error, "Error in setColumnArray: " + ex.Message);
 				}
 			}
 
@@ -1369,7 +1378,7 @@ namespace SMS_Search
 					break;
 				}
 			}
-			log.Logger(0, "SMS Search V" + Application.ProductVersion + " terminated");
+			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " terminated");
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1604,12 +1613,12 @@ namespace SMS_Search
 
 		private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
 		{
-            log.Logger(0, "backgroundWorker_DoWork: start");
+            log.Logger(LogLevel.Info, "backgroundWorker_DoWork: start");
             try
             {
                 if (e.Argument is Tuple<string, string, string, string> tuple4)
                 {
-                    log.Logger(0, $"backgroundWorker_DoWork: action='{tuple4.Item1}' server='{tuple4.Item2}' database='{tuple4.Item3}' tableLike='{tuple4.Item4}'");
+                    log.Logger(LogLevel.Info, $"backgroundWorker_DoWork: action='{tuple4.Item1}' server='{tuple4.Item2}' database='{tuple4.Item3}' tableLike='{tuple4.Item4}'");
                     switch (tuple4.Item1)
                     {
                         case "PopulateTableList":
@@ -1622,12 +1631,12 @@ namespace SMS_Search
                                 dataTable.Clear();
                                 dataAdapter.Fill(dataTable);
                                 e.Result = new Tuple<DataTable, string>(dataTable, tuple4.Item4);
-                                log.Logger(0, $"backgroundWorker_DoWork: PopulateTableList fetched {dataTable.Rows.Count} tables");
+                                log.Logger(LogLevel.Info, $"backgroundWorker_DoWork: PopulateTableList fetched {dataTable.Rows.Count} tables");
                             }
                             catch (Exception ex)
                             {
                                 e.Result = ex;
-                                log.Logger(1, "backgroundWorker_DoWork: PopulateTableList error - " + ex.Message);
+                                log.Logger(LogLevel.Error, "backgroundWorker_DoWork: PopulateTableList error - " + ex.Message);
                             }
                             finally
                             {
@@ -1638,7 +1647,7 @@ namespace SMS_Search
                 }
                 else if (e.Argument is Tuple<string, string> tuple2)
                 {
-                    log.Logger(0, $"backgroundWorker_DoWork: action='{tuple2.Item1}' server='{tuple2.Item2}'");
+                    log.Logger(LogLevel.Info, $"backgroundWorker_DoWork: action='{tuple2.Item1}' server='{tuple2.Item2}'");
                     switch (tuple2.Item1)
                     {
                         case "getDbNames":
@@ -1651,13 +1660,13 @@ namespace SMS_Search
                                     DataTable schema = sqlConnection.GetSchema("Databases");
                                     sqlConnection.Close();
                                     e.Result = schema;
-                                    log.Logger(0, $"backgroundWorker_DoWork: getDbNames fetched {schema.Rows.Count} databases");
+                                    log.Logger(LogLevel.Info, $"backgroundWorker_DoWork: getDbNames fetched {schema.Rows.Count} databases");
                                 }
                             }
                             catch (Exception ex)
                             {
                                 e.Result = ex;
-                                log.Logger(1, "backgroundWorker_DoWork: getDbNames error - " + ex.Message);
+                                log.Logger(LogLevel.Error, "backgroundWorker_DoWork: getDbNames error - " + ex.Message);
                             }
                             break;
                     }
@@ -1665,33 +1674,33 @@ namespace SMS_Search
                 else
                 {
                     Thread.Sleep(1000);
-                    log.Logger(0, "backgroundWorker_DoWork: no recognized argument");
+                    log.Logger(LogLevel.Info, "backgroundWorker_DoWork: no recognized argument");
                 }
             }
             catch (Exception ex)
             {
                 e.Result = ex;
-                log.Logger(1, "backgroundWorker_DoWork: unexpected error - " + ex.Message);
+                log.Logger(LogLevel.Error, "backgroundWorker_DoWork: unexpected error - " + ex.Message);
             }
             finally
             {
-                log.Logger(0, "backgroundWorker_DoWork: end");
+                log.Logger(LogLevel.Info, "backgroundWorker_DoWork: end");
             }
 		}
 
         private void getDbNames_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            log.Logger(0, "getDbNames_RunWorkerCompleted: start");
+            log.Logger(LogLevel.Info, "getDbNames_RunWorkerCompleted: start");
             try
             {
                 if (e.Result is Exception ex)
                 {
-                    log.Logger(1, "getDbNames_RunWorkerCompleted: error - " + ex.Message);
+                    log.Logger(LogLevel.Error, "getDbNames_RunWorkerCompleted: error - " + ex.Message);
                     MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 }
                 else if (e.Result is DataTable dt)
                 {
-                    log.Logger(0, $"getDbNames_RunWorkerCompleted: received {dt.Rows.Count} databases");
+                    log.Logger(LogLevel.Info, $"getDbNames_RunWorkerCompleted: received {dt.Rows.Count} databases");
                     foreach (DataRow dataRow in dt.Rows)
                     {
                         tscmbDbDatabase.Items.Add(dataRow["database_name"]);
@@ -1700,29 +1709,29 @@ namespace SMS_Search
             }
             catch (Exception ex2)
             {
-                log.Logger(1, "getDbNames_RunWorkerCompleted: exception - " + ex2.Message);
+                log.Logger(LogLevel.Error, "getDbNames_RunWorkerCompleted: exception - " + ex2.Message);
             }
             finally
             {
                 backgroundWorker.RunWorkerCompleted -= getDbNames_RunWorkerCompleted;
                 Cursor = Cursors.Default;
-                log.Logger(0, "getDbNames_RunWorkerCompleted: end");
+                log.Logger(LogLevel.Info, "getDbNames_RunWorkerCompleted: end");
             }
         }
 
         private void PopulateTableList_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            log.Logger(0, "PopulateTableList_RunWorkerCompleted: start");
+            log.Logger(LogLevel.Info, "PopulateTableList_RunWorkerCompleted: start");
             try
             {
                 if (e.Result is Exception ex)
                 {
-                    log.Logger(1, "PopulateTableList_RunWorkerCompleted: error - " + ex.Message);
+                    log.Logger(LogLevel.Error, "PopulateTableList_RunWorkerCompleted: error - " + ex.Message);
                     MessageBox.Show(ex.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 }
                 else if (e.Result is Tuple<DataTable, string> tuple)
                 {
-                    log.Logger(0, $"PopulateTableList_RunWorkerCompleted: received {tuple.Item1.Rows.Count} tables, requested selection '{tuple.Item2}'");
+                    log.Logger(LogLevel.Info, $"PopulateTableList_RunWorkerCompleted: received {tuple.Item1.Rows.Count} tables, requested selection '{tuple.Item2}'");
                     bindingSourceTbl.DataSource = tuple.Item1;
                     cmbTableFld.DataSource = bindingSourceTbl;
                     cmbTableFld.DisplayMember = "NAME";
@@ -1740,13 +1749,13 @@ namespace SMS_Search
             }
             catch (Exception ex2)
             {
-                log.Logger(1, "PopulateTableList_RunWorkerCompleted: exception - " + ex2.Message);
+                log.Logger(LogLevel.Error, "PopulateTableList_RunWorkerCompleted: exception - " + ex2.Message);
             }
             finally
             {
                 backgroundWorker.RunWorkerCompleted -= PopulateTableList_RunWorkerCompleted;
                 Cursor = Cursors.Default;
-                log.Logger(0, "PopulateTableList_RunWorkerCompleted: end");
+                log.Logger(LogLevel.Info, "PopulateTableList_RunWorkerCompleted: end");
             }
         }
 

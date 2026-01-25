@@ -47,7 +47,7 @@ namespace SMS_Search
 				if (!flag)
 				{
 					MessageBox.Show("The Unarchive target was positioned outside the viewable area of the screen, and will been repositioned to the default location.", "Unarchived target retrieved", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-					log.Logger(1, "Target location reset");
+					log.Logger(LogLevel.Error, "Target location reset");
 				}
 			}
 			else
@@ -55,7 +55,7 @@ namespace SMS_Search
 				Top = Convert.ToInt32(config.GetValue("UNARCHIVE", "LOCATIONY"));
 				Left = Convert.ToInt32(config.GetValue("UNARCHIVE", "LOCATIONX"));
 			}
-			log.Logger(0, "Target initialized at X: " + config.GetValue("UNARCHIVE", "LOCATIONX") + "; Y: " + config.GetValue("UNARCHIVE", "LOCATIONY"));
+			log.Logger(LogLevel.Info, "Target initialized at X: " + config.GetValue("UNARCHIVE", "LOCATIONX") + "; Y: " + config.GetValue("UNARCHIVE", "LOCATIONY"));
 		}
 		
         private void picTarget_MouseDown(object sender, MouseEventArgs e)
@@ -97,14 +97,14 @@ namespace SMS_Search
 						string text2 = array3[j];
 						File.SetAttributes(text2, File.GetAttributes(text2) & ~(FileAttributes.ReadOnly | FileAttributes.Archive));
 						num++;
-						log.Logger(0, "File unarchived: " + text2.ToString());
+						log.Logger(LogLevel.Info, "File unarchived: " + text2.ToString());
 					}
 				}
 				else
 				{
 					File.SetAttributes(text, File.GetAttributes(text) & ~(FileAttributes.ReadOnly | FileAttributes.Archive));
 					num++;
-					log.Logger(0, "File unarchived: " + text.ToString());
+					log.Logger(LogLevel.Info, "File unarchived: " + text.ToString());
 				}
 			}
 		}
@@ -114,7 +114,7 @@ namespace SMS_Search
 			config.SetValue("UNARCHIVE", "LOCATIONX", Location.X.ToString());
 			config.SetValue("UNARCHIVE", "LOCATIONY", Location.Y.ToString());
             config.Save();
-            log.Logger(0, "Target terminated at X: " + config.GetValue("UNARCHIVE", "LOCATIONX") + "; Y: " + config.GetValue("UNARCHIVE", "LOCATIONY"));
+            log.Logger(LogLevel.Info, "Target terminated at X: " + config.GetValue("UNARCHIVE", "LOCATIONX") + "; Y: " + config.GetValue("UNARCHIVE", "LOCATIONY"));
 		}
 
 	}

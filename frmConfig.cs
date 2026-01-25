@@ -45,9 +45,20 @@ namespace SMS_Search
 		{
             txtHotkey.KeyUp += txtHotkey_KeyUp;
             txtHotkey.Leave += txtHotkey_Leave;
+            chkLogging.CheckedChanged += chkLogging_CheckedChanged;
             loadConfig();
             UpdateLauncherStatusUI();
 		}
+
+        private void chkLogging_CheckedChanged(object sender, EventArgs e)
+        {
+            bool enabled = chkLogging.Checked;
+            cmbLogLevel.Enabled = enabled;
+            numRetention.Enabled = enabled;
+            lblLogLevel.Enabled = enabled;
+            lblRetention.Enabled = enabled;
+        }
+
 		private async void frmConfig_Shown(object sender, EventArgs e)
 		{
             Cursor = Cursors.WaitCursor;
@@ -216,6 +227,20 @@ namespace SMS_Search
 			{
                 chkLogging.Checked = false;
 			}
+
+            // Load new logging settings
+            string logLevel = config.GetValue("GENERAL", "LOG_LEVEL");
+            if (string.IsNullOrEmpty(logLevel)) logLevel = "Info";
+            cmbLogLevel.Text = logLevel;
+
+            string retentionStr = config.GetValue("GENERAL", "LOG_RETENTION");
+            int retention = 14;
+            if (int.TryParse(retentionStr, out int r)) retention = r;
+            numRetention.Value = retention;
+
+            // Trigger checkbox logic
+            chkLogging_CheckedChanged(null, null);
+
 			if (config.GetValue("GENERAL", "MULTI_INSTANCE") == "1")
 			{
                 chkMultiInstance.Checked = true;
@@ -496,6 +521,10 @@ namespace SMS_Search
 			{
                 config.SetValue("GENERAL", "DEBUG_LOG", "0");
 			}
+
+            config.SetValue("GENERAL", "LOG_LEVEL", cmbLogLevel.Text);
+            config.SetValue("GENERAL", "LOG_RETENTION", numRetention.Value.ToString());
+
 			if (chkMultiInstance.Checked)
 			{
                 config.SetValue("GENERAL", "MULTI_INSTANCE", "1");
