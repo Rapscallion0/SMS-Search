@@ -112,6 +112,8 @@ namespace SMS_Search
             {
                 frmConfig frmConfig = new frmConfig();
                 frmConfig.ShowDialog();
+                config.Load();
+                log.ReloadConfig();
             }
 
 			ValidateConfigFile();

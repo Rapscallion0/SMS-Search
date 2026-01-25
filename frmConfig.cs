@@ -145,6 +145,10 @@ namespace SMS_Search
 			if (DbNames.Count < 1)
 			{
                 cmbDbDatabase.Items.Clear();
+                cmbDbDatabase.Items.Add("Loading...");
+                cmbDbDatabase.SelectedIndex = 0;
+                cmbDbDatabase.Enabled = false;
+
                 string user = chkWindowsAuth.Checked ? null : txtDbUser.Text;
                 string pass = chkWindowsAuth.Checked ? null : txtDbPassword.Text;
 
@@ -152,6 +156,8 @@ namespace SMS_Search
 				{
                     Cursor = Cursors.WaitCursor;
                     var dbs = await _repo.GetDatabasesAsync(cmbDbServer.Text, user, pass);
+
+                    cmbDbDatabase.Items.Clear();
 					foreach (var db in dbs)
 					{
                         cmbDbDatabase.Items.Add(db);
@@ -159,11 +165,13 @@ namespace SMS_Search
 				}
 				catch (Exception ex)
 				{
+                    cmbDbDatabase.Items.Clear();
 					MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
 				}
 				finally
 				{
                     Cursor = Cursors.Default;
+                    cmbDbDatabase.Enabled = true;
 				}
 			}
             DbNames.Sort();
