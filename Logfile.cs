@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Serilog;
 using Serilog.Formatting.Json;
 using Serilog.Events;
+using Serilog.Formatting;
 
 namespace Log
 {
@@ -113,7 +114,7 @@ namespace Log
                         .MinimumLevel.Is(minimumLevel)
                         .Enrich.FromLogContext()
                         .WriteTo.File(
-                            new JsonFormatter(renderMessage: true),
+                            new CompactLocalTimeFormatter(),
                             logPath,
                             rollingInterval: RollingInterval.Day,
                             retainedFileCountLimit: retentionDays,
@@ -219,4 +220,77 @@ namespace Log
             ReloadConfig();
         }
 	}
+
+    public class CompactLocalTimeFormatter : ITextFormatter
+    {
+        private readonly JsonValueFormatter _valueFormatter;
+
+        public CompactLocalTimeFormatter(JsonValueFormatter valueFormatter = null)
+        {
+            _valueFormatter = valueFormatter ?? new JsonValueFormatter(typeTagName: null);
+        }
+
+        public void Format(LogEvent logEvent, TextWriter output)
+        {
+            output.Write("{");
+
+            // @t (Local Time)
+            output.Write("\"@t\":\"");
+            output.Write(logEvent.Timestamp.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"));
+            output.Write("\",");
+
+            // @src (Source)
+            if (logEvent.Properties.TryGetValue("Source", out var sourceValue))
+            {
+                output.Write("\"@src\":");
+                _valueFormatter.Format(sourceValue, output);
+                output.Write(",");
+            }
+
+            // @l (Level)
+            output.Write("\"@l\":\"");
+            output.Write(GetLevelName(logEvent.Level));
+            output.Write("\",");
+
+            // @m (Message)
+            output.Write("\"@m\":");
+            var message = logEvent.RenderMessage();
+            _valueFormatter.Format(new ScalarValue(message), output);
+
+            // @x (Exception)
+            if (logEvent.Exception != null)
+            {
+                output.Write(",\"@x\":");
+                _valueFormatter.Format(new ScalarValue(logEvent.Exception.ToString()), output);
+            }
+
+            // Other properties
+            foreach (var property in logEvent.Properties)
+            {
+                if (property.Key == "Source") continue;
+
+                output.Write(",");
+                JsonValueFormatter.WriteQuotedJsonString(property.Key, output);
+                output.Write(":");
+                _valueFormatter.Format(property.Value, output);
+            }
+
+            output.Write("}");
+            output.WriteLine();
+        }
+
+        private string GetLevelName(LogEventLevel level)
+        {
+            switch (level)
+            {
+                case LogEventLevel.Verbose: return "V";
+                case LogEventLevel.Debug: return "D";
+                case LogEventLevel.Information: return "I";
+                case LogEventLevel.Warning: return "W";
+                case LogEventLevel.Error: return "E";
+                case LogEventLevel.Fatal: return "F";
+                default: return "I";
+            }
+        }
+    }
 }
