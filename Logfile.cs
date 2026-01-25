@@ -1,15 +1,17 @@
 using SMS_Search;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
+using Serilog;
+using Serilog.Formatting.Compact;
+using Serilog.Events;
 
 namespace Log
 {
     public enum LogLevel
     {
+        Critical = 0,
         Error = 1,
         Warning = 2,
         Info = 3,
@@ -18,182 +20,203 @@ namespace Log
 
 	public class Logfile
 	{
-        private static readonly object _lock = new object();
-        private bool _isConfigLoaded = false;
-        private bool _debugLogEnabled = false;
-        private LogLevel _configuredLogLevel = LogLevel.Info;
+        private static ILogger _logger;
+        private static readonly object _syncRoot = new object();
         private string _source = "App";
-        private int _retentionDays = 14;
+
+        // Keep these for internal state tracking if needed, but primarily driven by Serilog config
+        private static bool _debugLogEnabled = false;
+        private static LogLevel _configuredLogLevel = LogLevel.Info;
 
         public Logfile(string source = "App")
         {
             _source = source;
+            EnsureConfigured();
+        }
+
+        private void EnsureConfigured()
+        {
+            if (_logger == null)
+            {
+                lock (_syncRoot)
+                {
+                    if (_logger == null)
+                    {
+                        ReloadConfig();
+                    }
+                }
+            }
         }
 
         public void ReloadConfig()
         {
-            try
+            lock (_syncRoot)
             {
-                string configPath = Path.Combine(Application.StartupPath, "SMS Search.json");
-                ConfigManager config = new ConfigManager(configPath);
-
-                _debugLogEnabled = config.GetValue("GENERAL", "DEBUG_LOG") == "1";
-
-                string configLevelStr = config.GetValue("GENERAL", "LOG_LEVEL");
-                _configuredLogLevel = LogLevel.Info; // Default
-                if (!string.IsNullOrEmpty(configLevelStr))
+                try
                 {
-                    try
+                    string configPath = Path.Combine(Application.StartupPath, "SMS Search.json");
+                    ConfigManager config = new ConfigManager(configPath);
+
+                    _debugLogEnabled = config.GetValue("GENERAL", "DEBUG_LOG") == "1";
+                    string configLevelStr = config.GetValue("GENERAL", "LOG_LEVEL");
+                    string retentionStr = config.GetValue("GENERAL", "LOG_RETENTION");
+
+                    int retentionDays = 14;
+                    if (!int.TryParse(retentionStr, out retentionDays))
                     {
-                        _configuredLogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), configLevelStr, true);
+                        retentionDays = 14;
                     }
-                    catch { }
-                }
 
-                string retentionStr = config.GetValue("GENERAL", "LOG_RETENTION");
-                if (!int.TryParse(retentionStr, out _retentionDays))
+                    _configuredLogLevel = LogLevel.Info;
+                    if (!string.IsNullOrEmpty(configLevelStr))
+                    {
+                        try
+                        {
+                            _configuredLogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), configLevelStr, true);
+                        }
+                        catch { }
+                    }
+
+                    // Map internal LogLevel to Serilog LogEventLevel
+                    LogEventLevel minimumLevel = LogEventLevel.Information;
+
+                    // Logic:
+                    // If DEBUG_LOG is OFF, maybe we only log Errors?
+                    // The original logic was:
+                    // "Always log Errors, or if Debug Log is enabled and level is within range"
+
+                    // New Logic to match:
+                    // If DEBUG_LOG is 0, we restrict to Error/Fatal?
+                    // Or does LogLevel config take precedence?
+                    // "Error events are always logged, while other levels require DEBUG_LOG to be enabled and the event level to be within the configured LOG_LEVEL."
+
+                    if (!_debugLogEnabled)
+                    {
+                        minimumLevel = LogEventLevel.Error;
+                    }
+                    else
+                    {
+                        switch (_configuredLogLevel)
+                        {
+                            case LogLevel.Critical: minimumLevel = LogEventLevel.Fatal; break;
+                            case LogLevel.Error: minimumLevel = LogEventLevel.Error; break;
+                            case LogLevel.Warning: minimumLevel = LogEventLevel.Warning; break;
+                            case LogLevel.Info: minimumLevel = LogEventLevel.Information; break;
+                            case LogLevel.Debug: minimumLevel = LogEventLevel.Debug; break;
+                            default: minimumLevel = LogEventLevel.Information; break;
+                        }
+                    }
+
+                    string logPath = Path.Combine(Application.StartupPath, "SMS_Search_.log");
+
+                    _logger = new LoggerConfiguration()
+                        .MinimumLevel.Is(minimumLevel)
+                        .Enrich.FromLogContext()
+                        .WriteTo.File(
+                            new CompactJsonFormatter(),
+                            logPath,
+                            rollingInterval: RollingInterval.Day,
+                            retainedFileCountLimit: retentionDays,
+                            shared: true)
+                        .CreateLogger();
+
+                    // Log the configuration snapshot as an event
+                    LogConfigSnapshot(config);
+                }
+                catch (Exception ex)
                 {
-                    _retentionDays = 14;
+                    // Fallback if config fails
+                    _logger = new LoggerConfiguration()
+                        .WriteTo.File(Path.Combine(Application.StartupPath, "SMS_Search_Fallback_.log"), rollingInterval: RollingInterval.Day)
+                        .CreateLogger();
+                    _logger.Error(ex, "Failed to load configuration");
                 }
-
-                _isConfigLoaded = true;
-            }
-            catch
-            {
-                // Fallback defaults
-                _debugLogEnabled = false;
-                _configuredLogLevel = LogLevel.Info;
-                _retentionDays = 14;
             }
         }
 
-		public void Logger(LogLevel level, string message)
-		{
-            if (!_isConfigLoaded)
-            {
-                ReloadConfig();
-            }
-
-            // Always log Errors, or if Debug Log is enabled and level is within range
-            if (level == LogLevel.Error || (_debugLogEnabled && (int)level <= (int)_configuredLogLevel))
-            {
-                string dateStr = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
-                string startupPath = Application.StartupPath;
-                string logFilePath = Path.Combine(startupPath, string.Format("SMS_Search_{0}.log", dateStr));
-
-                lock (_lock)
-                {
-                    try
-                    {
-                        bool isNewFile = !File.Exists(logFilePath);
-
-                        using (StreamWriter streamWriter = File.AppendText(logFilePath))
-                        {
-                            if (isNewFile)
-                            {
-                                WriteLogHeader(streamWriter);
-                            }
-
-                            string sourceTag = string.IsNullOrEmpty(_source) ? "" : "[" + _source + "] ";
-                            streamWriter.WriteLine(string.Concat(new object[]
-                            {
-                                "ts=\"",
-                                DateTime.Now.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture),
-                                "\" lvl=\"",
-                                level.ToString().ToUpper(),
-                                "\" msg=\"",
-                                sourceTag,
-                                message,
-                                "\" "
-                            }));
-                            streamWriter.Flush();
-                        }
-                    }
-                    catch
-                    {
-                        // If logging fails (e.g. file locked), we swallow it to prevent crashing the app
-                    }
-                }
-            }
-		}
-
-        private void WriteLogHeader(StreamWriter writer)
+        private void LogConfigSnapshot(ConfigManager config)
         {
             try
             {
-                writer.WriteLine(new string('=', 50));
-                writer.WriteLine("SMS Search Log File");
-                writer.WriteLine("Date: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                writer.WriteLine("Version: " + Application.ProductVersion);
-                writer.WriteLine("Machine: " + Environment.MachineName);
-                writer.WriteLine("User: " + Environment.UserName);
-                writer.WriteLine(new string('-', 50));
-                writer.WriteLine("Configuration Snapshot:");
-
-                string configPath = Path.Combine(Application.StartupPath, "SMS Search.json");
-                ConfigManager config = new ConfigManager(configPath);
                 var rawConfig = config.GetRawConfig();
+                var safeConfig = new Dictionary<string, Dictionary<string, string>>();
 
                 foreach (var section in rawConfig)
                 {
-                    writer.WriteLine($"[{section.Key}]");
+                    var safeSection = new Dictionary<string, string>();
                     foreach (var kvp in section.Value)
                     {
                         string val = kvp.Value;
-                        // Obfuscate potential passwords
                         if (kvp.Key.ToUpper().Contains("PASSWORD") || kvp.Key.ToUpper().Contains("PWD"))
                         {
                             val = "********";
                         }
-                        writer.WriteLine($"{kvp.Key}={val}");
+                        safeSection[kvp.Key] = val;
                     }
+                    safeConfig[section.Key] = safeSection;
                 }
-                writer.WriteLine(new string('=', 50));
+
+                var contextLogger = _logger.ForContext("Source", "System");
+                contextLogger.Information("Configuration Loaded. Version: {Version}. Machine: {Machine}. User: {User}. Config: {@Config}",
+                    Application.ProductVersion,
+                    Environment.MachineName,
+                    Environment.UserName,
+                    safeConfig);
             }
-            catch (Exception ex)
-            {
-                writer.WriteLine("Failed to write header: " + ex.Message);
-            }
+            catch { }
         }
 
-        public void CleanupLogs()
+		public void Logger(LogLevel level, string message)
+		{
+            EnsureConfigured();
+            var contextLogger = _logger.ForContext("Source", _source);
+
+            switch (level)
+            {
+                case LogLevel.Critical:
+                    contextLogger.Fatal(message);
+                    break;
+                case LogLevel.Error:
+                    contextLogger.Error(message);
+                    break;
+                case LogLevel.Warning:
+                    contextLogger.Warning(message);
+                    break;
+                case LogLevel.Info:
+                    contextLogger.Information(message);
+                    break;
+                case LogLevel.Debug:
+                    contextLogger.Debug(message);
+                    break;
+                default:
+                    contextLogger.Information(message);
+                    break;
+            }
+		}
+
+        public void LogSql(string query, long elapsedMs, int rowCount, bool success, string errorMessage = null)
         {
-            if (!_isConfigLoaded) ReloadConfig();
-            CleanupLogs(_retentionDays);
+            EnsureConfigured();
+            var contextLogger = _logger.ForContext("Source", _source);
+
+            if (!success)
+            {
+                contextLogger.Error("SQL Execution Failed. Elapsed: {ElapsedMs}ms. Error: {ErrorMessage}. Query: {Query}",
+                    elapsedMs, errorMessage, query);
+            }
+            else
+            {
+                // Requirement: Debug for deep-dive SQL execution details
+                contextLogger.Debug("SQL Execution Success. Elapsed: {ElapsedMs}ms. Rows: {RowCount}. Query: {Query}",
+                    elapsedMs, rowCount, query);
+            }
         }
 
         public void CleanupLogs(int retentionDays)
         {
-            try
-            {
-                string startupPath = Application.StartupPath;
-                string[] files = Directory.GetFiles(startupPath, "SMS_Search_*.log");
-                DateTime thresholdDate = DateTime.Now.Date.AddDays(-retentionDays);
-
-                foreach (string file in files)
-                {
-                    string fileName = Path.GetFileName(file);
-                    // Expected format: SMS_Search_yyyyMMdd.log
-                    // Length: SMS_Search_ (11) + yyyyMMdd (8) + .log (4) = 23
-                    if (fileName.Length == 23 && fileName.StartsWith("SMS_Search_") && fileName.EndsWith(".log"))
-                    {
-                        string datePart = fileName.Substring(11, 8);
-                        DateTime logDate;
-                        if (DateTime.TryParseExact(datePart, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out logDate))
-                        {
-                            if (logDate < thresholdDate)
-                            {
-                                try
-                                {
-                                    File.Delete(file);
-                                }
-                                catch { } // Best effort
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
+            // Serilog handles retention automatically based on 'retainedFileCountLimit'.
+            // However, if we want to force a reload of config to ensure retention is updated:
+            ReloadConfig();
         }
 	}
 }

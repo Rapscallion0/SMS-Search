@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -416,6 +417,7 @@ namespace SMS_Search
 				dGrd.DataSource = bindingSource;
                 DataTable dataTable = new DataTable();
                 dataTable.Locale = CultureInfo.InvariantCulture;
+                Stopwatch sw = Stopwatch.StartNew();
 
 				try
 				{
@@ -427,13 +429,14 @@ namespace SMS_Search
 					    new SqlCommandBuilder(dataAdapter);
 					    dataAdapter.Fill(dataTable);
                     });
+                    sw.Stop();
 
 					bindingSource.DataSource = dataTable;
-					log.Logger(LogLevel.Info, "SQL query executed");
-					log.Logger(LogLevel.Info, text);
+                    log.LogSql(text, sw.ElapsedMilliseconds, dataTable.Rows.Count, true);
 				}
 				catch (Exception ex)
 				{
+                    sw.Stop();
                     // Unwrap AggregateException if present, though Task.Run with await usually throws the inner exception.
                     Exception inner = ex;
                     if (ex is AggregateException ae) inner = ae.InnerException;
@@ -442,12 +445,11 @@ namespace SMS_Search
                     {
 					    SQLError = true;
 					    MessageBox.Show(sqlEx.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-					    log.Logger(LogLevel.Info, "SQL query executed");
-					    log.Logger(LogLevel.Info, text);
-					    log.Logger(LogLevel.Error, sqlEx.Message);
+                        log.LogSql(text, sw.ElapsedMilliseconds, 0, false, sqlEx.Message);
                     }
                     else
                     {
+                        log.LogSql(text, sw.ElapsedMilliseconds, 0, false, inner.Message);
                         throw;
                     }
 				}
@@ -458,7 +460,6 @@ namespace SMS_Search
 					if (dGrd.RowCount > 0 && !SQLError)
 					{
 						dGrd.CurrentCell = dGrd[0, 0];
-						log.Logger(LogLevel.Info, "SQL records returned: " + dGrd.RowCount.ToString());
 					}
 				}
 
@@ -1624,21 +1625,25 @@ namespace SMS_Search
                     switch (tuple4.Item1)
                     {
                         case "PopulateTableList":
+                            string selectCommandText = "SELECT NAME FROM sys.tables ORDER BY NAME";
+                            Stopwatch swTbl = Stopwatch.StartNew();
                             try
                             {
-                                string selectCommandText = "SELECT NAME FROM sys.tables ORDER BY NAME";
                                 dataAdapter = new SqlDataAdapter(selectCommandText, GetConnString(tuple4.Item2, tuple4.Item3));
                                 DataTable dataTable = new DataTable();
                                 dataTable.Locale = CultureInfo.InvariantCulture;
                                 dataTable.Clear();
                                 dataAdapter.Fill(dataTable);
+                                swTbl.Stop();
+
                                 e.Result = new Tuple<DataTable, string>(dataTable, tuple4.Item4);
-                                log.Logger(LogLevel.Info, $"backgroundWorker_DoWork: PopulateTableList fetched {dataTable.Rows.Count} tables");
+                                log.LogSql(selectCommandText, swTbl.ElapsedMilliseconds, dataTable.Rows.Count, true);
                             }
                             catch (Exception ex)
                             {
+                                swTbl.Stop();
                                 e.Result = ex;
-                                log.Logger(LogLevel.Error, "backgroundWorker_DoWork: PopulateTableList error - " + ex.Message);
+                                log.LogSql(selectCommandText, swTbl.ElapsedMilliseconds, 0, false, ex.Message);
                             }
                             finally
                             {
@@ -1653,6 +1658,7 @@ namespace SMS_Search
                     switch (tuple2.Item1)
                     {
                         case "getDbNames":
+                            Stopwatch swDb = Stopwatch.StartNew();
                             try
                             {
                                 string connectionString = GetConnString(tuple2.Item2, "master");
@@ -1661,14 +1667,16 @@ namespace SMS_Search
                                     sqlConnection.Open();
                                     DataTable schema = sqlConnection.GetSchema("Databases");
                                     sqlConnection.Close();
+                                    swDb.Stop();
                                     e.Result = schema;
-                                    log.Logger(LogLevel.Info, $"backgroundWorker_DoWork: getDbNames fetched {schema.Rows.Count} databases");
+                                    log.LogSql("GetSchema(\"Databases\")", swDb.ElapsedMilliseconds, schema.Rows.Count, true);
                                 }
                             }
                             catch (Exception ex)
                             {
+                                swDb.Stop();
                                 e.Result = ex;
-                                log.Logger(LogLevel.Error, "backgroundWorker_DoWork: getDbNames error - " + ex.Message);
+                                log.LogSql("GetSchema(\"Databases\")", swDb.ElapsedMilliseconds, 0, false, ex.Message);
                             }
                             break;
                     }
