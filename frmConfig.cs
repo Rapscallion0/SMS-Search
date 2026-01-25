@@ -144,9 +144,10 @@ namespace SMS_Search
 		{
 			if (DbNames.Count < 1)
 			{
+                string currentText = cmbDbDatabase.Text; // Preserve current text (e.g. from config)
                 cmbDbDatabase.Items.Clear();
                 cmbDbDatabase.Items.Add("Loading...");
-                cmbDbDatabase.SelectedIndex = 0;
+                // Do not select "Loading..." to avoid overwriting the Text property if it's already set
                 cmbDbDatabase.Enabled = false;
 
                 string user = chkWindowsAuth.Checked ? null : txtDbUser.Text;
@@ -157,8 +158,15 @@ namespace SMS_Search
                     Cursor = Cursors.WaitCursor;
                     var dbs = await _repo.GetDatabasesAsync(cmbDbServer.Text, user, pass);
 
+                    DbNames.Clear();
+                    foreach (var db in dbs)
+                    {
+                        DbNames.Add(db);
+                    }
+                    DbNames.Sort();
+
                     cmbDbDatabase.Items.Clear();
-					foreach (var db in dbs)
+					foreach (var db in DbNames)
 					{
                         cmbDbDatabase.Items.Add(db);
 					}
@@ -172,9 +180,25 @@ namespace SMS_Search
 				{
                     Cursor = Cursors.Default;
                     cmbDbDatabase.Enabled = true;
+                    // Restore text if it matches an item, or if it was valid input
+                    if (!string.IsNullOrEmpty(currentText) && currentText != "Loading...")
+                    {
+                         cmbDbDatabase.Text = currentText;
+                    }
+                    else if (cmbDbDatabase.Items.Count > 0)
+                    {
+                         cmbDbDatabase.SelectedIndex = 0;
+                    }
 				}
 			}
-            DbNames.Sort();
+            else
+            {
+                 // If cache exists, ensure combo is populated (in case it was cleared by something else)
+                 if (cmbDbDatabase.Items.Count == 0 && DbNames.Count > 0)
+                 {
+                      foreach (var db in DbNames) cmbDbDatabase.Items.Add(db);
+                 }
+            }
 		}
 		private void lblConfigFilePath_Click(object sender, EventArgs e)
 		{
