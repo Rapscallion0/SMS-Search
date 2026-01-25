@@ -158,7 +158,7 @@ namespace Log
                 }
 
                 var contextLogger = _logger.ForContext("Source", "System");
-                contextLogger.Information("Configuration Loaded. Version: {Version}. Machine: {Machine}. User: {User}. Config: {@Config}",
+                contextLogger.Information("Settings Loaded. Version: {Version}. Machine: {Machine}. User: {User}. Config: {@Config}",
                     Application.ProductVersion,
                     Environment.MachineName,
                     Environment.UserName,

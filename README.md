@@ -12,7 +12,7 @@ SMS Search is a Windows Forms application designed to assist in searching and qu
 - **Custom SQL**: Execute custom SQL queries directly within the application.
 - **SQL Cleaner**: Utility to "clean" SQL queries by removing formatting and comments for easier reading or copying.
 - **Unarchive Tool**: Includes a helper form (`frmUnarchive`) for handling archived data.
-- **Configuration**: Customizable settings via `SMS Search.ini` (Database connection, UI preferences).
+- **Configuration**: Customizable settings via `SMS Search_settings.json` (Database connection, UI preferences).
 - **Export/View**: Results are displayed in a DataGridView with sorting and resize capabilities.
 
 ## Prerequisites
@@ -31,7 +31,7 @@ SMS Search is a Windows Forms application designed to assist in searching and qu
 
 ## Configuration
 
-The application uses `SMS Search.ini` for configuration. If the file is missing or the connection fails, the configuration window will open on startup.
+The application uses `SMS Search_settings.json` for configuration. If the file is missing or the connection fails, the configuration window will open on startup.
 
 **Key Configuration Sections:**
 - `[CONNECTION]`: Stores `SERVER` and `DATABASE` names.

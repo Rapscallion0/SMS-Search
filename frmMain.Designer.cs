@@ -283,7 +283,7 @@ namespace SMS_Search
             this.btnSetup.Size = new System.Drawing.Size(28, 24);
             this.btnSetup.TabIndex = 3;
             this.btnSetup.TabStop = false;
-            this.toolTip.SetToolTip(this.btnSetup, "Configuration");
+            this.toolTip.SetToolTip(this.btnSetup, "Settings");
             this.btnSetup.UseVisualStyleBackColor = true;
             this.btnSetup.Click += new System.EventHandler(this.btnSetup_Click);
             // 

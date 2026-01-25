@@ -39,6 +39,25 @@ namespace SMS_Search
 
             _config = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
+            // Migration from SMS Search.json to SMS Search_settings.json
+            string legacyJsonName = "SMS Search.json";
+            string currentJsonName = Path.GetFileName(_jsonFilePath);
+            if (!string.Equals(legacyJsonName, currentJsonName, StringComparison.OrdinalIgnoreCase))
+            {
+                string dir = directory;
+                if (string.IsNullOrEmpty(dir)) dir = AppDomain.CurrentDomain.BaseDirectory;
+
+                string legacyPath = Path.Combine(dir, legacyJsonName);
+                if (File.Exists(legacyPath) && !File.Exists(_jsonFilePath))
+                {
+                    try
+                    {
+                        File.Move(legacyPath, _jsonFilePath);
+                    }
+                    catch { }
+                }
+            }
+
             Load();
         }
 

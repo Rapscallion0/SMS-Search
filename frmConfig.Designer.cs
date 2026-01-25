@@ -175,7 +175,7 @@ namespace SMS_Search
             this.btnResetConfig.Size = new System.Drawing.Size(75, 23);
             this.btnResetConfig.TabIndex = 5;
             this.btnResetConfig.Text = "Reload";
-            this.toolTip1.SetToolTip(this.btnResetConfig, "Reload configuration from file");
+            this.toolTip1.SetToolTip(this.btnResetConfig, "Reload settings from file");
             this.btnResetConfig.UseVisualStyleBackColor = true;
             this.btnResetConfig.Click += new System.EventHandler(this.btnReloadConfig_Click);
             // 
@@ -187,7 +187,7 @@ namespace SMS_Search
             this.btnApplyConfig.Size = new System.Drawing.Size(75, 23);
             this.btnApplyConfig.TabIndex = 6;
             this.btnApplyConfig.Text = "Apply";
-            this.toolTip1.SetToolTip(this.btnApplyConfig, "Save all configuration changes to file");
+            this.toolTip1.SetToolTip(this.btnApplyConfig, "Save all settings changes to file");
             this.btnApplyConfig.UseVisualStyleBackColor = true;
             this.btnApplyConfig.Click += new System.EventHandler(this.btnApplyConfig_Click);
             // 
@@ -239,7 +239,7 @@ namespace SMS_Search
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 7;
             this.btnCancel.Text = "Close";
-            this.toolTip1.SetToolTip(this.btnCancel, "Close configuration without saving changes");
+            this.toolTip1.SetToolTip(this.btnCancel, "Close settings without saving changes");
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
@@ -251,7 +251,7 @@ namespace SMS_Search
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 4;
             this.btnOk.Text = "OK";
-            this.toolTip1.SetToolTip(this.btnOk, "Apply changes and close configuration");
+            this.toolTip1.SetToolTip(this.btnOk, "Apply changes and close settings");
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
@@ -629,7 +629,7 @@ namespace SMS_Search
             this.lblLauncherInfo.Name = "lblLauncherInfo";
             this.lblLauncherInfo.Size = new System.Drawing.Size(400, 13);
             this.lblLauncherInfo.TabIndex = 0;
-            this.lblLauncherInfo.Text = "Configure the hidden launcher service to switch to SMS Search via global hotkey.";
+            this.lblLauncherInfo.Text = "Update the hidden launcher settings to switch to SMS Search via global hotkey.";
             //
             // lblHotkey
             //
@@ -705,7 +705,7 @@ namespace SMS_Search
             this.groupBox1.Size = new System.Drawing.Size(530, 80);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Configure the fields to query when using filters.";
+            this.groupBox1.Text = "Select the fields to query when using filters.";
             // 
             // txtQryFct
             // 
@@ -856,7 +856,7 @@ namespace SMS_Search
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "SMS Search configuration";
+            this.Text = "SMS Search Settings";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.frmConfig_Load);
             this.Shown += new System.EventHandler(this.frmConfig_Shown);

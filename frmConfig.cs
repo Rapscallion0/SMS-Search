@@ -26,7 +26,7 @@ namespace SMS_Search
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
-        private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search.json"));
+        private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search_settings.json"));
         private const string LauncherExe = "SMS Search Launcher.exe";
         private string _lastValidHotkey = "";
         private string _currentValidHotkey = "";
@@ -40,13 +40,13 @@ namespace SMS_Search
 			base.StartPosition = FormStartPosition.Manual;
 			base.Top = (Screen.PrimaryScreen.WorkingArea.Height - base.Height) / 2;
 			base.Left = (Screen.PrimaryScreen.WorkingArea.Width - base.Width) / 2;
-            lblConfigFilePath.Text = Path.Combine(Application.StartupPath, "SMS Search.json");
-            toolTip1.SetToolTip(lblConfigFilePath, Path.Combine(Application.StartupPath, "SMS Search.json"));
+            lblConfigFilePath.Text = Path.Combine(Application.StartupPath, "SMS Search_settings.json");
+            toolTip1.SetToolTip(lblConfigFilePath, Path.Combine(Application.StartupPath, "SMS Search_settings.json"));
 		}
 
 		private void frmConfig_Load(object sender, EventArgs e)
 		{
-            log.Logger(LogLevel.Info, "Configuration window opened");
+            log.Logger(LogLevel.Info, "Settings window opened");
             txtHotkey.KeyUp += txtHotkey_KeyUp;
             txtHotkey.Leave += txtHotkey_Leave;
             chkLogging.CheckedChanged += chkLogging_CheckedChanged;
@@ -178,7 +178,7 @@ namespace SMS_Search
 		}
 		private void lblConfigFilePath_Click(object sender, EventArgs e)
 		{
-			Process.Start(Path.Combine(Application.StartupPath, "SMS Search.json"));
+			Process.Start(Path.Combine(Application.StartupPath, "SMS Search_settings.json"));
 		}
 		private void loadConfig()
 		{
@@ -664,7 +664,7 @@ namespace SMS_Search
 
             config.Save();
             log.ReloadConfig();
-            log.Logger(LogLevel.Info, "Configuration saved");
+            log.Logger(LogLevel.Info, "Settings saved");
             ReloadLauncherIfRunning();
 		}
 		private void btnCancel_Click(object sender, EventArgs e)
