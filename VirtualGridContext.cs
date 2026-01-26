@@ -213,7 +213,7 @@ namespace SMS_Search
                 }
              }
 
-             using (var reader = await _repo.GetQueryDataReaderAsync(_server, _database, _user, _pass, finalSql, _parameters))
+             await _repo.ExecuteQueryWithReaderAsync(_server, _database, _user, _pass, finalSql, _parameters, async (reader) =>
              {
                  using (var writer = new System.IO.StreamWriter(filename))
                  {
@@ -227,7 +227,7 @@ namespace SMS_Search
                      }
                      writer.WriteLine();
 
-                     while (await reader.ReadAsync())
+                     while (reader.Read())
                      {
                          for (int i = 0; i < reader.FieldCount; i++)
                          {
@@ -239,7 +239,8 @@ namespace SMS_Search
                          writer.WriteLine();
                      }
                  }
-             }
+                 await Task.CompletedTask;
+             });
         }
     }
 }

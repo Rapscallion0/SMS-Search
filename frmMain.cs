@@ -550,7 +550,6 @@ namespace SMS_Search
                 var criteria = GetSearchCriteriaFromUI();
                 var queryResult = _queryBuilder.Build(criteria);
 
-				bool SQLError = false;
                 Stopwatch sw = Stopwatch.StartNew();
 
 				try
@@ -589,13 +588,10 @@ namespace SMS_Search
                         sw.Stop();
                         tslblRecordCnt.Text = dataTable.Rows.Count.ToString();
                         log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, dataTable.Rows.Count, true);
-
-                        SQLError = false;
                     }
                     catch (Exception ex2)
                     {
                         sw.Stop();
-                        SQLError = true;
                         MessageBox.Show("Virtual Load Error: " + ex.Message + "\n\nLegacy Load Error: " + ex2.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                         log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, 0, false, ex2.Message);
                     }

@@ -129,12 +129,16 @@ namespace SMS_Search
             }
         }
 
-        public async Task<SqlDataReader> GetQueryDataReaderAsync(string server, string database, string user, string pass, string sql, object parameters)
+        public async Task ExecuteQueryWithReaderAsync(string server, string database, string user, string pass, string sql, object parameters, Func<IDataReader, Task> action)
         {
-            var conn = new SqlConnection(GetConnectionString(server, database, user, pass));
-            await conn.OpenAsync();
-            // Caller is responsible for disposing reader and connection
-            return await conn.ExecuteReaderAsync(sql, parameters, commandBehavior: CommandBehavior.CloseConnection) as SqlDataReader;
+            using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+            {
+                await conn.OpenAsync();
+                using (var reader = await conn.ExecuteReaderAsync(sql, parameters))
+                {
+                    await action(reader);
+                }
+            }
         }
 
         private string ApplyFilter(string sql, string filter)
