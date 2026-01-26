@@ -40,7 +40,15 @@ namespace Log
         public Logfile(string source = "App")
         {
             _source = source;
-            _stateFilePath = Path.Combine(Application.StartupPath, "SMS Search.state");
+            _stateFilePath = Path.Combine(Application.StartupPath, "SMSSearch.state");
+
+            // Migrate legacy state file
+            string legacyStatePath = Path.Combine(Application.StartupPath, "SMS Search.state");
+            if (File.Exists(legacyStatePath) && !File.Exists(_stateFilePath))
+            {
+                try { File.Move(legacyStatePath, _stateFilePath); } catch { }
+            }
+
             EnsureConfigured();
         }
 
@@ -64,7 +72,7 @@ namespace Log
             {
                 try
                 {
-                    string configPath = Path.Combine(Application.StartupPath, "SMS Search_settings.json");
+                    string configPath = Path.Combine(Application.StartupPath, "SMSSearch_settings.json");
                     ConfigManager config = new ConfigManager(configPath);
 
                     _debugLogEnabled = config.GetValue("GENERAL", "DEBUG_LOG") == "1";
@@ -107,7 +115,7 @@ namespace Log
                         }
                     }
 
-                    string logPath = Path.Combine(Application.StartupPath, "SMS Search_log..json");
+                    string logPath = Path.Combine(Application.StartupPath, "SMSSearch_log..json");
 
                     _logger = new LoggerConfiguration()
                         .MinimumLevel.Is(minimumLevel)
@@ -127,7 +135,7 @@ namespace Log
                 {
                     // Fallback if config fails
                     _logger = new LoggerConfiguration()
-                        .WriteTo.File(Path.Combine(Application.StartupPath, "SMS Search_Fallback_log..log"), rollingInterval: RollingInterval.Day)
+                        .WriteTo.File(Path.Combine(Application.StartupPath, "SMSSearch_Fallback_log..log"), rollingInterval: RollingInterval.Day)
                         .CreateLogger();
                     _logger.Error(ex, "Failed to load configuration");
                 }
