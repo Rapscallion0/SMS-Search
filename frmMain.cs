@@ -73,8 +73,67 @@ namespace SMS_Search
 			Width = FormWidthMin;
 			splitContainer.Panel2MinSize = splitContainer.Height - splitContainer.Panel1.Height - splitContainer.SplitterWidth - 3;
 			StartPosition = FormStartPosition.Manual;
-			Top = (Screen.PrimaryScreen.WorkingArea.Height - FormHeightExpanded) / 2;
-			Left = (Screen.PrimaryScreen.WorkingArea.Width - Width) / 2;
+
+            string startupLoc = config.GetValue("GENERAL", "STARTUP_LOCATION");
+
+            if (startupLoc == "PRIMARY")
+            {
+			    Top = (Screen.PrimaryScreen.WorkingArea.Height - FormHeightExpanded) / 2;
+			    Left = (Screen.PrimaryScreen.WorkingArea.Width - Width) / 2;
+            }
+            else if (startupLoc == "ACTIVE")
+            {
+                // Active display (based on cursor)
+                Screen screen = Screen.FromPoint(Cursor.Position);
+			    Top = screen.WorkingArea.Top + (screen.WorkingArea.Height - FormHeightExpanded) / 2;
+			    Left = screen.WorkingArea.Left + (screen.WorkingArea.Width - Width) / 2;
+            }
+            else if (startupLoc == "CURSOR")
+            {
+                // Center around cursor
+                Top = Cursor.Position.Y - (FormHeightExpanded / 2);
+                Left = Cursor.Position.X - (Width / 2);
+            }
+            else
+            {
+                // Default to Last Location (LAST)
+                int lastTop, lastLeft;
+                bool validTop = int.TryParse(config.GetValue("GENERAL", "LAST_TOP"), out lastTop);
+                bool validLeft = int.TryParse(config.GetValue("GENERAL", "LAST_LEFT"), out lastLeft);
+
+                if (validTop && validLeft)
+                {
+                    // Check if the last location is visible on any screen
+                    bool isVisible = false;
+                    foreach (Screen screen in Screen.AllScreens)
+                    {
+                        if (screen.Bounds.Contains(new Point(lastLeft + 20, lastTop + 20)))
+                        {
+                            isVisible = true;
+                            break;
+                        }
+                    }
+
+                    if (isVisible)
+                    {
+                        Top = lastTop;
+                        Left = lastLeft;
+                    }
+                    else
+                    {
+                        // Fallback to primary if off-screen
+                        Top = (Screen.PrimaryScreen.WorkingArea.Height - FormHeightExpanded) / 2;
+			            Left = (Screen.PrimaryScreen.WorkingArea.Width - Width) / 2;
+                    }
+                }
+                else
+                {
+                    // Fallback to primary if no last location saved
+                    Top = (Screen.PrimaryScreen.WorkingArea.Height - FormHeightExpanded) / 2;
+			        Left = (Screen.PrimaryScreen.WorkingArea.Width - Width) / 2;
+                }
+            }
+
 			txtNumFct.Focus();
 		}
 
@@ -1087,6 +1146,15 @@ namespace SMS_Search
 				Visible = false;
 				return;
 			}
+
+            // Save last location
+            if (WindowState == FormWindowState.Normal)
+            {
+                config.SetValue("GENERAL", "LAST_TOP", Top.ToString());
+                config.SetValue("GENERAL", "LAST_LEFT", Left.ToString());
+                config.Save();
+            }
+
 			foreach (Form form in Application.OpenForms)
 			{
 				if (form is frmUnarchive)
