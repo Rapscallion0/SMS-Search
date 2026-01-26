@@ -7,6 +7,7 @@ using Serilog;
 using Serilog.Formatting.Json;
 using Serilog.Events;
 using Serilog.Formatting;
+using System.Text.Json;
 
 namespace Log
 {
@@ -19,11 +20,18 @@ namespace Log
         Debug = 4
     }
 
+    public class LogState
+    {
+        public DateTime LastFullLogDate { get; set; } = DateTime.MinValue;
+        public Dictionary<string, Dictionary<string, string>> LastConfig { get; set; } = new Dictionary<string, Dictionary<string, string>>();
+    }
+
 	public class Logfile
 	{
         private static ILogger _logger;
         private static readonly object _syncRoot = new object();
         private string _source = "App";
+        private readonly string _stateFilePath;
 
         // Keep these for internal state tracking if needed, but primarily driven by Serilog config
         private static bool _debugLogEnabled = false;
@@ -32,6 +40,7 @@ namespace Log
         public Logfile(string source = "App")
         {
             _source = source;
+            _stateFilePath = Path.Combine(Application.StartupPath, "SMS Search.state");
             EnsureConfigured();
         }
 
@@ -81,16 +90,6 @@ namespace Log
                     // Map internal LogLevel to Serilog LogEventLevel
                     LogEventLevel minimumLevel = LogEventLevel.Information;
 
-                    // Logic:
-                    // If DEBUG_LOG is OFF, maybe we only log Errors?
-                    // The original logic was:
-                    // "Always log Errors, or if Debug Log is enabled and level is within range"
-
-                    // New Logic to match:
-                    // If DEBUG_LOG is 0, we restrict to Error/Fatal?
-                    // Or does LogLevel config take precedence?
-                    // "Error events are always logged, while other levels require DEBUG_LOG to be enabled and the event level to be within the configured LOG_LEVEL."
-
                     if (!_debugLogEnabled)
                     {
                         minimumLevel = LogEventLevel.Error;
@@ -121,8 +120,8 @@ namespace Log
                             shared: true)
                         .CreateLogger();
 
-                    // Log the configuration snapshot as an event
-                    LogConfigSnapshot(config);
+                    // Process configuration logging (Full vs Delta)
+                    ProcessConfigLogging(config);
                 }
                 catch (Exception ex)
                 {
@@ -135,34 +134,165 @@ namespace Log
             }
         }
 
-        private void LogConfigSnapshot(ConfigManager config)
+        private void ProcessConfigLogging(ConfigManager config)
         {
             try
             {
-                var rawConfig = config.GetRawConfig();
-                var safeConfig = new Dictionary<string, Dictionary<string, string>>();
+                // 1. Get current sanitized config
+                var currentRaw = config.GetRawConfig();
+                var currentSafe = SanitizeConfig(currentRaw);
 
-                foreach (var section in rawConfig)
+                // 2. Load previous state
+                LogState state = LoadLogState();
+
+                // 3. Check if we need full log (Different Day)
+                if (state.LastFullLogDate.Date != DateTime.Now.Date)
                 {
-                    var safeSection = new Dictionary<string, string>();
-                    foreach (var kvp in section.Value)
-                    {
-                        string val = kvp.Value;
-                        if (kvp.Key.ToUpper().Contains("PASSWORD") || kvp.Key.ToUpper().Contains("PWD"))
-                        {
-                            val = "********";
-                        }
-                        safeSection[kvp.Key] = val;
-                    }
-                    safeConfig[section.Key] = safeSection;
-                }
+                    // Full Log
+                    var contextLogger = _logger.ForContext("Source", "System");
+                    contextLogger.Information("Settings Loaded. Version: {Version}. Machine: {Machine}. User: {User}. Config: {@Config}",
+                        Application.ProductVersion,
+                        Environment.MachineName,
+                        Environment.UserName,
+                        currentSafe);
 
-                var contextLogger = _logger.ForContext("Source", "System");
-                contextLogger.Information("Settings Loaded. Version: {Version}. Machine: {Machine}. User: {User}. Config: {@Config}",
-                    Application.ProductVersion,
-                    Environment.MachineName,
-                    Environment.UserName,
-                    safeConfig);
+                    // Update State
+                    state.LastFullLogDate = DateTime.Now;
+                    state.LastConfig = currentSafe;
+                    SaveLogState(state);
+                }
+                else
+                {
+                    // Same Day -> Check for Deltas
+                    // Compare stored LastConfig with CurrentSafe
+                    var changes = GetConfigChanges(state.LastConfig, currentSafe);
+
+                    if (changes.Count > 0)
+                    {
+                        var contextLogger = _logger.ForContext("Source", "System");
+                        foreach (var change in changes)
+                        {
+                            contextLogger.Information(change);
+                        }
+
+                        // Update State with new config
+                        state.LastConfig = currentSafe;
+                        SaveLogState(state);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error processing config logging state");
+            }
+        }
+
+        private List<string> GetConfigChanges(
+            Dictionary<string, Dictionary<string, string>> oldConfig,
+            Dictionary<string, Dictionary<string, string>> newConfig)
+        {
+            var changes = new List<string>();
+
+            // Check for added or modified keys
+            foreach (var sectionKey in newConfig.Keys)
+            {
+                if (!oldConfig.ContainsKey(sectionKey))
+                {
+                    foreach (var key in newConfig[sectionKey].Keys)
+                    {
+                        changes.Add($"Config changed: [{sectionKey}] {key}: (null) -> {newConfig[sectionKey][key]}");
+                    }
+                }
+                else
+                {
+                    var oldSection = oldConfig[sectionKey];
+                    var newSection = newConfig[sectionKey];
+
+                    foreach (var key in newSection.Keys)
+                    {
+                        if (!oldSection.ContainsKey(key))
+                        {
+                            changes.Add($"Config changed: [{sectionKey}] {key}: (null) -> {newSection[key]}");
+                        }
+                        else if (oldSection[key] != newSection[key])
+                        {
+                            changes.Add($"Config changed: [{sectionKey}] {key}: {oldSection[key]} -> {newSection[key]}");
+                        }
+                    }
+                }
+            }
+
+            // Check for removed keys (optional, but good for completeness)
+            foreach (var sectionKey in oldConfig.Keys)
+            {
+                if (!newConfig.ContainsKey(sectionKey))
+                {
+                    foreach (var key in oldConfig[sectionKey].Keys)
+                    {
+                        changes.Add($"Config changed: [{sectionKey}] {key}: {oldConfig[sectionKey][key]} -> (null)");
+                    }
+                }
+                else
+                {
+                    var oldSection = oldConfig[sectionKey];
+                    var newSection = newConfig[sectionKey];
+
+                    foreach (var key in oldSection.Keys)
+                    {
+                        if (!newSection.ContainsKey(key))
+                        {
+                            changes.Add($"Config changed: [{sectionKey}] {key}: {oldSection[key]} -> (null)");
+                        }
+                    }
+                }
+            }
+
+            return changes;
+        }
+
+        private Dictionary<string, Dictionary<string, string>> SanitizeConfig(Dictionary<string, Dictionary<string, string>> rawConfig)
+        {
+            var safeConfig = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var section in rawConfig)
+            {
+                var safeSection = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var kvp in section.Value)
+                {
+                    string val = kvp.Value;
+                    if (kvp.Key.ToUpper().Contains("PASSWORD") || kvp.Key.ToUpper().Contains("PWD"))
+                    {
+                        val = "********";
+                    }
+                    safeSection[kvp.Key] = val;
+                }
+                safeConfig[section.Key] = safeSection;
+            }
+            return safeConfig;
+        }
+
+        private LogState LoadLogState()
+        {
+            if (File.Exists(_stateFilePath))
+            {
+                try
+                {
+                    string json = File.ReadAllText(_stateFilePath);
+                    var state = JsonSerializer.Deserialize<LogState>(json);
+                    if (state != null) return state;
+                }
+                catch { }
+            }
+            return new LogState();
+        }
+
+        private void SaveLogState(LogState state)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(state, options);
+                File.WriteAllText(_stateFilePath, json);
             }
             catch { }
         }
