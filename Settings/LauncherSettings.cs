@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SMS_Search;
 using Log;
+using System.Management;
 
 namespace SMS_Search.Settings
 {
@@ -20,7 +21,7 @@ namespace SMS_Search.Settings
 
         private ConfigManager _config;
         private Logfile _log = new Logfile();
-        private const string LauncherExe = "SMSSearchLauncher.exe";
+        private const string LegacyLauncherExe = "SMSSearchLauncher.exe";
         private string _lastValidHotkey = "";
         private string _currentValidHotkey = "";
         private bool _isCurrentHotkeyValid = false;
@@ -32,6 +33,10 @@ namespace SMS_Search.Settings
             InitializeComponent();
             _config = config;
             LoadSettings();
+
+            // Check for migration
+            CheckAndMigrateLegacy();
+
             UpdateLauncherStatusUI();
             WireUpEvents();
         }
@@ -76,6 +81,62 @@ namespace SMS_Search.Settings
             _isCurrentHotkeyValid = true;
 
             _isLoaded = true;
+        }
+
+        private void CheckAndMigrateLegacy()
+        {
+            string legacyPath = Path.Combine(Application.StartupPath, LegacyLauncherExe);
+            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string oldShortcut = Path.Combine(startupFolder, "SMS Search Launcher.lnk"); // Very old
+            string legacyShortcut = Path.Combine(startupFolder, "SMSSearchLauncher.lnk"); // Recent old
+
+            bool legacyExists = File.Exists(legacyPath) || File.Exists(oldShortcut) || File.Exists(legacyShortcut);
+
+            if (legacyExists)
+            {
+                _log.Logger(LogLevel.Info, "Legacy launcher detected. Migrating...");
+                // We run unregister (cleans up legacy) then register (sets up new)
+                // We do this async fire-and-forget or just invoke register button logic?
+                // Invoke Register logic but need to be careful about UI thread.
+                // Since this is Constructor/Load, we should probably do it carefully.
+                // Let's defer to a method we can await or run on load.
+
+                // For now, we will just queue it up.
+                this.BeginInvoke(new Action(async () => {
+                     await PerformMigration();
+                }));
+            }
+        }
+
+        private async Task PerformMigration()
+        {
+             try
+             {
+                 _log.Logger(LogLevel.Info, "Starting migration of legacy launcher...");
+                 lblLauncherStatus.Text = "Status: Migrating...";
+                 DrawStatusLight(Color.Orange);
+                 btnRegister.Enabled = false;
+                 btnUnregister.Enabled = false;
+
+                 await Task.Run(() =>
+                 {
+                     KillLauncher(); // Kills legacy and new
+                     DeleteLegacyLauncher(); // Deletes legacy exe
+                     RemoveStartupShortcut(); // Removes all shortcuts
+
+                     // Now Register New
+                     CreateStartupShortcut();
+                     StartLauncher();
+                 });
+             }
+             catch (Exception ex)
+             {
+                 _log.Logger(LogLevel.Error, "Migration failed: " + ex.Message);
+             }
+             finally
+             {
+                 UpdateLauncherStatusUI();
+             }
         }
 
         private void WireUpEvents()
@@ -175,6 +236,9 @@ namespace SMS_Search.Settings
             {
                  _config.SetValue("LAUNCHER", "HOTKEY", txtHotkey.Text);
                  _config.Save();
+
+                 // If running, restart to pick up new hotkey
+                 ReloadLauncherIfRunning();
             }
         }
 
@@ -221,7 +285,6 @@ namespace SMS_Search.Settings
                 await Task.Run(() =>
                 {
                     KillLauncher();
-                    ExtractLauncher();
                     CreateStartupShortcut();
                     StartLauncher();
                 });
@@ -253,7 +316,7 @@ namespace SMS_Search.Settings
                 {
                     RemoveStartupShortcut();
                     KillLauncher();
-                    DeleteLauncher();
+                    DeleteLegacyLauncher();
                 });
             }
             catch (Exception ex)
@@ -268,56 +331,13 @@ namespace SMS_Search.Settings
             }
         }
 
-        private void ExtractLauncher()
+        private void DeleteLegacyLauncher()
         {
-            _log.Logger(LogLevel.Info, "Extracting Launcher executable");
-            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
-            try
-            {
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly(); // Note: This might be SMS_Search.dll/exe
-                // The resource name might depend on namespace. "SMS_Search.Resources.SMSSearchLauncher.exe"
-                // But previously `GetExecutingAssembly` was `SMS_Search` (frmConfig).
-                // Now `LauncherSettings` is in `SMS_Search.Settings`. Executing assembly should be same (project).
-
-                string resourceName = "SMS_Search.Resources.SMSSearchLauncher.exe";
-
-                var resources = assembly.GetManifestResourceNames();
-                var foundResource = Array.Find(resources, r => r.EndsWith("SMSSearchLauncher.exe", StringComparison.OrdinalIgnoreCase));
-
-                if (foundResource != null)
-                {
-                    resourceName = foundResource;
-                }
-                else
-                {
-                    string availableResources = string.Join(Environment.NewLine, resources);
-                    throw new Exception("Embedded launcher resource not found.\nAvailable resources:\n" + availableResources);
-                }
-
-                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-                {
-                    if (stream == null)
-                    {
-                        throw new Exception("Embedded launcher resource stream is null for '" + resourceName + "'.");
-                    }
-                    using (FileStream fileStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
-                    {
-                        stream.CopyTo(fileStream);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Failed to extract launcher: " + ex.Message);
-            }
-        }
-
-        private void DeleteLauncher()
-        {
-            _log.Logger(LogLevel.Info, "Deleting Launcher executable");
-            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
+            _log.Logger(LogLevel.Info, "Checking for legacy Launcher executable");
+            string targetPath = Path.Combine(Application.StartupPath, LegacyLauncherExe);
             if (File.Exists(targetPath))
             {
+                _log.Logger(LogLevel.Info, "Deleting legacy Launcher executable");
                 int retries = 5;
                 while (retries >= 0)
                 {
@@ -331,7 +351,8 @@ namespace SMS_Search.Settings
                         bool isRetryable = ex is IOException || ex is UnauthorizedAccessException;
                         if (retries == 0 || !isRetryable)
                         {
-                            throw new Exception("Failed to delete launcher executable: " + ex.Message);
+                            _log.Logger(LogLevel.Warning, "Failed to delete legacy launcher: " + ex.Message);
+                            return;
                         }
                         retries--;
                         System.Threading.Thread.Sleep(200);
@@ -345,7 +366,7 @@ namespace SMS_Search.Settings
             _log.Logger(LogLevel.Info, "Creating Startup shortcut");
             string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
             string shortcutPath = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
-            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
+            string targetPath = Application.ExecutablePath; // Point to SELF
 
             // Cleanup old shortcut if exists
             string oldShortcut = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
@@ -354,12 +375,12 @@ namespace SMS_Search.Settings
                 try { File.Delete(oldShortcut); } catch { }
             }
 
-            if (!File.Exists(targetPath))
-            {
-                throw new FileNotFoundException("Launcher executable not found at: " + targetPath);
-            }
+            // Cleanup legacy shortcut
+             string legacyShortcut = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
+             // Actually this is the SAME name as the new one.
+             // We will overwrite it.
 
-            string script = String.Format("$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('{0}'); $Shortcut.TargetPath = '{1}'; $Shortcut.WorkingDirectory = '{2}'; $Shortcut.Save()",
+            string script = String.Format("$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('{0}'); $Shortcut.TargetPath = '{1}'; $Shortcut.Arguments = '--listener'; $Shortcut.WorkingDirectory = '{2}'; $Shortcut.Save()",
                 shortcutPath, targetPath, Application.StartupPath);
 
             ProcessStartInfo psi = new ProcessStartInfo();
@@ -394,40 +415,83 @@ namespace SMS_Search.Settings
 
         private void StartLauncher()
         {
-            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
-            if (File.Exists(targetPath))
+            string targetPath = Application.ExecutablePath;
+            if (!IsLauncherRunning())
             {
-                if (!IsLauncherRunning())
-                {
-                    _log.Logger(LogLevel.Info, "Starting Launcher");
-                    Process.Start(targetPath);
-                }
+                _log.Logger(LogLevel.Info, "Starting Launcher");
+                Process.Start(targetPath, "--listener");
             }
         }
 
         private void KillLauncher()
         {
+            // Kill legacy
             foreach (var name in new[] { "Launcher", "SMS Search Launcher", "SMSSearchLauncher" })
             {
-                Process[] processes = Process.GetProcessesByName(name);
-                foreach (Process p in processes)
+                foreach (Process p in Process.GetProcessesByName(name))
                 {
                     try
                     {
-                        _log.Logger(LogLevel.Info, "Killing process: " + name);
-                        p.Kill();
-                        p.WaitForExit(5000);
+                         _log.Logger(LogLevel.Info, "Killing legacy process: " + name);
+                         p.Kill();
+                         p.WaitForExit(5000);
                     }
                     catch { }
                 }
+            }
+
+            // Kill new listener
+            try
+            {
+                // We need to identify SMSSearch.exe running with --listener
+                using (var searcher = new ManagementObjectSearcher("SELECT ProcessId, CommandLine FROM Win32_Process WHERE Name LIKE 'SMSSearch%'"))
+                using (var objects = searcher.Get())
+                {
+                    foreach (var obj in objects)
+                    {
+                        string cmd = obj["CommandLine"]?.ToString();
+                        if (cmd != null && cmd.Contains("--listener"))
+                        {
+                            int pid = Convert.ToInt32(obj["ProcessId"]);
+                            try
+                            {
+                                Process p = Process.GetProcessById(pid);
+                                _log.Logger(LogLevel.Info, "Killing listener process: " + pid);
+                                p.Kill();
+                                p.WaitForExit(5000);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                 _log.Logger(LogLevel.Error, "Error killing listener: " + ex.Message);
             }
         }
 
         private bool IsLauncherRunning()
         {
-            return Process.GetProcessesByName("Launcher").Length > 0 ||
-                   Process.GetProcessesByName("SMS Search Launcher").Length > 0 ||
-                   Process.GetProcessesByName("SMSSearchLauncher").Length > 0;
+             // Check Mutex
+            try
+            {
+                // Note: Mutex.OpenExisting requires the exact name used in Program.cs which was "Global\SMSSearchListener" (prepend Global\ explicitly there? No, passed "SMSSearchListener" -> "Global\SMSSearchListener")
+                // SingleApplication prepends Global\.
+                // So the mutex name is "Global\SMSSearchListener".
+                using (var mutex = System.Threading.Mutex.OpenExisting("Global\\SMSSearchListener"))
+                {
+                    return true;
+                }
+            }
+            catch (WaitHandleCannotBeOpenedException)
+            {
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private void ReloadLauncherIfRunning()
@@ -463,9 +527,12 @@ namespace SMS_Search.Settings
         {
             string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
             string shortcutPath = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
-            string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
 
-            bool isRegistered = File.Exists(shortcutPath) && File.Exists(targetPath);
+            // Check if registered: Shortcut must exist.
+            // AND target of shortcut should be us?
+            // Simplified check: just shortcut existence + isListener running?
+
+            bool isRegistered = File.Exists(shortcutPath);
 
             DrawStatusLight(isRegistered);
 

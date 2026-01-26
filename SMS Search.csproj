@@ -52,29 +52,9 @@
   <ItemGroup>
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Management" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Launcher\**" />
-    <EmbeddedResource Remove="Launcher\**" />
-    <None Remove="Launcher\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="Launcher\Launcher.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
-
-  <Target Name="EmbedLauncher" AfterTargets="ResolveReferences">
-    <Message Text="Embedding SMS Search Launcher from Launcher/bin/$(Configuration)/SMSSearchLauncher.exe" Importance="high" />
-    <Error Condition="!Exists('Launcher/bin/$(Configuration)/SMSSearchLauncher.exe')" Text="Launcher executable not found at Launcher/bin/$(Configuration)/SMSSearchLauncher.exe. Build Launcher project first." />
-    <ItemGroup>
-      <EmbeddedResource Include="Launcher/bin/$(Configuration)/SMSSearchLauncher.exe">
-        <LogicalName>SMS_Search.Resources.SMSSearchLauncher.exe</LogicalName>
-      </EmbeddedResource>
-    </ItemGroup>
-  </Target>
 
   <Target Name="PostBuildRelease" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
      <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\publish_release.ps1&quot; -AssemblyInfoPath &quot;$(MSBuildProjectDirectory)\Properties\AssemblyInfo.cs&quot; -ExePath &quot;$(TargetPath)&quot;" />
