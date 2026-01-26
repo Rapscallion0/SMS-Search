@@ -31,7 +31,7 @@ namespace SMS_Search
 
         private BindingSource bindingSource;
         private Button btnPopGrid;
-        private DataGridView dGrd;
+        private SMS_Search.ExDataGridView dGrd;
         private ToolTip toolTip;
         private Button btnClearResults;
         private GroupBox groupBox1;
@@ -123,7 +123,7 @@ namespace SMS_Search
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.btnPopGrid = new System.Windows.Forms.Button();
-            this.dGrd = new System.Windows.Forms.DataGridView();
+            this.dGrd = new SMS_Search.ExDataGridView();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.btnSetup = new System.Windows.Forms.Button();
             this.picRefresh = new System.Windows.Forms.PictureBox();
