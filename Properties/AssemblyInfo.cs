@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Rapscallion Tools")]
-[assembly: AssemblyProduct("Properties")]
+[assembly: AssemblyProduct("SMS Search")]
 [assembly: AssemblyCopyright("© 2013-2026 Rapscallion Tools")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -31,5 +31,4 @@ using System.Runtime.InteropServices;
 //
 [assembly: AssemblyVersion("1.6.5.26023")]
 [assembly: AssemblyFileVersion("1.6.5.26023")]
-
 [assembly: AssemblyInformationalVersion("1.6.5.26023")]
