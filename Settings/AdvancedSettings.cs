@@ -48,7 +48,7 @@ namespace SMS_Search.Settings
             txtQryFct.TextChanged += (s, e) => SaveSetting("QUERY", "FUNCTION", txtQryFct.Text);
             txtQryTlz.TextChanged += (s, e) => SaveSetting("QUERY", "TOTALIZER", txtQryTlz.Text);
 
-            btnTestToast.Click += (s, e) => Utils.showToast(0, "This is a test toast notification", "Test Toast");
+            //btnTestToast.Click += (s, e) => Utils.showToast(0, "This is a test toast notification", "Test Toast");
         }
 
         private void SaveSetting(string section, string key, string value)
