@@ -31,9 +31,9 @@ namespace SMS_Search.Settings
             this.chkCheckUpdate = new System.Windows.Forms.CheckBox();
             this.btnChkUpdate = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            //
+            // 
             // chkCheckUpdate
-            //
+            // 
             this.chkCheckUpdate.AutoSize = true;
             this.chkCheckUpdate.Location = new System.Drawing.Point(20, 20);
             this.chkCheckUpdate.Name = "chkCheckUpdate";
@@ -41,18 +41,18 @@ namespace SMS_Search.Settings
             this.chkCheckUpdate.TabIndex = 0;
             this.chkCheckUpdate.Text = "Automatically check for update on startup";
             this.chkCheckUpdate.UseVisualStyleBackColor = true;
-            //
+            // 
             // btnChkUpdate
-            //
+            // 
             this.btnChkUpdate.Location = new System.Drawing.Point(20, 50);
             this.btnChkUpdate.Name = "btnChkUpdate";
             this.btnChkUpdate.Size = new System.Drawing.Size(140, 30);
             this.btnChkUpdate.TabIndex = 1;
-            this.btnChkUpdate.Text = "Check for update now";
+            this.btnChkUpdate.Text = "Check for update";
             this.btnChkUpdate.UseVisualStyleBackColor = true;
-            //
+            // 
             // UpdateSettings
-            //
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnChkUpdate);
