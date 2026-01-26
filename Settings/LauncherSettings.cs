@@ -95,9 +95,9 @@ namespace SMS_Search.Settings
             string legacyPath = Path.Combine(Application.StartupPath, LegacyLauncherExe);
             string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
             string oldShortcut = Path.Combine(startupFolder, "SMS Search Launcher.lnk"); // Very old
-            string legacyShortcut = Path.Combine(startupFolder, "SMSSearchLauncher.lnk"); // Recent old
+            // string legacyShortcut = Path.Combine(startupFolder, "SMSSearchLauncher.lnk"); // Recent old - matches current new shortcut name!
 
-            bool legacyExists = File.Exists(legacyPath) || File.Exists(oldShortcut) || File.Exists(legacyShortcut);
+            bool legacyExists = File.Exists(legacyPath) || File.Exists(oldShortcut);
 
             if (legacyExists)
             {
@@ -427,6 +427,15 @@ namespace SMS_Search.Settings
             {
                 _log.Logger(LogLevel.Info, "Starting Launcher");
                 Process.Start(targetPath, "--listener");
+
+                // Wait for it to start
+                int retries = 20; // 2 seconds
+                while (retries > 0)
+                {
+                    if (IsLauncherRunning()) break;
+                    System.Threading.Thread.Sleep(100);
+                    retries--;
+                }
             }
         }
 
@@ -540,26 +549,28 @@ namespace SMS_Search.Settings
             // Simplified check: just shortcut existence + isListener running?
 
             bool isRegistered = File.Exists(shortcutPath);
-
-            DrawStatusLight(isRegistered);
+            bool isRunning = IsLauncherRunning();
 
             if (isRegistered)
             {
                  btnRegister.Enabled = false;
                  btnUnregister.Enabled = true;
 
-                 if (IsLauncherRunning())
+                 if (isRunning)
                  {
                       lblLauncherStatus.Text = "Status: Registered - Service Running";
+                      DrawStatusLight(Color.Green);
                  }
                  else
                  {
                       lblLauncherStatus.Text = "Status: Registered - Service Stopped";
+                      DrawStatusLight(Color.Orange);
                  }
             }
             else
             {
                  lblLauncherStatus.Text = "Status: Not Registered";
+                 DrawStatusLight(Color.Red);
                  btnRegister.Enabled = true;
                  btnUnregister.Enabled = false;
             }
