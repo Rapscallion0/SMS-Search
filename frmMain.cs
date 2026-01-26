@@ -60,6 +60,7 @@ namespace SMS_Search
 		private static UpdateChecker Versions = new UpdateChecker();
 		private dbConnector dbConn = new dbConnector();
         private DataRepository _repo = new DataRepository();
+        private VirtualGridContext _gridContext;
         private QueryBuilder _queryBuilder;
 		private ArrayList arrayGrdFld = new ArrayList();
 		private ArrayList arrayGrdDesc = new ArrayList();
@@ -68,6 +69,13 @@ namespace SMS_Search
 		public frmMain(string[] Params)
 		{
 			InitializeComponent();
+            _gridContext = new VirtualGridContext(_repo);
+            _gridContext.DataReady += _gridContext_DataReady;
+            _gridContext.LoadError += _gridContext_LoadError;
+
+            dGrd.CellValueNeeded += dGrd_CellValueNeeded;
+            dGrd.ColumnHeaderMouseClick += dGrd_ColumnHeaderMouseClick;
+
             _filterDebounceTimer = new System.Windows.Forms.Timer();
             _filterDebounceTimer.Interval = 500;
             _filterDebounceTimer.Tick += _filterDebounceTimer_Tick;
@@ -242,8 +250,6 @@ namespace SMS_Search
             typeof(DataGridView).InvokeMember("DoubleBuffered",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty,
                 null, dGrd, new object[] { true });
-
-            bindingSource.ListChanged += BindingSource_ListChanged;
 
 			//Show();
 			//Focus();
@@ -527,12 +533,16 @@ namespace SMS_Search
             string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
             string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 
+            _gridContext.SetConnection(server, database, user, pass);
+
 			bool SQLConnected = await _repo.TestConnectionAsync(server, database, user, pass);
 			arrayGrdDesc.Clear();
 			arrayGrdDesc.TrimToSize();
 			arrayGrdFld.Clear();
 			arrayGrdFld.TrimToSize();
 			dGrd.DataSource = null;
+            dGrd.Rows.Clear();
+            dGrd.Columns.Clear();
 			tslblRecordCnt.Text = "0";
 
 			if (SQLConnected)
@@ -541,43 +551,60 @@ namespace SMS_Search
                 var queryResult = _queryBuilder.Build(criteria);
 
 				bool SQLError = false;
-				dGrd.DataSource = bindingSource;
                 Stopwatch sw = Stopwatch.StartNew();
-                int rowCount = 0;
 
 				try
 				{
-                    var dataTable = await _repo.ExecuteQueryAsync(server, database, user, pass, queryResult.Sql, queryResult.Parameters);
+                    // 1. Get Schema to setup columns
+                    var schemaDt = await _gridContext.GetSchemaAsync(queryResult.Sql, queryResult.Parameters);
+                    foreach (DataColumn col in schemaDt.Columns)
+                    {
+                        dGrd.Columns.Add(new DataGridViewTextBoxColumn { Name = col.ColumnName, HeaderText = col.ColumnName });
+                    }
+
+                    // 2. Load Data (Count)
+                    dGrd.VirtualMode = true;
+                    tslblRecordCnt.Text = "Loading...";
+                    string defaultSort = dGrd.Columns.Count > 0 ? dGrd.Columns[0].Name : null;
+                    await _gridContext.LoadAsync(queryResult.Sql, queryResult.Parameters, defaultSort);
+
                     sw.Stop();
-                    rowCount = dataTable.Rows.Count;
-					bindingSource.DataSource = dataTable;
-                    log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, rowCount, true);
+                    log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, _gridContext.TotalCount, true);
 				}
 				catch (Exception ex)
 				{
-                    sw.Stop();
-				    SQLError = true;
-				    MessageBox.Show(ex.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                    log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, 0, false, ex.Message);
+                    // Fallback to legacy load
+                    log.Logger(LogLevel.Warning, "Virtual Mode Load failed, attempting legacy load: " + ex.Message);
+                    try
+                    {
+                        dGrd.VirtualMode = false;
+                        dGrd.Rows.Clear();
+                        dGrd.Columns.Clear();
+
+                        var dataTable = await _repo.ExecuteQueryAsync(server, database, user, pass, queryResult.Sql, queryResult.Parameters);
+
+                        bindingSource.DataSource = dataTable;
+                        dGrd.DataSource = bindingSource;
+
+                        sw.Stop();
+                        tslblRecordCnt.Text = dataTable.Rows.Count.ToString();
+                        log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, dataTable.Rows.Count, true);
+
+                        SQLError = false;
+                    }
+                    catch (Exception ex2)
+                    {
+                        sw.Stop();
+                        SQLError = true;
+                        MessageBox.Show("Virtual Load Error: " + ex.Message + "\n\nLegacy Load Error: " + ex2.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                        log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, 0, false, ex2.Message);
+                    }
 				}
 				finally
 				{
-                    string limitStr = config.GetValue("GENERAL", "AUTO_RESIZE_LIMIT");
-                    int limit = 5000;
-                    if (string.IsNullOrEmpty(limitStr) || !int.TryParse(limitStr, out limit)) limit = 5000;
-
-                    if (dGrd.RowCount <= limit)
-                    {
-					    dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-                    }
-
-					if (dGrd.RowCount > 0 && !SQLError)
-					{
-						dGrd.CurrentCell = dGrd[0, 0];
-					}
+                    // Resize columns based on headers first
+					dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.ColumnHeader);
 				}
-
-				tslblRecordCnt.Text = dGrd.RowCount.ToString();
 				
                 if (Height < FormHeightMin + GridMinRowHeight && dGrd.RowCount > 0)
 				{
@@ -601,6 +628,42 @@ namespace SMS_Search
 			setHeaders();
 			SetBusy(false);
 		}
+
+        private void dGrd_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
+        {
+            if (e.RowIndex < _gridContext.TotalCount)
+            {
+                e.Value = _gridContext.GetValue(e.RowIndex, e.ColumnIndex);
+            }
+        }
+
+        private void _gridContext_DataReady(object sender, EventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => _gridContext_DataReady(sender, e)));
+                return;
+            }
+            dGrd.RowCount = _gridContext.TotalCount;
+            tslblRecordCnt.Text = _gridContext.TotalCount.ToString();
+            dGrd.Invalidate();
+        }
+
+        private void _gridContext_LoadError(object sender, string e)
+        {
+             if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => _gridContext_LoadError(sender, e)));
+                return;
+            }
+            MessageBox.Show(e, "Error loading data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private async void dGrd_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            var col = dGrd.Columns[e.ColumnIndex];
+            await _gridContext.ApplySortAsync(col.Name);
+        }
 
         private SearchCriteria GetSearchCriteriaFromUI()
         {
@@ -1486,22 +1549,36 @@ namespace SMS_Search
             _filterDebounceTimer.Start();
         }
 
-        private void _filterDebounceTimer_Tick(object sender, EventArgs e)
+        private async void _filterDebounceTimer_Tick(object sender, EventArgs e)
         {
             _filterDebounceTimer.Stop();
 
-            if (bindingSource.DataSource is DataTable dt)
+            string text = txtGridFilter.Text;
+
+            if (dGrd.VirtualMode)
             {
+                // Server-side filtering
+                var columns = new List<string>();
+                foreach (DataGridViewColumn col in dGrd.Columns)
+                {
+                    if (col.Visible) columns.Add(col.Name);
+                }
+
+                await _gridContext.ApplyFilterAsync(text, columns);
+            }
+            else if (bindingSource.DataSource != null)
+            {
+                // Legacy Client-side filtering
                 string filter = "";
-                string text = txtGridFilter.Text.Replace("'", "''"); // Escape single quote
-                if (!string.IsNullOrWhiteSpace(text))
+                string safeText = text.Replace("'", "''");
+                if (!string.IsNullOrWhiteSpace(safeText))
                 {
                     List<string> criteria = new List<string>();
                     foreach (DataGridViewColumn col in dGrd.Columns)
                     {
                         if (col.Visible)
                         {
-                            criteria.Add(string.Format("CONVERT([{0}], 'System.String') LIKE '%{1}%'", col.Name, text));
+                            criteria.Add(string.Format("CONVERT([{0}], 'System.String') LIKE '%{1}%'", col.Name, safeText));
                         }
                     }
                     if (criteria.Count > 0)
@@ -1510,12 +1587,15 @@ namespace SMS_Search
                     }
                 }
                 bindingSource.Filter = filter;
+
+                if (bindingSource.DataSource is DataTable dt)
+                    tslblRecordCnt.Text = !string.IsNullOrEmpty(filter) ? $"{bindingSource.Count} / {dt.Rows.Count}" : bindingSource.Count.ToString();
             }
         }
 
-        private void btnExport_Click(object sender, EventArgs e)
+        private async void btnExport_Click(object sender, EventArgs e)
         {
-            if (dGrd.Rows.Count == 0) return;
+            if (dGrd.RowCount == 0) return;
 
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
@@ -1523,35 +1603,25 @@ namespace SMS_Search
                 sfd.FileName = "SMS_Search_Export_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
+                    SetBusy(true);
                     try
                     {
-                        StringBuilder csv = new StringBuilder();
-
-                        // Headers
-                        List<string> headers = new List<string>();
-                        foreach (DataGridViewColumn col in dGrd.Columns)
+                        var headerMap = new Dictionary<string, string>();
+                        foreach(DataGridViewColumn col in dGrd.Columns)
                         {
-                            headers.Add("\"" + col.HeaderText.Replace("\"", "\"\"") + "\"");
-                        }
-                        csv.AppendLine(string.Join(",", headers));
-
-                        // Rows
-                        foreach (DataGridViewRow row in dGrd.Rows)
-                        {
-                            List<string> cells = new List<string>();
-                            foreach (DataGridViewCell cell in row.Cells)
-                            {
-                                cells.Add("\"" + (cell.Value?.ToString() ?? "").Replace("\"", "\"\"") + "\"");
-                            }
-                            csv.AppendLine(string.Join(",", cells));
+                            headerMap[col.Name] = col.HeaderText;
                         }
 
-                        File.WriteAllText(sfd.FileName, csv.ToString());
+                        await _gridContext.ExportToCsvAsync(sfd.FileName, headerMap);
                         Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show("Error exporting: " + ex.Message, "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        SetBusy(false);
                     }
                 }
             }
@@ -1577,23 +1647,5 @@ namespace SMS_Search
             DbOnline(tscmbDbDatabase.Text);
         }
 
-        private void BindingSource_ListChanged(object sender, ListChangedEventArgs e)
-        {
-            if (bindingSource.DataSource is DataTable dt)
-            {
-                if (!string.IsNullOrEmpty(bindingSource.Filter))
-                {
-                    tslblRecordCnt.Text = $"{bindingSource.Count} / {dt.Rows.Count}";
-                }
-                else
-                {
-                    tslblRecordCnt.Text = bindingSource.Count.ToString();
-                }
-            }
-            else
-            {
-                 tslblRecordCnt.Text = bindingSource.Count.ToString();
-            }
-        }
 	}
 }
