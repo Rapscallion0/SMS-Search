@@ -35,9 +35,6 @@ namespace SMS_Search.Settings
             _config = config;
             LoadSettings();
 
-            // Check for migration
-            CheckAndMigrateLegacy();
-
             UpdateLauncherStatusUI();
             WireUpEvents();
         }
@@ -45,6 +42,15 @@ namespace SMS_Search.Settings
         public LauncherSettings()
         {
             InitializeComponent();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            if (!DesignMode)
+            {
+                CheckAndMigrateLegacy();
+            }
         }
 
         public void Reload()
