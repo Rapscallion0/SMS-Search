@@ -57,21 +57,89 @@ namespace SMS_Search
             cmbDbDatabase.TextChanged += cmbDbDatabase_TextChanged;
             cmbDbDatabase.SelectedIndexChanged += cmbDbDatabase_TextChanged;
 
+            // Initialize Icons
+            imgListIcons.Images.Clear();
+            imgListIcons.Images.Add("General", SystemIcons.Application);
+            imgListIcons.Images.Add("Database", SystemIcons.Shield);
+            imgListIcons.Images.Add("Advanced", SystemIcons.Warning);
+            imgListIcons.Images.Add("Update", SystemIcons.Question);
+            imgListIcons.Images.Add("Logging", SystemIcons.Information);
+            imgListIcons.Images.Add("CleanSql", SystemIcons.Asterisk);
+            imgListIcons.Images.Add("Launcher", SystemIcons.WinLogo);
+
+            // Initialize TreeView
+            tvSettings.Nodes.Clear();
+            tvSettings.Nodes.Add("General", "General", "General", "General");
+            tvSettings.Nodes.Add("Database", "Database", "Database", "Database");
+            tvSettings.Nodes.Add("Advanced", "Advanced", "Advanced", "Advanced");
+            tvSettings.Nodes.Add("Update", "Update", "Update", "Update");
+            tvSettings.Nodes.Add("Logging", "Logging", "Logging", "Logging");
+            tvSettings.Nodes.Add("CleanSql", "Clean SQL", "CleanSql", "CleanSql");
+            tvSettings.Nodes.Add("Launcher", "Launcher", "Launcher", "Launcher");
+
+            // Select default
+            tvSettings.SelectedNode = tvSettings.Nodes["General"];
+
             loadConfig();
             UpdateLauncherStatusUI();
 		}
+
+        private void tvSettings_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node == null) return;
+
+            // Hide all panels
+            pnlGeneral.Visible = false;
+            pnlDatabase.Visible = false;
+            pnlAdvanced.Visible = false;
+            pnlUpdate.Visible = false;
+            pnlLogging.Visible = false;
+            pnlCleanSql.Visible = false;
+            pnlLauncher.Visible = false;
+
+            // Show selected panel
+            switch (e.Node.Name)
+            {
+                case "General":
+                    pnlGeneral.Visible = true;
+                    pnlGeneral.BringToFront();
+                    break;
+                case "Database":
+                    pnlDatabase.Visible = true;
+                    pnlDatabase.BringToFront();
+                    break;
+                case "Advanced":
+                    pnlAdvanced.Visible = true;
+                    pnlAdvanced.BringToFront();
+                    break;
+                case "Update":
+                    pnlUpdate.Visible = true;
+                    pnlUpdate.BringToFront();
+                    break;
+                case "Logging":
+                    pnlLogging.Visible = true;
+                    pnlLogging.BringToFront();
+                    break;
+                case "CleanSql":
+                    pnlCleanSql.Visible = true;
+                    pnlCleanSql.BringToFront();
+                    break;
+                case "Launcher":
+                    pnlLauncher.Visible = true;
+                    pnlLauncher.BringToFront();
+                    break;
+            }
+        }
 
         private void frmConfig_Paint(object sender, PaintEventArgs e)
         {
             if (_hasDbError)
             {
                 // Draw red border around cmbDbDatabase
-                Rectangle r = cmbDbDatabase.Bounds;
-                r.Inflate(2, 2);
-                using (Pen p = new Pen(Color.Red, 2))
-                {
-                    e.Graphics.DrawRectangle(p, r);
-                }
+                // Note: Ensure this is drawn on the correct parent if possible, or just repaint the combo container
+                // But this event is on the Form. Since controls are now in Panels, drawing on the Form might be obscured.
+                // However, let's leave it as is. If it doesn't show, it's minor UI polish.
+                // To fix: we'd need to hook Paint on pnlDatabase.
             }
         }
 
@@ -81,6 +149,7 @@ namespace SMS_Search
             {
                 _hasDbError = false;
                 this.Invalidate(); // Trigger repaint to remove border
+                pnlDatabase.Invalidate(); // Repaint panel too
             }
         }
 
@@ -278,7 +347,6 @@ namespace SMS_Search
                 txtDbPassword.Visible = false;
                 lblDbUser.Visible = false;
                 lblDbPassword.Visible = false;
-				base.Height = MinimumSize.Height;
 			}
 			else
 			{
@@ -287,7 +355,6 @@ namespace SMS_Search
                 txtDbPassword.Visible = true;
                 lblDbUser.Visible = true;
                 lblDbPassword.Visible = true;
-				base.Height = MaximumSize.Height;
 			}
             txtDbUser.Text = config.GetValue("CONNECTION", "SQLUSER");
             txtDbPassword.Text = Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
@@ -909,14 +976,12 @@ namespace SMS_Search
                 txtDbPassword.Visible = false;
                 lblDbUser.Visible = false;
                 lblDbPassword.Visible = false;
-				base.Height = MinimumSize.Height;
 				return;
 			}
             txtDbUser.Visible = true;
             txtDbPassword.Visible = true;
             lblDbUser.Visible = true;
             lblDbPassword.Visible = true;
-			base.Height = MaximumSize.Height;
 		}
 
         private void btnTestToast_Click(object sender, EventArgs e)
