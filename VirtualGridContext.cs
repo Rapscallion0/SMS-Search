@@ -31,6 +31,8 @@ namespace SMS_Search
         public string SortColumn { get; private set; }
         public string SortDirection { get; private set; } = "ASC";
         public string FilterText { get; private set; }
+        private string _rawFilterText;
+        private List<string> _filterColumns;
 
         public event EventHandler DataReady;
         public event EventHandler<string> LoadError;
@@ -70,6 +72,9 @@ namespace SMS_Search
 
         public async Task ApplyFilterAsync(string filterText, IEnumerable<string> columns)
         {
+            _rawFilterText = filterText;
+            _filterColumns = new List<string>(columns);
+
             // Convert simple text filter to SQL WHERE
             // "val" -> "Col1 LIKE '%val%' OR Col2 LIKE '%val%'"
             if (string.IsNullOrWhiteSpace(filterText))
@@ -88,6 +93,40 @@ namespace SMS_Search
             }
 
             await ReloadAsync();
+        }
+
+        public async Task<long> GetTotalMatchCountAsync()
+        {
+            if (string.IsNullOrWhiteSpace(_rawFilterText) || _filterColumns == null || _filterColumns.Count == 0)
+                return 0;
+
+            return await _repo.GetTotalMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, _filterColumns);
+        }
+
+        public async Task<long> GetPrecedingMatchCountAsync(int limitRowIndex)
+        {
+            if (string.IsNullOrWhiteSpace(_rawFilterText) || _filterColumns == null || _filterColumns.Count == 0 || limitRowIndex <= 0)
+                return 0;
+
+            return await _repo.GetPrecedingMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, _filterColumns, limitRowIndex, SortColumn, SortDirection);
+        }
+
+        public async Task WaitForRowAsync(int rowIndex)
+        {
+            if (_cache.ContainsKey(rowIndex)) return;
+
+            // Trigger fetch by accessing (ignoring return)
+            GetValue(rowIndex, 0);
+
+            // Poll for data arrival
+            int timeout = 5000; // 5 seconds max wait
+            int interval = 50;
+            while (timeout > 0)
+            {
+                if (_cache.ContainsKey(rowIndex)) return;
+                await Task.Delay(interval);
+                timeout -= interval;
+            }
         }
 
         public async Task ApplySortAsync(string column)

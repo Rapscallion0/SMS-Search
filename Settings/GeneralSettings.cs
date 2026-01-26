@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 using SMS_Search;
 
@@ -13,6 +14,7 @@ namespace SMS_Search.Settings
         {
             InitializeComponent();
             _config = config;
+            InitializeCustomControls();
             LoadSettings();
             WireUpEvents();
         }
@@ -20,6 +22,12 @@ namespace SMS_Search.Settings
         public GeneralSettings()
         {
             InitializeComponent();
+        }
+
+        private void InitializeCustomControls()
+        {
+            picHighlightWarning.Image = SystemIcons.Warning.ToBitmap();
+            toolTip1.SetToolTip(picHighlightWarning, "Turning this feature on can slow down displaying query result as it is a heavy process.");
         }
 
         public void Reload()
@@ -59,6 +67,17 @@ namespace SMS_Search.Settings
             string autoResizeLimit = _config.GetValue("GENERAL", "AUTO_RESIZE_LIMIT");
             if (string.IsNullOrEmpty(autoResizeLimit)) autoResizeLimit = "5000";
             txtAutoResizeLimit.Text = autoResizeLimit;
+
+            // Highlight Settings
+            chkHighlightMatches.Checked = _config.GetValue("GENERAL", "HIGHLIGHT_MATCHES") == "1";
+
+            string colorVal = _config.GetValue("GENERAL", "MATCH_HIGHLIGHT_COLOR");
+            Color highlightColor = Color.Yellow;
+            if (!string.IsNullOrEmpty(colorVal) && int.TryParse(colorVal, out int argb))
+            {
+                highlightColor = Color.FromArgb(argb);
+            }
+            btnHighlightColor.BackColor = highlightColor;
 
             _isLoaded = true;
         }
@@ -110,6 +129,19 @@ namespace SMS_Search.Settings
                     string saved = _config.GetValue("GENERAL", "AUTO_RESIZE_LIMIT");
                     if (string.IsNullOrEmpty(saved)) saved = "5000";
                     txtAutoResizeLimit.Text = saved;
+                }
+            };
+
+            // Highlight Events
+            chkHighlightMatches.CheckedChanged += (s, e) => SaveSetting("GENERAL", "HIGHLIGHT_MATCHES", chkHighlightMatches.Checked ? "1" : "0");
+
+            btnHighlightColor.Click += (s, e) =>
+            {
+                colorDialog1.Color = btnHighlightColor.BackColor;
+                if (colorDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    btnHighlightColor.BackColor = colorDialog1.Color;
+                    SaveSetting("GENERAL", "MATCH_HIGHLIGHT_COLOR", colorDialog1.Color.ToArgb().ToString());
                 }
             };
         }
