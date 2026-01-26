@@ -50,6 +50,12 @@ namespace SMS_Search.Settings
             if (tableLookup == "RECORDS") cmbTableLookup.Text = "Show Records";
             else cmbTableLookup.Text = "Show Fields";
 
+            string startupLoc = _config.GetValue("GENERAL", "STARTUP_LOCATION");
+            if (startupLoc == "PRIMARY") cmbStartupLocation.Text = "Primary display";
+            else if (startupLoc == "ACTIVE") cmbStartupLocation.Text = "Active display";
+            else if (startupLoc == "CURSOR") cmbStartupLocation.Text = "Cursor location";
+            else cmbStartupLocation.Text = "Last location"; // Default
+
             _isLoaded = true;
         }
 
@@ -77,6 +83,15 @@ namespace SMS_Search.Settings
                 string val = "FIELDS";
                 if (cmbTableLookup.Text == "Show Records") val = "RECORDS";
                 SaveSetting("GENERAL", "TABLE_LOOKUP", val);
+            };
+
+            cmbStartupLocation.SelectedIndexChanged += (s, e) =>
+            {
+                string val = "LAST";
+                if (cmbStartupLocation.Text == "Primary display") val = "PRIMARY";
+                else if (cmbStartupLocation.Text == "Active display") val = "ACTIVE";
+                else if (cmbStartupLocation.Text == "Cursor location") val = "CURSOR";
+                SaveSetting("GENERAL", "STARTUP_LOCATION", val);
             };
         }
 
