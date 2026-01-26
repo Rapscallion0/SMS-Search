@@ -74,7 +74,7 @@ namespace SMS_Search
                 string safeFilter = filterText.Replace("'", "''");
                 foreach (var col in columns)
                 {
-                    clauses.Add($"CONVERT([{col}], 'System.String') LIKE '%{safeFilter}%'");
+                    clauses.Add($"CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%'");
                 }
                 FilterText = string.Join(" OR ", clauses);
             }
