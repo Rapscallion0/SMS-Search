@@ -65,6 +65,7 @@ namespace SMS_Search
 		private ArrayList arrayGrdFld = new ArrayList();
 		private ArrayList arrayGrdDesc = new ArrayList();
         private System.Windows.Forms.Timer _filterDebounceTimer;
+        private ContextMenuStrip _headerContextMenu;
 
 		public frmMain(string[] Params)
 		{
@@ -79,6 +80,12 @@ namespace SMS_Search
             _filterDebounceTimer = new System.Windows.Forms.Timer();
             _filterDebounceTimer.Interval = 500;
             _filterDebounceTimer.Tick += _filterDebounceTimer_Tick;
+
+            _headerContextMenu = new ContextMenuStrip();
+            var item = _headerContextMenu.Items.Add("Resize to fit content");
+            item.Click += (s, ev) => {
+                 dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+            };
 
 			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " initialized");
 			MinimumSize = new Size(FormWidthMin, FormHeightMin);
@@ -671,6 +678,12 @@ namespace SMS_Search
 
         private async void dGrd_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Right)
+            {
+                _headerContextMenu.Show(Cursor.Position);
+                return;
+            }
+
             var col = dGrd.Columns[e.ColumnIndex];
             await _gridContext.ApplySortAsync(col.Name);
 
@@ -1211,48 +1224,76 @@ namespace SMS_Search
 
 		private void setHeaders()
 		{
-			if (!chkToggleDesc.Checked)
-			{
-				IEnumerator enumerator = dGrd.Columns.GetEnumerator();
-				try
-				{
-					while (enumerator.MoveNext())
-					{
-						DataGridViewColumn dataGridViewColumn = (DataGridViewColumn)enumerator.Current;
-						dGrd.Columns[dataGridViewColumn.Index].HeaderText = arrayGrdFld[dataGridViewColumn.Index].ToString();
-					}
-					return;
-				}
-				finally
-				{
-					IDisposable disposable = enumerator as IDisposable;
-					if (disposable != null)
-					{
-						disposable.Dispose();
-					}
-				}
-			}
-			foreach (DataGridViewColumn dataGridViewColumn2 in dGrd.Columns)
-			{
-				dGrd.Columns[dataGridViewColumn2.Index].HeaderText = arrayGrdDesc[dataGridViewColumn2.Index].ToString();
-			}
+            bool showDesc = chkToggleDesc.Checked;
+
+            for (int i = 0; i < dGrd.Columns.Count; i++)
+            {
+                if (i < arrayGrdFld.Count && i < arrayGrdDesc.Count)
+                {
+                    string field = arrayGrdFld[i].ToString();
+                    string desc = arrayGrdDesc[i].ToString();
+
+                    if (showDesc)
+                    {
+                        dGrd.Columns[i].HeaderText = !string.IsNullOrEmpty(desc) ? desc : field;
+                        dGrd.Columns[i].ToolTipText = field;
+                    }
+                    else
+                    {
+                        dGrd.Columns[i].HeaderText = field;
+                        dGrd.Columns[i].ToolTipText = desc;
+                    }
+                }
+            }
+
 			if (config.GetValue("GENERAL", "RESIZECOLUMNS") == "1")
 			{
                 string limitStr = config.GetValue("GENERAL", "AUTO_RESIZE_LIMIT");
                 int limit = 5000;
                 if (string.IsNullOrEmpty(limitStr) || !int.TryParse(limitStr, out limit)) limit = 5000;
 
+                int firstDisplayedScrollingColumnIndex = dGrd.FirstDisplayedScrollingColumnIndex;
+
                 if (dGrd.RowCount <= limit)
                 {
-				    int firstDisplayedScrollingColumnIndex = dGrd.FirstDisplayedScrollingColumnIndex;
 				    dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-				    if (firstDisplayedScrollingColumnIndex >= 0)
-				    {
-					    dGrd.FirstDisplayedScrollingColumnIndex = firstDisplayedScrollingColumnIndex;
-				    }
                 }
+                else
+                {
+                    ResizeColumnsBasedOnFirstRows(100);
+                }
+
+			    if (firstDisplayedScrollingColumnIndex >= 0)
+			    {
+				    dGrd.FirstDisplayedScrollingColumnIndex = firstDisplayedScrollingColumnIndex;
+			    }
 			}
 		}
+
+        private void ResizeColumnsBasedOnFirstRows(int rowLimit)
+        {
+            if (dGrd.RowCount == 0) return;
+
+            int rowsToCheck = Math.Min(dGrd.RowCount, rowLimit);
+
+            foreach (DataGridViewColumn col in dGrd.Columns)
+            {
+                if (!col.Visible) continue;
+
+                // Measure Header
+                int maxWidth = col.HeaderCell.PreferredSize.Width;
+
+                // Measure Cells
+                for (int i = 0; i < rowsToCheck; i++)
+                {
+                    var cell = dGrd.Rows[i].Cells[col.Index];
+                    int cellWidth = cell.GetPreferredSize(i, DataGridViewAutoSizeColumnMode.AllCells, true).Width;
+                    if (cellWidth > maxWidth) maxWidth = cellWidth;
+                }
+
+                col.Width = maxWidth;
+            }
+        }
 
 		private void chkToggleDesc_CheckedChanged(object sender, EventArgs e)
 		{
