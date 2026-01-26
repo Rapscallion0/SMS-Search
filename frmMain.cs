@@ -63,10 +63,15 @@ namespace SMS_Search
         private QueryBuilder _queryBuilder;
 		private ArrayList arrayGrdFld = new ArrayList();
 		private ArrayList arrayGrdDesc = new ArrayList();
+        private System.Windows.Forms.Timer _filterDebounceTimer;
 
 		public frmMain(string[] Params)
 		{
 			InitializeComponent();
+            _filterDebounceTimer = new System.Windows.Forms.Timer();
+            _filterDebounceTimer.Interval = 500;
+            _filterDebounceTimer.Tick += _filterDebounceTimer_Tick;
+
 			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " initialized");
 			MinimumSize = new Size(FormWidthMin, FormHeightMin);
 			Height = FormHeightMin;
@@ -233,6 +238,13 @@ namespace SMS_Search
 				frmUnarchive.Show();
 				btnShowTarget.Checked = true;
 			}
+
+            typeof(DataGridView).InvokeMember("DoubleBuffered",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty,
+                null, dGrd, new object[] { true });
+
+            bindingSource.ListChanged += BindingSource_ListChanged;
+
 			//Show();
 			//Focus();
 			//BringToFront();
@@ -550,7 +562,15 @@ namespace SMS_Search
 				}
 				finally
 				{
-					dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+                    string limitStr = config.GetValue("GENERAL", "AUTO_RESIZE_LIMIT");
+                    int limit = 5000;
+                    if (string.IsNullOrEmpty(limitStr) || !int.TryParse(limitStr, out limit)) limit = 5000;
+
+                    if (dGrd.RowCount <= limit)
+                    {
+					    dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+                    }
+
 					if (dGrd.RowCount > 0 && !SQLError)
 					{
 						dGrd.CurrentCell = dGrd[0, 0];
@@ -1137,12 +1157,19 @@ namespace SMS_Search
 			}
 			if (config.GetValue("GENERAL", "RESIZECOLUMNS") == "1")
 			{
-				int firstDisplayedScrollingColumnIndex = dGrd.FirstDisplayedScrollingColumnIndex;
-				dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-				if (firstDisplayedScrollingColumnIndex >= 0)
-				{
-					dGrd.FirstDisplayedScrollingColumnIndex = firstDisplayedScrollingColumnIndex;
-				}
+                string limitStr = config.GetValue("GENERAL", "AUTO_RESIZE_LIMIT");
+                int limit = 5000;
+                if (string.IsNullOrEmpty(limitStr) || !int.TryParse(limitStr, out limit)) limit = 5000;
+
+                if (dGrd.RowCount <= limit)
+                {
+				    int firstDisplayedScrollingColumnIndex = dGrd.FirstDisplayedScrollingColumnIndex;
+				    dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+				    if (firstDisplayedScrollingColumnIndex >= 0)
+				    {
+					    dGrd.FirstDisplayedScrollingColumnIndex = firstDisplayedScrollingColumnIndex;
+				    }
+                }
 			}
 		}
 
@@ -1455,6 +1482,14 @@ namespace SMS_Search
 
         private void txtGridFilter_TextChanged(object sender, EventArgs e)
         {
+            _filterDebounceTimer.Stop();
+            _filterDebounceTimer.Start();
+        }
+
+        private void _filterDebounceTimer_Tick(object sender, EventArgs e)
+        {
+            _filterDebounceTimer.Stop();
+
             if (bindingSource.DataSource is DataTable dt)
             {
                 string filter = "";
@@ -1540,6 +1575,25 @@ namespace SMS_Search
         private void ReconnectDB_Click(object sender, EventArgs e)
         {
             DbOnline(tscmbDbDatabase.Text);
+        }
+
+        private void BindingSource_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            if (bindingSource.DataSource is DataTable dt)
+            {
+                if (!string.IsNullOrEmpty(bindingSource.Filter))
+                {
+                    tslblRecordCnt.Text = $"{bindingSource.Count} / {dt.Rows.Count}";
+                }
+                else
+                {
+                    tslblRecordCnt.Text = bindingSource.Count.ToString();
+                }
+            }
+            else
+            {
+                 tslblRecordCnt.Text = bindingSource.Count.ToString();
+            }
         }
 	}
 }

@@ -43,6 +43,8 @@ namespace SMS_Search.Settings
             this.cmbTableLookup = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             this.cmbStartupLocation = new System.Windows.Forms.ComboBox();
+            this.lblAutoResizeLimit = new System.Windows.Forms.Label();
+            this.txtAutoResizeLimit = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label6
@@ -200,10 +202,28 @@ namespace SMS_Search.Settings
             this.cmbStartupLocation.Size = new System.Drawing.Size(100, 21);
             this.cmbStartupLocation.TabIndex = 14;
             // 
+            // lblAutoResizeLimit
+            //
+            this.lblAutoResizeLimit.AutoSize = true;
+            this.lblAutoResizeLimit.Location = new System.Drawing.Point(220, 200);
+            this.lblAutoResizeLimit.Name = "lblAutoResizeLimit";
+            this.lblAutoResizeLimit.Size = new System.Drawing.Size(130, 13);
+            this.lblAutoResizeLimit.TabIndex = 15;
+            this.lblAutoResizeLimit.Text = "Max rows for auto-resize:";
+            //
+            // txtAutoResizeLimit
+            //
+            this.txtAutoResizeLimit.Location = new System.Drawing.Point(355, 197);
+            this.txtAutoResizeLimit.Name = "txtAutoResizeLimit";
+            this.txtAutoResizeLimit.Size = new System.Drawing.Size(60, 20);
+            this.txtAutoResizeLimit.TabIndex = 16;
+            //
             // GeneralSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.txtAutoResizeLimit);
+            this.Controls.Add(this.lblAutoResizeLimit);
             this.Controls.Add(this.cmbStartupLocation);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.cmbTableLookup);
@@ -243,5 +263,7 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.ComboBox cmbTableLookup;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox cmbStartupLocation;
+        private System.Windows.Forms.Label lblAutoResizeLimit;
+        private System.Windows.Forms.TextBox txtAutoResizeLimit;
     }
 }
