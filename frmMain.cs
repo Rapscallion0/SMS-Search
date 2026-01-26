@@ -3,6 +3,7 @@ using DbConn;
 using Log;
 // using Microsoft.SqlServer.TransactSql.ScriptDom;
 using SMS_Search.Properties;
+using SMS_Search.Settings;
 using System;
 using System.Collections;
 using System.Collections.Generic;
