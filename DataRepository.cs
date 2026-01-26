@@ -133,8 +133,23 @@ namespace SMS_Search
         {
             var conn = new SqlConnection(GetConnectionString(server, database, user, pass));
             await conn.OpenAsync();
-            // Caller is responsible for disposing reader and connection
-            return await conn.ExecuteReaderAsync(sql, parameters, commandBehavior: CommandBehavior.CloseConnection) as SqlDataReader;
+
+            using (var cmd = new SqlCommand(sql, conn))
+            {
+                // We must manually map Dapper parameters because Dapper's ExecuteReaderAsync
+                // does not support CommandBehavior.CloseConnection, which is critical here.
+                if (parameters is DynamicParameters dp)
+                {
+                    foreach (var name in dp.ParameterNames)
+                    {
+                        var val = dp.Get<object>(name);
+                        cmd.Parameters.AddWithValue(name, val ?? DBNull.Value);
+                    }
+                }
+
+                // Caller is responsible for disposing reader which closes connection
+                return await cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection);
+            }
         }
 
         private string ApplyFilter(string sql, string filter)
