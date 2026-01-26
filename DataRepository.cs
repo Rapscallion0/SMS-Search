@@ -204,5 +204,69 @@ namespace SMS_Search
                  return list;
              }
         }
+
+        public async Task<long> GetTotalMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, IEnumerable<string> columns)
+        {
+            if (string.IsNullOrWhiteSpace(filterText)) return 0;
+            string safeFilter = filterText.Replace("'", "''");
+
+            List<string> sumParts = new List<string>();
+            foreach (var col in columns)
+            {
+                sumParts.Add($"(CASE WHEN CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
+            }
+            string sumExpression = string.Join(" + ", sumParts);
+
+            string finalSql = ApplyFilter(sql, filterClause);
+            string countSql = $"SELECT SUM((0 + {sumExpression})) FROM ({finalSql}) AS _CountQ";
+
+            using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+            {
+                await conn.OpenAsync();
+                var result = await conn.ExecuteScalarAsync<object>(countSql, parameters);
+                if (result == null || result == DBNull.Value) return 0;
+                return Convert.ToInt64(result);
+            }
+        }
+
+        public async Task<long> GetPrecedingMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, IEnumerable<string> columns, int limitRowIndex, string sortCol, string sortDir)
+        {
+            if (limitRowIndex <= 0) return 0;
+            if (string.IsNullOrWhiteSpace(filterText)) return 0;
+            string safeFilter = filterText.Replace("'", "''");
+
+            List<string> sumParts = new List<string>();
+            foreach (var col in columns)
+            {
+                sumParts.Add($"(CASE WHEN CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
+            }
+            string sumExpression = string.Join(" + ", sumParts);
+
+            string finalSql = ApplyFilter(sql, filterClause);
+
+            string orderBy = "(SELECT NULL)";
+            if (!string.IsNullOrEmpty(sortCol))
+            {
+                string safeCol = sortCol.Replace("[", "").Replace("]", "");
+                orderBy = $"[{safeCol}] {sortDir}";
+            }
+
+            // Using OFFSET/FETCH in subquery to limit rows
+            string countSql = $@"
+                SELECT SUM((0 + {sumExpression}))
+                FROM (
+                    SELECT * FROM ({finalSql}) AS _Base
+                    ORDER BY {orderBy}
+                    OFFSET 0 ROWS FETCH NEXT {limitRowIndex} ROWS ONLY
+                ) AS _Preceding";
+
+            using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+            {
+                await conn.OpenAsync();
+                var result = await conn.ExecuteScalarAsync<object>(countSql, parameters);
+                if (result == null || result == DBNull.Value) return 0;
+                return Convert.ToInt64(result);
+            }
+        }
     }
 }

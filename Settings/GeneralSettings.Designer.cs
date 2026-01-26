@@ -28,6 +28,7 @@ namespace SMS_Search.Settings
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.label6 = new System.Windows.Forms.Label();
             this.chkAlwaysOnTop = new System.Windows.Forms.CheckBox();
             this.chkDescriptionColumns = new System.Windows.Forms.CheckBox();
@@ -45,6 +46,13 @@ namespace SMS_Search.Settings
             this.cmbStartupLocation = new System.Windows.Forms.ComboBox();
             this.lblAutoResizeLimit = new System.Windows.Forms.Label();
             this.txtAutoResizeLimit = new System.Windows.Forms.TextBox();
+            this.chkHighlightMatches = new System.Windows.Forms.CheckBox();
+            this.picHighlightWarning = new System.Windows.Forms.PictureBox();
+            this.lblHighlightColor = new System.Windows.Forms.Label();
+            this.btnHighlightColor = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            ((System.ComponentModel.ISupportInitialize)(this.picHighlightWarning)).BeginInit();
             this.SuspendLayout();
             // 
             // label6
@@ -218,10 +226,51 @@ namespace SMS_Search.Settings
             this.txtAutoResizeLimit.Size = new System.Drawing.Size(60, 20);
             this.txtAutoResizeLimit.TabIndex = 16;
             //
+            // chkHighlightMatches
+            //
+            this.chkHighlightMatches.AutoSize = true;
+            this.chkHighlightMatches.Location = new System.Drawing.Point(18, 230);
+            this.chkHighlightMatches.Name = "chkHighlightMatches";
+            this.chkHighlightMatches.Size = new System.Drawing.Size(188, 17);
+            this.chkHighlightMatches.TabIndex = 17;
+            this.chkHighlightMatches.Text = "Show/calculate matches on filter";
+            this.chkHighlightMatches.UseVisualStyleBackColor = true;
+            //
+            // picHighlightWarning
+            //
+            this.picHighlightWarning.Location = new System.Drawing.Point(212, 230);
+            this.picHighlightWarning.Name = "picHighlightWarning";
+            this.picHighlightWarning.Size = new System.Drawing.Size(16, 16);
+            this.picHighlightWarning.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picHighlightWarning.TabIndex = 18;
+            this.picHighlightWarning.TabStop = false;
+            //
+            // lblHighlightColor
+            //
+            this.lblHighlightColor.AutoSize = true;
+            this.lblHighlightColor.Location = new System.Drawing.Point(15, 260);
+            this.lblHighlightColor.Name = "lblHighlightColor";
+            this.lblHighlightColor.Size = new System.Drawing.Size(110, 13);
+            this.lblHighlightColor.TabIndex = 19;
+            this.lblHighlightColor.Text = "Match highlight color:";
+            //
+            // btnHighlightColor
+            //
+            this.btnHighlightColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHighlightColor.Location = new System.Drawing.Point(131, 255);
+            this.btnHighlightColor.Name = "btnHighlightColor";
+            this.btnHighlightColor.Size = new System.Drawing.Size(40, 23);
+            this.btnHighlightColor.TabIndex = 20;
+            this.btnHighlightColor.UseVisualStyleBackColor = true;
+            //
             // GeneralSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnHighlightColor);
+            this.Controls.Add(this.lblHighlightColor);
+            this.Controls.Add(this.picHighlightWarning);
+            this.Controls.Add(this.chkHighlightMatches);
             this.Controls.Add(this.txtAutoResizeLimit);
             this.Controls.Add(this.lblAutoResizeLimit);
             this.Controls.Add(this.cmbStartupLocation);
@@ -241,6 +290,7 @@ namespace SMS_Search.Settings
             this.Controls.Add(this.label6);
             this.Name = "GeneralSettings";
             this.Size = new System.Drawing.Size(430, 400);
+            ((System.ComponentModel.ISupportInitialize)(this.picHighlightWarning)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -265,5 +315,11 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.ComboBox cmbStartupLocation;
         private System.Windows.Forms.Label lblAutoResizeLimit;
         private System.Windows.Forms.TextBox txtAutoResizeLimit;
+        private System.Windows.Forms.CheckBox chkHighlightMatches;
+        private System.Windows.Forms.PictureBox picHighlightWarning;
+        private System.Windows.Forms.Label lblHighlightColor;
+        private System.Windows.Forms.Button btnHighlightColor;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ColorDialog colorDialog1;
     }
 }

@@ -109,6 +109,9 @@ namespace SMS_Search
         private TextBox txtGridFilter;
         private Button btnClearFilter;
         private Button btnExport;
+        private Label lblMatchCount;
+        private Button btnPrevMatch;
+        private Button btnNextMatch;
 
         #region Windows Form Designer generated code
 
@@ -204,6 +207,9 @@ namespace SMS_Search
             this.txtGridFilter = new System.Windows.Forms.TextBox();
             this.lblFilter = new System.Windows.Forms.Label();
             this.chkToggleDesc = new System.Windows.Forms.CheckBox();
+            this.lblMatchCount = new System.Windows.Forms.Label();
+            this.btnPrevMatch = new System.Windows.Forms.Button();
+            this.btnNextMatch = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -1074,6 +1080,9 @@ namespace SMS_Search
             // 
             // splitContainer.Panel2
             // 
+            this.splitContainer.Panel2.Controls.Add(this.btnNextMatch);
+            this.splitContainer.Panel2.Controls.Add(this.btnPrevMatch);
+            this.splitContainer.Panel2.Controls.Add(this.lblMatchCount);
             this.splitContainer.Panel2.Controls.Add(this.btnExport);
             this.splitContainer.Panel2.Controls.Add(this.btnClearFilter);
             this.splitContainer.Panel2.Controls.Add(this.txtGridFilter);
@@ -1100,6 +1109,37 @@ namespace SMS_Search
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
+            // lblMatchCount
+            //
+            this.lblMatchCount.AutoSize = true;
+            this.lblMatchCount.Location = new System.Drawing.Point(365, 39);
+            this.lblMatchCount.Name = "lblMatchCount";
+            this.lblMatchCount.Size = new System.Drawing.Size(0, 15);
+            this.lblMatchCount.TabIndex = 14;
+            this.lblMatchCount.Visible = false;
+            //
+            // btnPrevMatch
+            //
+            this.btnPrevMatch.Location = new System.Drawing.Point(470, 34);
+            this.btnPrevMatch.Name = "btnPrevMatch";
+            this.btnPrevMatch.Size = new System.Drawing.Size(25, 25);
+            this.btnPrevMatch.TabIndex = 15;
+            this.btnPrevMatch.Text = "<";
+            this.btnPrevMatch.UseVisualStyleBackColor = true;
+            this.btnPrevMatch.Visible = false;
+            this.btnPrevMatch.Click += new System.EventHandler(this.btnPrevMatch_Click);
+            //
+            // btnNextMatch
+            //
+            this.btnNextMatch.Location = new System.Drawing.Point(500, 34);
+            this.btnNextMatch.Name = "btnNextMatch";
+            this.btnNextMatch.Size = new System.Drawing.Size(25, 25);
+            this.btnNextMatch.TabIndex = 16;
+            this.btnNextMatch.Text = ">";
+            this.btnNextMatch.UseVisualStyleBackColor = true;
+            this.btnNextMatch.Visible = false;
+            this.btnNextMatch.Click += new System.EventHandler(this.btnNextMatch_Click);
+            //
             // btnClearFilter
             // 
             this.btnClearFilter.Location = new System.Drawing.Point(251, 34);

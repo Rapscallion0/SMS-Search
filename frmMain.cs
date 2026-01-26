@@ -67,6 +67,10 @@ namespace SMS_Search
         private System.Windows.Forms.Timer _filterDebounceTimer;
         private ContextMenuStrip _headerContextMenu;
 
+        private bool _highlightMatches = false;
+        private Color _matchHighlightColor = Color.Yellow;
+        private long _lastTotalMatchCount = 0;
+
 		public frmMain(string[] Params)
 		{
 			InitializeComponent();
@@ -76,6 +80,9 @@ namespace SMS_Search
 
             dGrd.CellValueNeeded += dGrd_CellValueNeeded;
             dGrd.ColumnHeaderMouseClick += dGrd_ColumnHeaderMouseClick;
+            dGrd.RowPrePaint += dGrd_RowPrePaint;
+            dGrd.CellPainting += dGrd_CellPainting;
+            dGrd.CurrentCellChanged += dGrd_CurrentCellChanged;
 
             _filterDebounceTimer = new System.Windows.Forms.Timer();
             _filterDebounceTimer.Interval = 500;
@@ -474,6 +481,17 @@ namespace SMS_Search
             _queryBuilder = new QueryBuilder(fctFields, tlzFields);
 
             LoadCleanSqlRules();
+
+            _highlightMatches = config.GetValue("GENERAL", "HIGHLIGHT_MATCHES") == "1";
+            string colorVal = config.GetValue("GENERAL", "MATCH_HIGHLIGHT_COLOR");
+            if (!string.IsNullOrEmpty(colorVal) && int.TryParse(colorVal, out int argb))
+            {
+                _matchHighlightColor = Color.FromArgb(argb);
+            }
+            else
+            {
+                _matchHighlightColor = Color.Yellow;
+            }
 
 			SetBusy(false);
 		}
@@ -1618,6 +1636,24 @@ namespace SMS_Search
             _filterDebounceTimer.Stop();
 
             string text = txtGridFilter.Text;
+            bool hasFilter = !string.IsNullOrWhiteSpace(text);
+
+            if (_highlightMatches)
+            {
+                lblMatchCount.Visible = hasFilter;
+                btnPrevMatch.Visible = hasFilter;
+                btnNextMatch.Visible = hasFilter;
+                if (!hasFilter)
+                {
+                    lblMatchCount.Text = "";
+                }
+            }
+            else
+            {
+                lblMatchCount.Visible = false;
+                btnPrevMatch.Visible = false;
+                btnNextMatch.Visible = false;
+            }
 
             if (dGrd.VirtualMode)
             {
@@ -1629,6 +1665,13 @@ namespace SMS_Search
                 }
 
                 await _gridContext.ApplyFilterAsync(text, columns);
+
+                if (_highlightMatches && hasFilter)
+                {
+                    lblMatchCount.Text = "Calculating...";
+                    _lastTotalMatchCount = await _gridContext.GetTotalMatchCountAsync();
+                    lblMatchCount.Text = $"Found: {_lastTotalMatchCount} matches";
+                }
             }
             else if (bindingSource.DataSource != null)
             {
@@ -1654,6 +1697,175 @@ namespace SMS_Search
 
                 if (bindingSource.DataSource is DataTable dt)
                     tslblRecordCnt.Text = !string.IsNullOrEmpty(filter) ? $"{bindingSource.Count} / {dt.Rows.Count}" : bindingSource.Count.ToString();
+            }
+        }
+
+        private void dGrd_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        {
+            if (dGrd.CurrentCell != null && e.RowIndex == dGrd.CurrentCell.RowIndex)
+            {
+                dGrd.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightCyan;
+            }
+            else
+            {
+                // Reset to default
+                dGrd.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Empty;
+            }
+        }
+
+        private void dGrd_CurrentCellChanged(object sender, EventArgs e)
+        {
+            // Force redraw of all rows to update row highlight
+            // Or optimize by invalidating only old and new row
+            dGrd.Invalidate();
+
+            // Reset "X of Y" text when user manually changes cell, unless we are in the middle of navigation?
+            // User requirement: "If the user click off of a result then only show the total count again."
+            if (_highlightMatches && lblMatchCount.Visible && lblMatchCount.Text.Contains("of"))
+            {
+                 lblMatchCount.Text = $"Found: {_lastTotalMatchCount} matches";
+            }
+        }
+
+        private void dGrd_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (_highlightMatches && e.RowIndex >= 0 && e.ColumnIndex >= 0 && !string.IsNullOrEmpty(txtGridFilter.Text))
+            {
+                if (e.Value != null)
+                {
+                    string val = e.Value.ToString();
+                    if (val.IndexOf(txtGridFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        e.CellStyle.BackColor = _matchHighlightColor;
+                        e.PaintBackground(e.CellBounds, true);
+                        e.PaintContent(e.CellBounds);
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        private async void btnPrevMatch_Click(object sender, EventArgs e)
+        {
+            await NavigateMatch(false);
+        }
+
+        private async void btnNextMatch_Click(object sender, EventArgs e)
+        {
+            await NavigateMatch(true);
+        }
+
+        private async Task NavigateMatch(bool forward)
+        {
+            if (dGrd.RowCount == 0) return;
+            string filterText = txtGridFilter.Text;
+            if (string.IsNullOrEmpty(filterText)) return;
+
+            int startRow = dGrd.CurrentCell != null ? dGrd.CurrentCell.RowIndex : 0;
+            int startCol = dGrd.CurrentCell != null ? dGrd.CurrentCell.ColumnIndex : 0;
+
+            int currentRow = startRow;
+            int currentCol = startCol;
+
+            bool found = false;
+
+            // Simple client-side search because grid is filtered to only show matching rows.
+            // We just need to find the next cell that matches.
+            // Warning: If rows are many, we might need to fetch data.
+            // But since grid is virtual, accessing dGrd[col, row].Value triggers LoadPage.
+            // This might be slow if we traverse many rows.
+            // However, every row has a match (since filtered). So we will find one very quickly (in current row or next row).
+
+            // Search limit to avoid infinite loops or massive fetches (though every row should have a match)
+            int rowsChecked = 0;
+            int maxRowsToCheck = dGrd.RowCount;
+
+            while (rowsChecked < maxRowsToCheck)
+            {
+                // Advance col
+                if (forward)
+                {
+                    currentCol++;
+                    if (currentCol >= dGrd.ColumnCount)
+                    {
+                        currentCol = 0;
+                        currentRow++;
+                        if (currentRow >= dGrd.RowCount) currentRow = 0; // Wrap around? Or stop? User didn't specify. Wrap is good.
+                    }
+                }
+                else
+                {
+                    currentCol--;
+                    if (currentCol < 0)
+                    {
+                        currentCol = dGrd.ColumnCount - 1;
+                        currentRow--;
+                        if (currentRow < 0) currentRow = dGrd.RowCount - 1;
+                    }
+                }
+
+                // Check match
+                // Only check visible columns
+                if (dGrd.Columns[currentCol].Visible)
+                {
+                    var val = dGrd[currentCol, currentRow].Value;
+                    // Accessing .Value triggers VirtualGridContext.GetValue -> RequestPage -> Async?
+                    // VirtualGridContext.GetValue returns null if not in cache and triggers RequestPage.
+                    // If it returns null, we can't check it immediately.
+                    // We need to wait for data?
+                    // This implementation of VirtualGridContext is async-void for RequestPage.
+                    // We can't await it easily.
+                    // BUT: RequestPage fetches a page (100 rows).
+                    // If we hit a null value, we should probably wait.
+                    // Since we can't await GetValue, this loop will fail if data isn't loaded.
+
+                    if (val == null)
+                    {
+                        await _gridContext.WaitForRowAsync(currentRow);
+                        val = dGrd[currentCol, currentRow].Value;
+                    }
+
+                    if (val != null && val.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        dGrd.CurrentCell = dGrd[currentCol, currentRow];
+                        found = true;
+                        break;
+                    }
+                }
+
+                // If we wrapped around to start, stop
+                if (currentRow == startRow && currentCol == startCol) break;
+
+                // Optimization: If we moved to a new row, and we know every row has a match, we should find it in this row.
+                // So rowsChecked increment is effectively checking how many cells? No.
+                // Just guard against infinite loop.
+                if (forward && currentCol == 0) rowsChecked++;
+                if (!forward && currentCol == dGrd.ColumnCount - 1) rowsChecked++;
+            }
+
+            if (found)
+            {
+                // Calculate X of Y
+                lblMatchCount.Text = "Calculating...";
+                long total = await _gridContext.GetTotalMatchCountAsync();
+                long preceding = await _gridContext.GetPrecedingMatchCountAsync(dGrd.CurrentCell.RowIndex);
+
+                // Add matches in current row up to current col
+                long currentMatches = 0;
+                for (int c = 0; c <= dGrd.CurrentCell.ColumnIndex; c++)
+                {
+                    if (dGrd.Columns[c].Visible)
+                    {
+                         var v = dGrd[c, dGrd.CurrentCell.RowIndex].Value;
+                         if (v != null && v.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0)
+                         {
+                             currentMatches++;
+                         }
+                    }
+                }
+
+                long matchIndex = preceding + currentMatches;
+                lblMatchCount.Text = $"Match {matchIndex} of {total}";
             }
         }
 
