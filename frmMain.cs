@@ -1287,7 +1287,7 @@ namespace SMS_Search
                 for (int i = 0; i < rowsToCheck; i++)
                 {
                     var cell = dGrd.Rows[i].Cells[col.Index];
-                    int cellWidth = cell.GetPreferredSize(i, DataGridViewAutoSizeColumnMode.AllCells, true).Width;
+                    int cellWidth = cell.PreferredSize.Width;
                     if (cellWidth > maxWidth) maxWidth = cellWidth;
                 }
 
