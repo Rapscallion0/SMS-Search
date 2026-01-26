@@ -567,6 +567,11 @@ namespace SMS_Search
                     string defaultSort = dGrd.Columns.Count > 0 ? dGrd.Columns[0].Name : null;
                     await _gridContext.LoadAsync(queryResult.Sql, queryResult.Parameters, defaultSort);
 
+                    if (dGrd.Columns.Count > 0)
+                    {
+                         dGrd.Columns[0].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+                    }
+
                     sw.Stop();
                     log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, _gridContext.TotalCount, true);
 				}
@@ -641,7 +646,16 @@ namespace SMS_Search
                 return;
             }
             dGrd.RowCount = _gridContext.TotalCount;
-            tslblRecordCnt.Text = _gridContext.TotalCount.ToString();
+
+            if (!string.IsNullOrEmpty(_gridContext.FilterText))
+            {
+                tslblRecordCnt.Text = $"{_gridContext.TotalCount} / {_gridContext.UnfilteredCount}";
+            }
+            else
+            {
+                tslblRecordCnt.Text = _gridContext.TotalCount.ToString();
+            }
+
             dGrd.Invalidate();
         }
 
@@ -659,6 +673,16 @@ namespace SMS_Search
         {
             var col = dGrd.Columns[e.ColumnIndex];
             await _gridContext.ApplySortAsync(col.Name);
+
+            foreach (DataGridViewColumn c in dGrd.Columns)
+            {
+                c.HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.None;
+            }
+
+            if (_gridContext.SortDirection == "ASC")
+                col.HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+            else
+                col.HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Descending;
         }
 
         private SearchCriteria GetSearchCriteriaFromUI()
@@ -1124,7 +1148,6 @@ namespace SMS_Search
 			}
 			else
 			{
-				SetBusy(true);
 				frmConfig frmConfig = new frmConfig();
 				frmConfig.StartPosition = FormStartPosition.CenterParent;
 				frmConfig.ShowDialog();
@@ -1142,7 +1165,6 @@ namespace SMS_Search
                 log.ReloadConfig();
 
 				ValidateConfigFile();
-                SetBusy(false);
 			}
 		}
 
@@ -1543,6 +1565,11 @@ namespace SMS_Search
         {
             _filterDebounceTimer.Stop();
             _filterDebounceTimer.Start();
+        }
+
+        private void btnClearFilter_Click(object sender, EventArgs e)
+        {
+            txtGridFilter.Text = "";
         }
 
         private async void _filterDebounceTimer_Tick(object sender, EventArgs e)

@@ -107,6 +107,7 @@ namespace SMS_Search
         private CheckBox chkToggleDesc;
         private Label lblFilter;
         private TextBox txtGridFilter;
+        private Button btnClearFilter;
         private Button btnExport;
 
         #region Windows Form Designer generated code
@@ -203,6 +204,7 @@ namespace SMS_Search
             this.chkToggleDesc = new System.Windows.Forms.CheckBox();
             this.lblFilter = new System.Windows.Forms.Label();
             this.txtGridFilter = new System.Windows.Forms.TextBox();
+            this.btnClearFilter = new System.Windows.Forms.Button();
             this.btnExport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
@@ -276,6 +278,7 @@ namespace SMS_Search
             dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dGrd.RowHeadersDefaultCellStyle = dataGridViewCellStyle8;
             this.dGrd.RowHeadersVisible = false;
+            this.dGrd.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dGrd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dGrd.Size = new System.Drawing.Size(591, 330);
             this.dGrd.TabIndex = 4;
@@ -1091,6 +1094,7 @@ namespace SMS_Search
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.btnExport);
+            this.splitContainer.Panel2.Controls.Add(this.btnClearFilter);
             this.splitContainer.Panel2.Controls.Add(this.txtGridFilter);
             this.splitContainer.Panel2.Controls.Add(this.lblFilter);
             this.splitContainer.Panel2.Controls.Add(this.chkToggleDesc);
@@ -1133,9 +1137,19 @@ namespace SMS_Search
             this.txtGridFilter.TabIndex = 11;
             this.txtGridFilter.TextChanged += new System.EventHandler(this.txtGridFilter_TextChanged);
             //
+            // btnClearFilter
+            //
+            this.btnClearFilter.Location = new System.Drawing.Point(251, 34);
+            this.btnClearFilter.Name = "btnClearFilter";
+            this.btnClearFilter.Size = new System.Drawing.Size(23, 23);
+            this.btnClearFilter.TabIndex = 13;
+            this.btnClearFilter.Text = "x";
+            this.btnClearFilter.UseVisualStyleBackColor = true;
+            this.btnClearFilter.Click += new System.EventHandler(this.btnClearFilter_Click);
+            //
             // btnExport
             //
-            this.btnExport.Location = new System.Drawing.Point(255, 34);
+            this.btnExport.Location = new System.Drawing.Point(280, 34);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(75, 25);
             this.btnExport.TabIndex = 12;

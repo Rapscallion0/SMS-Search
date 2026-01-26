@@ -21,6 +21,7 @@ namespace SMS_Search
 
         // State
         public int TotalCount { get; private set; }
+        public int UnfilteredCount { get; private set; }
         private Dictionary<int, DataRow> _cache;
         private HashSet<int> _pagesBeingFetched;
         private const int PageSize = 100;
@@ -56,8 +57,15 @@ namespace SMS_Search
             SortColumn = initialSortColumn;
             SortDirection = "ASC";
             FilterText = null;
+            UnfilteredCount = 0; // Reset before reload
 
             await ReloadAsync();
+
+            // On initial load, TotalCount is the UnfilteredCount
+            if (string.IsNullOrEmpty(FilterText))
+            {
+                UnfilteredCount = TotalCount;
+            }
         }
 
         public async Task ApplyFilterAsync(string filterText, IEnumerable<string> columns)
