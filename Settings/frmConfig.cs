@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 using SMS_Search;
 using Log;
+using DbConn;
 
 namespace SMS_Search.Settings
 {
@@ -19,6 +20,8 @@ namespace SMS_Search.Settings
         private LoggingSettings loggingSettings;
         private CleanSqlSettings cleanSqlSettings;
         private LauncherSettings launcherSettings;
+
+        public bool ForceDatabaseSetup { get; set; } = false;
 
         public frmConfig()
         {
@@ -81,7 +84,42 @@ namespace SMS_Search.Settings
 
             // Select default
             if (tvSettings.Nodes.Count > 0)
-                tvSettings.SelectedNode = tvSettings.Nodes["General"];
+            {
+                if (ForceDatabaseSetup)
+                    tvSettings.SelectedNode = tvSettings.Nodes["Database"];
+                else
+                    tvSettings.SelectedNode = tvSettings.Nodes["General"];
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (ForceDatabaseSetup && this.DialogResult != DialogResult.OK)
+            {
+                string server = config.GetValue("CONNECTION", "SERVER");
+                string database = config.GetValue("CONNECTION", "DATABASE");
+                bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+                string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
+                dbConnector db = new dbConnector();
+                if (db.TestDbConn(server, database, false, user, pass))
+                {
+                    this.DialogResult = DialogResult.OK;
+                }
+                else
+                {
+                    if (MessageBox.Show("A valid database connection is required to use this application.\n\nAre you sure you want to exit?", "Database Connection Required", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    {
+                        this.DialogResult = DialogResult.Cancel;
+                    }
+                    else
+                    {
+                        e.Cancel = true;
+                    }
+                }
+            }
+            base.OnFormClosing(e);
         }
 
         private void tvSettings_AfterSelect(object sender, TreeViewEventArgs e)

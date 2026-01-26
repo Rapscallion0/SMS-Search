@@ -111,8 +111,15 @@ namespace SMS_Search
 
             if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), false, user, pass) || !File.Exists(frmMain.ConfigFilePath))
             {
-                frmConfig frmConfig = new frmConfig();
-                frmConfig.ShowDialog();
+                using (frmConfig frmConfig = new frmConfig())
+                {
+                    frmConfig.ForceDatabaseSetup = true;
+                    if (frmConfig.ShowDialog() != DialogResult.OK)
+                    {
+                        Application.Exit();
+                        return;
+                    }
+                }
                 config.Load();
                 log.ReloadConfig();
             }
