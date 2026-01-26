@@ -15,7 +15,9 @@ namespace SMS_Search
 		[STAThread]
 		private static void Main(string[] args)
 		{
-            log = new Logfile();
+            bool isListener = args.Length > 0 && args[0] == "--listener";
+            log = new Logfile(isListener ? "Listener" : "App");
+
             Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 
@@ -25,6 +27,15 @@ namespace SMS_Search
 
             try
             {
+                if (isListener)
+                {
+                    if (SingleApplication.Run("SMSSearchListener"))
+                    {
+                        Application.Run(new SMS_Search.Listener.HiddenWindow());
+                    }
+                    return;
+                }
+
                 ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
 			    if (config.GetValue("GENERAL", "MULTI_INSTANCE") == "1")
 			    {

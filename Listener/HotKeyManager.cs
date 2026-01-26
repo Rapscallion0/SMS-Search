@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace SMS_Search_Launcher
+namespace SMS_Search.Listener
 {
     public static class HotKeyManager
     {

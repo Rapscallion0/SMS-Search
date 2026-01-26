@@ -4,17 +4,20 @@ using System.IO;
 using SMS_Search; // For ConfigManager
 using Log;
 
-namespace SMS_Search_Launcher
+namespace SMS_Search.Listener
 {
     public class HiddenWindow : Form
     {
         private const int WM_HOTKEY = 0x0312;
         private const int HOTKEY_ID = 1;
         private ConfigManager _config;
-        private Logfile log = new Logfile("Launcher");
+        private Logfile log = new Logfile("Listener"); // Changed log name
 
         public HiddenWindow()
         {
+            // Set title for identification
+            this.Text = "SMSSearch Listener Service";
+
             // Hide the form completely
             this.ShowInTaskbar = false;
             this.WindowState = FormWindowState.Minimized;
@@ -33,7 +36,8 @@ namespace SMS_Search_Launcher
 
         private void LoadConfigAndRegisterHotKey()
         {
-            string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SMS Search_settings.json");
+            // Updated to use standardized filename
+            string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SMSSearch_settings.json");
             _config = new ConfigManager(configPath);
 
             string hotkeyStr = _config.GetValue("LAUNCHER", "HOTKEY");

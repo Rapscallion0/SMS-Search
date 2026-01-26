@@ -46,9 +46,9 @@ namespace SingleInstance
 				SingleApplication.SetForegroundWindow(currentInstanceWindowHandle);
 			}
 		}
-		public static bool Run(Form frmMain)
+		public static bool Run(Form frmMain, string mutexName = null)
 		{
-			if (SingleApplication.IsAlreadyRunning())
+			if (SingleApplication.IsAlreadyRunning(mutexName))
 			{
 				SingleApplication.SwitchToCurrentInstance();
 				return false;
@@ -56,15 +56,20 @@ namespace SingleInstance
 			Application.Run(frmMain);
 			return true;
 		}
-		public static bool Run()
+		public static bool Run(string mutexName = null)
 		{
-			return !SingleApplication.IsAlreadyRunning();
+			return !SingleApplication.IsAlreadyRunning(mutexName);
 		}
-		private static bool IsAlreadyRunning()
+		private static bool IsAlreadyRunning(string mutexName = null)
 		{
-			string location = Assembly.GetExecutingAssembly().Location;
-			FileSystemInfo fileSystemInfo = new FileInfo(location);
-			string name = fileSystemInfo.Name;
+            string name = mutexName;
+            if (string.IsNullOrEmpty(name))
+            {
+			    string location = Assembly.GetExecutingAssembly().Location;
+			    FileSystemInfo fileSystemInfo = new FileInfo(location);
+			    name = fileSystemInfo.Name;
+            }
+
 			bool flag;
 			SingleApplication.mutex = new Mutex(true,"Global\\" + name,out flag);
 			if (flag)
