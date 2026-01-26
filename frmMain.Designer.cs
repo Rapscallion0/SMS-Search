@@ -33,7 +33,6 @@ namespace SMS_Search
         private Button btnPopGrid;
         private SMS_Search.ExDataGridView dGrd;
         private ToolTip toolTip;
-        private Button btnClearResults;
         private GroupBox groupBox1;
         private DateTimePicker dateGregorian;
         private Label label1;
@@ -139,7 +138,6 @@ namespace SMS_Search
             this.btnShowTarget = new System.Windows.Forms.CheckBox();
             this.dateGregorian = new System.Windows.Forms.DateTimePicker();
             this.txtJulian = new System.Windows.Forms.TextBox();
-            this.btnClearResults = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.rdbCustSqlFct = new System.Windows.Forms.RadioButton();
@@ -401,16 +399,6 @@ namespace SMS_Search
             this.txtJulian.TabIndex = 1;
             this.txtJulian.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtJulian_KeyDown);
             this.txtJulian.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Num_KeyPress);
-            // 
-            // btnClearResults
-            // 
-            this.btnClearResults.Location = new System.Drawing.Point(84, 4);
-            this.btnClearResults.Name = "btnClearResults";
-            this.btnClearResults.Size = new System.Drawing.Size(80, 23);
-            this.btnClearResults.TabIndex = 1;
-            this.btnClearResults.Text = "Clear Results";
-            this.btnClearResults.UseVisualStyleBackColor = true;
-            this.btnClearResults.Click += new System.EventHandler(this.btnClearResults_Click);
             // 
             // groupBox1
             // 
@@ -1089,7 +1077,6 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.lblFilter);
             this.splitContainer.Panel2.Controls.Add(this.chkToggleDesc);
             this.splitContainer.Panel2.Controls.Add(this.groupBox1);
-            this.splitContainer.Panel2.Controls.Add(this.btnClearResults);
             this.splitContainer.Panel2.Controls.Add(this.dGrd);
             this.splitContainer.Panel2.Controls.Add(this.btnPopGrid);
             this.splitContainer.Panel2MinSize = 29;

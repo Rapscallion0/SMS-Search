@@ -234,7 +234,7 @@ namespace SMS_Search
              return await _repo.GetQuerySchemaAsync(_server, _database, _user, _pass, sql, parameters);
         }
 
-        public async Task ExportToCsvAsync(string filename, Dictionary<string, string> headerMap = null)
+        public async Task ExportToCsvAsync(string filename, Dictionary<string, string> headerMap = null, bool includeHeaders = true)
         {
              string finalSql = _baseSql;
              if (!string.IsNullOrWhiteSpace(FilterText))
@@ -265,14 +265,17 @@ namespace SMS_Search
                  using (var writer = new System.IO.StreamWriter(filename))
                  {
                      // Write headers
-                     for (int i = 0; i < reader.FieldCount; i++)
+                     if (includeHeaders)
                      {
-                         if (i > 0) writer.Write(",");
-                         string colName = reader.GetName(i);
-                         string header = (headerMap != null && headerMap.ContainsKey(colName)) ? headerMap[colName] : colName;
-                         writer.Write("\"" + header.Replace("\"", "\"\"") + "\"");
+                         for (int i = 0; i < reader.FieldCount; i++)
+                         {
+                             if (i > 0) writer.Write(",");
+                             string colName = reader.GetName(i);
+                             string header = (headerMap != null && headerMap.ContainsKey(colName)) ? headerMap[colName] : colName;
+                             writer.Write("\"" + header.Replace("\"", "\"\"") + "\"");
+                         }
+                         writer.WriteLine();
                      }
-                     writer.WriteLine();
 
                      while (await reader.ReadAsync())
                      {

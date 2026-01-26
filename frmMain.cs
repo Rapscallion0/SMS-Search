@@ -88,11 +88,7 @@ namespace SMS_Search
             _filterDebounceTimer.Interval = 500;
             _filterDebounceTimer.Tick += _filterDebounceTimer_Tick;
 
-            _headerContextMenu = new ContextMenuStrip();
-            var item = _headerContextMenu.Items.Add("Resize to fit content");
-            item.Click += (s, ev) => {
-                 dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-            };
+            SetupGridContextMenu();
 
 			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " initialized");
 			MinimumSize = new Size(FormWidthMin, FormHeightMin);
@@ -1161,13 +1157,66 @@ namespace SMS_Search
 			}
 		}
 
-        private void btnClearResults_Click(object sender, EventArgs e)
+        private void ClearResults()
         {
             dGrd.DataSource = null;
             tslblRecordCnt.Text = "0";
             Height = FormHeightMin;
         }
-        
+
+        private void SetupGridContextMenu()
+        {
+            var menu = new ContextMenuStrip();
+
+            // 1. Select all
+            var itemSelectAll = menu.Items.Add("Select all");
+            itemSelectAll.Click += (s, e) => dGrd.SelectAll();
+
+            // 2. Copy
+            var itemCopy = menu.Items.Add("Copy");
+            itemCopy.Click += (s, e) => CopyToClipboard(false);
+
+            // 3. Copy with headers
+            var itemCopyWithHeaders = menu.Items.Add("Copy with headers");
+            itemCopyWithHeaders.Click += (s, e) => CopyToClipboard(true);
+
+            // 4. Separator
+            menu.Items.Add(new ToolStripSeparator());
+
+            // 5. Resize content to fit
+            var itemResize = menu.Items.Add("Resize to fit content");
+            itemResize.Click += (s, e) => dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+
+            // 6. Clear result
+            var itemClear = menu.Items.Add("Clear result");
+            itemClear.Click += (s, e) => ClearResults();
+
+            dGrd.ContextMenuStrip = menu;
+            _headerContextMenu = menu; // Reuse for header
+        }
+
+        private void CopyToClipboard(bool includeHeaders)
+        {
+            if (dGrd.GetCellCount(DataGridViewElementStates.Selected) > 0)
+            {
+                var oldMode = dGrd.ClipboardCopyMode;
+                try
+                {
+                    dGrd.ClipboardCopyMode = includeHeaders
+                        ? DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText
+                        : DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+
+                    DataObject dataObj = dGrd.GetClipboardContent();
+                    if (dataObj != null)
+                        Clipboard.SetDataObject(dataObj);
+                }
+                finally
+                {
+                    dGrd.ClipboardCopyMode = oldMode;
+                }
+            }
+        }
+
         private void btnSetup_Click(object sender, EventArgs e)
 		{
 			// Check if both Ctrl and Shift are pressed
@@ -1879,6 +1928,8 @@ namespace SMS_Search
                 sfd.FileName = "SMS_Search_Export_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
+                    bool includeHeaders = MessageBox.Show("Include headers in export?", "Export CSV", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+
                     SetBusy(true);
                     try
                     {
@@ -1888,7 +1939,7 @@ namespace SMS_Search
                             headerMap[col.Name] = col.HeaderText;
                         }
 
-                        await _gridContext.ExportToCsvAsync(sfd.FileName, headerMap);
+                        await _gridContext.ExportToCsvAsync(sfd.FileName, headerMap, includeHeaders);
                         Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
                     }
                     catch (Exception ex)
