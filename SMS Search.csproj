@@ -9,6 +9,7 @@
     <ApplicationIcon>SMS Search.ico</ApplicationIcon>
     <RootNamespace>SMS_Search</RootNamespace>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>

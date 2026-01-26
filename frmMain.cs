@@ -73,6 +73,7 @@ namespace SMS_Search
 			Width = FormWidthMin;
 			splitContainer.Panel2MinSize = splitContainer.Height - splitContainer.Panel1.Height - splitContainer.SplitterWidth - 3;
 			StartPosition = FormStartPosition.Manual;
+            toolStrip.Renderer = new ToolStripSystemRenderer();
 
             string startupLoc = config.GetValue("GENERAL", "STARTUP_LOCATION");
 
@@ -277,6 +278,21 @@ namespace SMS_Search
 			setTabTextFocus();
 		}
 
+        private void SetBusy(bool busy)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => SetBusy(busy)));
+                return;
+            }
+
+            Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
+            tsProgressBar.Visible = busy;
+            btnPopGrid.Enabled = !busy;
+            picRefresh.Enabled = !busy;
+            tscmbDbDatabase.Enabled = !busy;
+        }
+
         public string GetConnString(string DbServer, string DbDatabase)
 		{
             if (config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH")))
@@ -300,7 +316,7 @@ namespace SMS_Search
             string server = tscmbDbServer.Text;
             string database = tscmbDbDatabase.Text;
 
-			Cursor = Cursors.WaitCursor;
+			SetBusy(true);
 
             try
             {
@@ -339,7 +355,7 @@ namespace SMS_Search
             finally
             {
 			    setTabTextFocus();
-                Cursor = Cursors.Default;
+                SetBusy(false);
             }
 		}
 
@@ -348,7 +364,7 @@ namespace SMS_Search
         /// </summary>
         private void ValidateConfigFile()
 		{
-			Cursor = Cursors.WaitCursor;
+			SetBusy(true);
 
 			// Read connection values once
 			string server = config.GetValue("CONNECTION", "SERVER");
@@ -434,7 +450,7 @@ namespace SMS_Search
 
             LoadCleanSqlRules();
 
-			Cursor = Cursors.Default;
+			SetBusy(false);
 		}
 
         private void LoadCleanSqlRules()
@@ -489,7 +505,7 @@ namespace SMS_Search
 
         private async void btnPopGrid_Click(object sender, EventArgs e)
 		{
-			Cursor = Cursors.WaitCursor;
+			SetBusy(true);
 			tslblInfo.Text = "";
 
             string server = tscmbDbServer.Text;
@@ -563,7 +579,7 @@ namespace SMS_Search
 			setTabTextFocus();
 			await setColumnArrayAsync();
 			setHeaders();
-			Cursor = Cursors.Default;
+			SetBusy(false);
 		}
 
         private SearchCriteria GetSearchCriteriaFromUI()
@@ -1029,7 +1045,7 @@ namespace SMS_Search
 			}
 			else
 			{
-				Cursor = Cursors.WaitCursor;
+				SetBusy(true);
 				frmConfig frmConfig = new frmConfig();
 				frmConfig.StartPosition = FormStartPosition.CenterParent;
 				frmConfig.ShowDialog();
@@ -1047,6 +1063,7 @@ namespace SMS_Search
                 log.ReloadConfig();
 
 				ValidateConfigFile();
+                SetBusy(false);
 			}
 		}
 
@@ -1219,7 +1236,7 @@ namespace SMS_Search
 		private async void getDbNames()
 		{
 			tscmbDbDatabase.Items.Clear();
-			Cursor = Cursors.WaitCursor;
+			SetBusy(true);
 
             string server = tscmbDbServer.Text;
 
@@ -1243,7 +1260,7 @@ namespace SMS_Search
             }
             finally
             {
-                Cursor = Cursors.Default;
+                SetBusy(false);
             }
 		}
 
@@ -1435,6 +1452,75 @@ namespace SMS_Search
 			}
 			TopMost = true;
 		}
+
+        private void txtGridFilter_TextChanged(object sender, EventArgs e)
+        {
+            if (bindingSource.DataSource is DataTable dt)
+            {
+                string filter = "";
+                string text = txtGridFilter.Text.Replace("'", "''"); // Escape single quote
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    List<string> criteria = new List<string>();
+                    foreach (DataGridViewColumn col in dGrd.Columns)
+                    {
+                        if (col.Visible)
+                        {
+                            criteria.Add(string.Format("CONVERT([{0}], 'System.String') LIKE '%{1}%'", col.Name, text));
+                        }
+                    }
+                    if (criteria.Count > 0)
+                    {
+                        filter = string.Join(" OR ", criteria);
+                    }
+                }
+                bindingSource.Filter = filter;
+            }
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            if (dGrd.Rows.Count == 0) return;
+
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                sfd.FileName = "SMS_Search_Export_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        StringBuilder csv = new StringBuilder();
+
+                        // Headers
+                        List<string> headers = new List<string>();
+                        foreach (DataGridViewColumn col in dGrd.Columns)
+                        {
+                            headers.Add("\"" + col.HeaderText.Replace("\"", "\"\"") + "\"");
+                        }
+                        csv.AppendLine(string.Join(",", headers));
+
+                        // Rows
+                        foreach (DataGridViewRow row in dGrd.Rows)
+                        {
+                            List<string> cells = new List<string>();
+                            foreach (DataGridViewCell cell in row.Cells)
+                            {
+                                cells.Add("\"" + (cell.Value?.ToString() ?? "").Replace("\"", "\"\"") + "\"");
+                            }
+                            csv.AppendLine(string.Join(",", cells));
+                        }
+
+                        File.WriteAllText(sfd.FileName, csv.ToString());
+                        Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error exporting: " + ex.Message, "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
 
         // Put DB online
         private void DbOnline(string database)

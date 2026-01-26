@@ -101,9 +101,13 @@ namespace SMS_Search
         private CheckBox btnShowTarget;
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripLabel tslblInfo;
+        private ToolStripProgressBar tsProgressBar;
         private SplitContainer splitContainer;
         private CheckBox chkLastTransaction;
         private CheckBox chkToggleDesc;
+        private Label lblFilter;
+        private TextBox txtGridFilter;
+        private Button btnExport;
 
         #region Windows Form Designer generated code
 
@@ -192,10 +196,14 @@ namespace SMS_Search
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.tslblInfo = new System.Windows.Forms.ToolStripLabel();
+            this.tsProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.bindingSourceTbl = new System.Windows.Forms.BindingSource(this.components);
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.chkToggleDesc = new System.Windows.Forms.CheckBox();
+            this.lblFilter = new System.Windows.Forms.Label();
+            this.txtGridFilter = new System.Windows.Forms.TextBox();
+            this.btnExport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -240,7 +248,7 @@ namespace SMS_Search
             this.dGrd.BackgroundColor = System.Drawing.SystemColors.ControlLight;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -249,19 +257,19 @@ namespace SMS_Search
             this.dGrd.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
             dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dGrd.DefaultCellStyle = dataGridViewCellStyle7;
             this.dGrd.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.dGrd.Location = new System.Drawing.Point(2, 37);
+            this.dGrd.Location = new System.Drawing.Point(2, 65);
             this.dGrd.Name = "dGrd";
             this.dGrd.ReadOnly = true;
             dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -664,7 +672,7 @@ namespace SMS_Search
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.ForeColor = System.Drawing.Color.DarkRed;
             this.label5.Location = new System.Drawing.Point(221, 6);
             this.label5.Name = "label5";
@@ -707,7 +715,7 @@ namespace SMS_Search
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.Color.DarkRed;
             this.label3.Location = new System.Drawing.Point(221, 6);
             this.label3.Name = "label3";
@@ -823,7 +831,7 @@ namespace SMS_Search
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.Color.DarkRed;
             this.label4.Location = new System.Drawing.Point(221, 6);
             this.label4.Name = "label4";
@@ -913,7 +921,7 @@ namespace SMS_Search
             // 
             this.label6.AutoSize = true;
             this.label6.BackColor = System.Drawing.Color.White;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label6.Location = new System.Drawing.Point(90, 7);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(14, 15);
@@ -956,6 +964,7 @@ namespace SMS_Search
             this.tsInfo,
             this.toolStripSeparator3,
             this.toolStripSeparator4,
+            this.tsProgressBar,
             this.tslblInfo});
             this.toolStrip.Location = new System.Drawing.Point(0, 555);
             this.toolStrip.Name = "toolStrip";
@@ -1051,9 +1060,16 @@ namespace SMS_Search
             // tslblInfo
             // 
             this.tslblInfo.Name = "tslblInfo";
-            this.tslblInfo.Size = new System.Drawing.Size(50, 22);
+            this.tslblInfo.Size = new System.Drawing.Size(46, 22);
             this.tslblInfo.Text = "tslblInfo";
             // 
+            // tsProgressBar
+            //
+            this.tsProgressBar.Name = "tsProgressBar";
+            this.tsProgressBar.Size = new System.Drawing.Size(100, 22);
+            this.tsProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.tsProgressBar.Visible = false;
+            //
             // splitContainer
             // 
             this.splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1074,6 +1090,9 @@ namespace SMS_Search
             // 
             // splitContainer.Panel2
             // 
+            this.splitContainer.Panel2.Controls.Add(this.btnExport);
+            this.splitContainer.Panel2.Controls.Add(this.txtGridFilter);
+            this.splitContainer.Panel2.Controls.Add(this.lblFilter);
             this.splitContainer.Panel2.Controls.Add(this.chkToggleDesc);
             this.splitContainer.Panel2.Controls.Add(this.groupBox1);
             this.splitContainer.Panel2.Controls.Add(this.btnClearResults);
@@ -1097,6 +1116,33 @@ namespace SMS_Search
             this.chkToggleDesc.UseVisualStyleBackColor = true;
             this.chkToggleDesc.CheckedChanged += new System.EventHandler(this.chkToggleDesc_CheckedChanged);
             // 
+            // lblFilter
+            //
+            this.lblFilter.AutoSize = true;
+            this.lblFilter.Location = new System.Drawing.Point(5, 38);
+            this.lblFilter.Name = "lblFilter";
+            this.lblFilter.Size = new System.Drawing.Size(36, 15);
+            this.lblFilter.TabIndex = 10;
+            this.lblFilter.Text = "Filter:";
+            //
+            // txtGridFilter
+            //
+            this.txtGridFilter.Location = new System.Drawing.Point(45, 35);
+            this.txtGridFilter.Name = "txtGridFilter";
+            this.txtGridFilter.Size = new System.Drawing.Size(200, 23);
+            this.txtGridFilter.TabIndex = 11;
+            this.txtGridFilter.TextChanged += new System.EventHandler(this.txtGridFilter_TextChanged);
+            //
+            // btnExport
+            //
+            this.btnExport.Location = new System.Drawing.Point(255, 34);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(75, 25);
+            this.btnExport.TabIndex = 12;
+            this.btnExport.Text = "Export CSV";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            //
             // frmMain
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
@@ -1135,6 +1181,7 @@ namespace SMS_Search
             this.splitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ResumeLayout(false);
             this.PerformLayout();
 
