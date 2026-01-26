@@ -67,6 +67,83 @@ namespace SMS_Search
             }
         }
 
+        public async Task<int> GetQueryCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filter = null)
+        {
+            string finalSql = ApplyFilter(sql, filter);
+            // Inject TOP 100 PERCENT to handle potential inner ORDER BYs if the user provided one in Custom SQL
+            // But this is tricky to do robustly with string manipulation.
+            // We will rely on the caller (QueryBuilder) to provide clean SQL, or fallback if it fails.
+            string countSql = $"SELECT COUNT(*) FROM ({finalSql}) AS _CountQ";
+
+            using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+            {
+                await conn.OpenAsync();
+                return await conn.ExecuteScalarAsync<int>(countSql, parameters);
+            }
+        }
+
+        public async Task<DataTable> GetQueryPageAsync(string server, string database, string user, string pass, string sql, object parameters, int offset, int limit, string sortCol, string sortDir, string filter = null)
+        {
+            string finalSql = ApplyFilter(sql, filter);
+
+            // Ensure we have an ORDER BY for OFFSET
+            string orderBy = "(SELECT NULL)";
+            if (!string.IsNullOrEmpty(sortCol))
+            {
+                // Sanitize sortCol (remove brackets to be safe, then re-add)
+                string safeCol = sortCol.Replace("[", "").Replace("]", "");
+                orderBy = $"[{safeCol}] {sortDir}";
+            }
+
+            string pageSql = $@"
+                SELECT * FROM ({finalSql}) AS _PageQ
+                ORDER BY {orderBy}
+                OFFSET {offset} ROWS FETCH NEXT {limit} ROWS ONLY";
+
+            using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+            {
+                await conn.OpenAsync();
+                using (var reader = await conn.ExecuteReaderAsync(pageSql, parameters))
+                {
+                    var dt = new DataTable();
+                    dt.Load(reader);
+                    return dt;
+                }
+            }
+        }
+
+        public async Task<DataTable> GetQuerySchemaAsync(string server, string database, string user, string pass, string sql, object parameters)
+        {
+            // Get schema (0 rows)
+            string schemaSql = $"SELECT TOP 0 * FROM ({sql}) AS _SchemaQ";
+
+            using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+            {
+                await conn.OpenAsync();
+                using (var reader = await conn.ExecuteReaderAsync(schemaSql, parameters))
+                {
+                    var dt = new DataTable();
+                    dt.Load(reader);
+                    return dt;
+                }
+            }
+        }
+
+        public async Task<SqlDataReader> GetQueryDataReaderAsync(string server, string database, string user, string pass, string sql, object parameters)
+        {
+            var conn = new SqlConnection(GetConnectionString(server, database, user, pass));
+            await conn.OpenAsync();
+            // Caller is responsible for disposing reader and connection
+            return await conn.ExecuteReaderAsync(sql, parameters, commandBehavior: CommandBehavior.CloseConnection) as SqlDataReader;
+        }
+
+        private string ApplyFilter(string sql, string filter)
+        {
+            if (string.IsNullOrWhiteSpace(filter)) return sql;
+            // The filter must be a valid WHERE clause snippet
+            return $"SELECT * FROM ({sql}) AS _FilterQ WHERE {filter}";
+        }
+
         public async Task<IEnumerable<string>> GetDatabasesAsync(string server, string user, string pass)
         {
             // Connect to master
@@ -94,9 +171,6 @@ namespace SMS_Search
                  // Batch query
                  string sql = "SELECT F1453 as Name, F1454 as Description FROM RB_FIELDS WHERE F1453 IN @Names";
                  var result = await conn.QueryAsync(sql, new { Names = columnNames });
-
-                 // Map back to list in order? Or return dictionary?
-                 // Original logic returned a list matching the input columns index.
 
                  var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                  foreach(var r in result)

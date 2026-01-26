@@ -79,7 +79,7 @@ GROUP BY
                     string fldNum = "F" + criteria.Value;
                     HandleWildcards(ref fldNum, out string op);
 
-                    sql = $"{FieldSelectBase} AND RBF.F1452 = TAB.name {FieldSelectJoinPKey} WHERE col.name {op} @Val {FieldSelectGroupBy} ORDER BY TAB.name";
+                    sql = $"{FieldSelectBase} AND RBF.F1452 = TAB.name {FieldSelectJoinPKey} WHERE col.name {op} @Val {FieldSelectGroupBy}";
                     p.Add("@Val", fldNum);
                 }
                 else if (criteria.Type == SearchType.Description)
@@ -88,7 +88,7 @@ GROUP BY
                     if (criteria.AnyMatch) desc = $"*{desc}*";
                     HandleWildcards(ref desc, out string op);
 
-                    sql = $"{FieldSelectBase} AND RBF.F1452 = TAB.name {FieldSelectJoinPKey} WHERE RBF.F1454 {op} @Val {FieldSelectGroupBy} ORDER BY CAST(SUBSTRING(COL.name,2,255) AS INT), TAB.name";
+                    sql = $"{FieldSelectBase} AND RBF.F1452 = TAB.name {FieldSelectJoinPKey} WHERE RBF.F1454 {op} @Val {FieldSelectGroupBy}";
                     p.Add("@Val", desc);
                 }
                 else if (criteria.Type == SearchType.Table)
@@ -98,7 +98,7 @@ GROUP BY
                         string table = criteria.Value;
                         HandleWildcards(ref table, out string op);
 
-                        sql = $"{FieldSelectBase} AND RBF.F1452 {op} @Table {FieldSelectJoinPKey} WHERE TAB.name {op} @Table {FieldSelectGroupBy} ORDER BY CAST(SUBSTRING(COL.name,2,255) AS INT)";
+                        sql = $"{FieldSelectBase} AND RBF.F1452 {op} @Table {FieldSelectJoinPKey} WHERE TAB.name {op} @Table {FieldSelectGroupBy}";
                         p.Add("@Table", table);
                     }
                     else
