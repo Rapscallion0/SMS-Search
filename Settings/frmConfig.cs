@@ -10,7 +10,7 @@ namespace SMS_Search.Settings
 {
     public partial class frmConfig : Form
     {
-        private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMS Search_settings.json"));
+        private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
         private Logfile log = new Logfile();
 
         private GeneralSettings generalSettings;
@@ -29,8 +29,8 @@ namespace SMS_Search.Settings
             base.StartPosition = FormStartPosition.Manual;
             base.Top = (Screen.PrimaryScreen.WorkingArea.Height - base.Height) / 2;
             base.Left = (Screen.PrimaryScreen.WorkingArea.Width - base.Width) / 2;
-            lblConfigFilePath.Text = Path.Combine(Application.StartupPath, "SMS Search_settings.json");
-            toolTip1.SetToolTip(lblConfigFilePath, Path.Combine(Application.StartupPath, "SMS Search_settings.json"));
+            lblConfigFilePath.Text = Path.Combine(Application.StartupPath, "SMSSearch_settings.json");
+            toolTip1.SetToolTip(lblConfigFilePath, Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
 
             InitializeUserControls();
         }
@@ -152,7 +152,7 @@ namespace SMS_Search.Settings
              if (MessageBox.Show("This will reset all settings to their default values (including Database connection).\nAre you sure?",
                  "Revert to Default", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
              {
-                 string path = Path.Combine(Application.StartupPath, "SMS Search_settings.json");
+                 string path = Path.Combine(Application.StartupPath, "SMSSearch_settings.json");
                  try
                  {
                      if (File.Exists(path)) File.Delete(path);
@@ -178,7 +178,7 @@ namespace SMS_Search.Settings
 
         private void lblConfigFilePath_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(Path.Combine(Application.StartupPath, "SMS Search_settings.json"));
+            System.Diagnostics.Process.Start(Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
         }
     }
 }
