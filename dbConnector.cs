@@ -78,7 +78,7 @@ namespace DbConn
             catch (Exception ex)
             {
                 log.Logger(LogLevel.Error, "TestDbConnAsync: Connection failed - " + ex.Message);
-                return false;
+                throw;
             }
         }
 	}

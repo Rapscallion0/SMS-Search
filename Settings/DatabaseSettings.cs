@@ -346,12 +346,42 @@ namespace SMS_Search.Settings
              }
         }
 
-        private void btnTestConn_Click(object sender, EventArgs e)
+        private async void btnTestConn_Click(object sender, EventArgs e)
         {
-            if (_dbConn.TestDbConn(cmbDbServer.Text, cmbDbDatabase.Text, true, chkWindowsAuth.Checked ? null : txtDbUser.Text, chkWindowsAuth.Checked ? null : txtDbPassword.Text))
-			{
-				MessageBox.Show("Database connection passed.", "Test DB Connection", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-			}
+            if (string.IsNullOrWhiteSpace(cmbDbDatabase.Text) ||
+                cmbDbDatabase.Text == "Select Database" ||
+                cmbDbDatabase.Text == "Loading..." ||
+                cmbDbDatabase.Text == "Select a valid Server")
+            {
+                MessageBox.Show("Please select a database first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            lblConnStatus.Text = "Connecting...";
+            lblConnStatus.ForeColor = Color.Black;
+            btnTestConn.Enabled = false;
+
+            try
+            {
+                await _dbConn.TestDbConnAsync(
+                    cmbDbServer.Text,
+                    cmbDbDatabase.Text,
+                    chkWindowsAuth.Checked ? null : txtDbUser.Text,
+                    chkWindowsAuth.Checked ? null : txtDbPassword.Text);
+
+                lblConnStatus.Text = "Connection Successful";
+                lblConnStatus.ForeColor = Color.Green;
+            }
+            catch (Exception ex)
+            {
+                lblConnStatus.Text = "Connection Failed";
+                lblConnStatus.ForeColor = Color.Red;
+                MessageBox.Show(ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
+            finally
+            {
+                btnTestConn.Enabled = true;
+            }
         }
 
         private void DatabaseSettings_Paint(object sender, PaintEventArgs e)

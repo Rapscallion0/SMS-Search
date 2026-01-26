@@ -39,6 +39,7 @@ namespace SMS_Search.Settings
             this.txtDbUser = new System.Windows.Forms.TextBox();
             this.lblDbPassword = new System.Windows.Forms.Label();
             this.txtDbPassword = new System.Windows.Forms.TextBox();
+            this.lblConnStatus = new System.Windows.Forms.Label();
             this.SuspendLayout();
             //
             // label3
@@ -145,10 +146,19 @@ namespace SMS_Search.Settings
             this.txtDbPassword.Size = new System.Drawing.Size(150, 20);
             this.txtDbPassword.TabIndex = 9;
             //
+            // lblConnStatus
+            //
+            this.lblConnStatus.AutoSize = true;
+            this.lblConnStatus.Location = new System.Drawing.Point(200, 155);
+            this.lblConnStatus.Name = "lblConnStatus";
+            this.lblConnStatus.Size = new System.Drawing.Size(0, 13);
+            this.lblConnStatus.TabIndex = 11;
+            //
             // DatabaseSettings
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblConnStatus);
             this.Controls.Add(this.txtDbPassword);
             this.Controls.Add(this.lblDbPassword);
             this.Controls.Add(this.txtDbUser);
@@ -180,5 +190,6 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.TextBox txtDbUser;
         private System.Windows.Forms.Label lblDbPassword;
         private System.Windows.Forms.TextBox txtDbPassword;
+        private System.Windows.Forms.Label lblConnStatus;
     }
 }
