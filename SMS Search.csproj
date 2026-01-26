@@ -66,7 +66,7 @@
     </ProjectReference>
   </ItemGroup>
 
-  <Target Name="EmbedLauncher" BeforeTargets="CoreCompile">
+  <Target Name="EmbedLauncher" AfterTargets="ResolveReferences">
     <Message Text="Embedding SMS Search Launcher from Launcher/bin/$(Configuration)/SMSSearchLauncher.exe" Importance="high" />
     <Error Condition="!Exists('Launcher/bin/$(Configuration)/SMSSearchLauncher.exe')" Text="Launcher executable not found at Launcher/bin/$(Configuration)/SMSSearchLauncher.exe. Build Launcher project first." />
     <ItemGroup>
