@@ -20,7 +20,7 @@ namespace SMS_Search.Settings
 
         private ConfigManager _config;
         private Logfile _log = new Logfile();
-        private const string LauncherExe = "SMS Search Launcher.exe";
+        private const string LauncherExe = "SMSSearchLauncher.exe";
         private string _lastValidHotkey = "";
         private string _currentValidHotkey = "";
         private bool _isCurrentHotkeyValid = false;
@@ -275,14 +275,14 @@ namespace SMS_Search.Settings
             try
             {
                 var assembly = System.Reflection.Assembly.GetExecutingAssembly(); // Note: This might be SMS_Search.dll/exe
-                // The resource name might depend on namespace. "SMS_Search.Resources.SMS Search Launcher.exe"
+                // The resource name might depend on namespace. "SMS_Search.Resources.SMSSearchLauncher.exe"
                 // But previously `GetExecutingAssembly` was `SMS_Search` (frmConfig).
                 // Now `LauncherSettings` is in `SMS_Search.Settings`. Executing assembly should be same (project).
 
-                string resourceName = "SMS_Search.Resources.SMS Search Launcher.exe";
+                string resourceName = "SMS_Search.Resources.SMSSearchLauncher.exe";
 
                 var resources = assembly.GetManifestResourceNames();
-                var foundResource = Array.Find(resources, r => r.EndsWith("SMS Search Launcher.exe", StringComparison.OrdinalIgnoreCase));
+                var foundResource = Array.Find(resources, r => r.EndsWith("SMSSearchLauncher.exe", StringComparison.OrdinalIgnoreCase));
 
                 if (foundResource != null)
                 {
@@ -344,8 +344,15 @@ namespace SMS_Search.Settings
         {
             _log.Logger(LogLevel.Info, "Creating Startup shortcut");
             string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-            string shortcutPath = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
+            string shortcutPath = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
             string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
+
+            // Cleanup old shortcut if exists
+            string oldShortcut = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
+            if (File.Exists(oldShortcut))
+            {
+                try { File.Delete(oldShortcut); } catch { }
+            }
 
             if (!File.Exists(targetPath))
             {
@@ -370,11 +377,18 @@ namespace SMS_Search.Settings
         {
             _log.Logger(LogLevel.Info, "Removing Startup shortcut");
             string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-            string shortcutPath = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
 
+            string shortcutPath = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
             if (File.Exists(shortcutPath))
             {
                 File.Delete(shortcutPath);
+            }
+
+            // Cleanup old shortcut
+            string oldShortcut = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
+            if (File.Exists(oldShortcut))
+            {
+                File.Delete(oldShortcut);
             }
         }
 
@@ -393,7 +407,7 @@ namespace SMS_Search.Settings
 
         private void KillLauncher()
         {
-            foreach (var name in new[] { "Launcher", "SMS Search Launcher" })
+            foreach (var name in new[] { "Launcher", "SMS Search Launcher", "SMSSearchLauncher" })
             {
                 Process[] processes = Process.GetProcessesByName(name);
                 foreach (Process p in processes)
@@ -411,7 +425,9 @@ namespace SMS_Search.Settings
 
         private bool IsLauncherRunning()
         {
-            return Process.GetProcessesByName("Launcher").Length > 0 || Process.GetProcessesByName("SMS Search Launcher").Length > 0;
+            return Process.GetProcessesByName("Launcher").Length > 0 ||
+                   Process.GetProcessesByName("SMS Search Launcher").Length > 0 ||
+                   Process.GetProcessesByName("SMSSearchLauncher").Length > 0;
         }
 
         private void ReloadLauncherIfRunning()
@@ -446,7 +462,7 @@ namespace SMS_Search.Settings
         private void UpdateLauncherStatusUI()
         {
             string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-            string shortcutPath = Path.Combine(startupFolder, "SMS Search Launcher.lnk");
+            string shortcutPath = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
             string targetPath = Path.Combine(Application.StartupPath, LauncherExe);
 
             bool isRegistered = File.Exists(shortcutPath) && File.Exists(targetPath);

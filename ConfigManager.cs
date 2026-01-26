@@ -27,26 +27,50 @@ namespace SMS_Search
         {
             _jsonFilePath = jsonFilePath;
             string directory = Path.GetDirectoryName(_jsonFilePath);
-            // Default to "SMS Search.ini" if directory is empty (current dir)
+            // Default to "SMSSearch.ini" if directory is empty (current dir)
             if (string.IsNullOrEmpty(directory))
             {
-                _iniFilePath = "SMS Search.ini";
+                _iniFilePath = "SMSSearch.ini";
             }
             else
             {
-                _iniFilePath = Path.Combine(directory, "SMS Search.ini");
+                _iniFilePath = Path.Combine(directory, "SMSSearch.ini");
+            }
+
+            string dir = directory;
+            if (string.IsNullOrEmpty(dir)) dir = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Migrate legacy INI if exists
+            string legacyIniName = "SMS Search.ini";
+            string legacyIniPath = Path.Combine(dir, legacyIniName);
+            if (File.Exists(legacyIniPath) && !File.Exists(_iniFilePath))
+            {
+                try { File.Move(legacyIniPath, _iniFilePath); } catch { }
             }
 
             _config = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
-            // Migration from SMS Search.json to SMS Search_settings.json
-            string legacyJsonName = "SMS Search.json";
             string currentJsonName = Path.GetFileName(_jsonFilePath);
+
+            // Migration from SMS Search_settings.json (previous version) to SMSSearch_settings.json (current)
+            string prevSettingsName = "SMS Search_settings.json";
+            if (!string.Equals(prevSettingsName, currentJsonName, StringComparison.OrdinalIgnoreCase))
+            {
+                string prevPath = Path.Combine(dir, prevSettingsName);
+                if (File.Exists(prevPath) && !File.Exists(_jsonFilePath))
+                {
+                    try
+                    {
+                        File.Move(prevPath, _jsonFilePath);
+                    }
+                    catch { }
+                }
+            }
+
+            // Migration from SMS Search.json to SMSSearch_settings.json
+            string legacyJsonName = "SMS Search.json";
             if (!string.Equals(legacyJsonName, currentJsonName, StringComparison.OrdinalIgnoreCase))
             {
-                string dir = directory;
-                if (string.IsNullOrEmpty(dir)) dir = AppDomain.CurrentDomain.BaseDirectory;
-
                 string legacyPath = Path.Combine(dir, legacyJsonName);
                 if (File.Exists(legacyPath) && !File.Exists(_jsonFilePath))
                 {
