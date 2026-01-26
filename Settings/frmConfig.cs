@@ -73,6 +73,12 @@ namespace SMS_Search.Settings
             imgListIcons.Images.Add("CleanSql", SystemIcons.Asterisk);
             imgListIcons.Images.Add("Launcher", SystemIcons.WinLogo);
 
+            // Ensure selected icons don't change
+            foreach (TreeNode node in tvSettings.Nodes)
+            {
+                node.SelectedImageKey = node.ImageKey;
+            }
+
             // Select default
             if (tvSettings.Nodes.Count > 0)
                 tvSettings.SelectedNode = tvSettings.Nodes["General"];
