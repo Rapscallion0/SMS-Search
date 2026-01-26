@@ -11,7 +11,13 @@
     <AssemblyName>SMSSearch</AssemblyName>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
+
+  <Target Name="KillLauncher" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <Exec Command="taskkill /F /IM &quot;SMS Search Launcher.exe&quot; 2&gt;nul || exit 0" />
+    <Exec Command="taskkill /F /IM &quot;SMSSearchLauncher.exe&quot; 2&gt;nul || exit 0" />
+  </Target>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <ShouldCreateLogs>True</ShouldCreateLogs>
