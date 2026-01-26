@@ -65,13 +65,13 @@ namespace SMS_Search.Settings
 
             // Icons
             imgListIcons.Images.Clear();
-            imgListIcons.Images.Add("General", SystemIcons.Application);
-            imgListIcons.Images.Add("Database", SystemIcons.Shield);
-            imgListIcons.Images.Add("Advanced", SystemIcons.Warning);
-            imgListIcons.Images.Add("Update", SystemIcons.Question);
-            imgListIcons.Images.Add("Logging", SystemIcons.Information);
-            imgListIcons.Images.Add("CleanSql", SystemIcons.Asterisk);
-            imgListIcons.Images.Add("Launcher", SystemIcons.WinLogo);
+            imgListIcons.Images.Add("General", IconLoader.GetIcon("General"));
+            imgListIcons.Images.Add("Database", IconLoader.GetIcon("Database"));
+            imgListIcons.Images.Add("Advanced", IconLoader.GetIcon("Advanced"));
+            imgListIcons.Images.Add("Update", IconLoader.GetIcon("Update"));
+            imgListIcons.Images.Add("Logging", IconLoader.GetIcon("Logging"));
+            imgListIcons.Images.Add("CleanSql", IconLoader.GetIcon("CleanSql"));
+            imgListIcons.Images.Add("Launcher", IconLoader.GetIcon("Launcher"));
 
             // Ensure selected icons don't change
             foreach (TreeNode node in tvSettings.Nodes)
