@@ -20,6 +20,8 @@ namespace SMS_Search.Settings
         private List<string> _dbNames = new List<string>();
         private bool _isLoaded = false;
         private bool _hasDbError = false;
+        private string _lastLoadedServer;
+        private bool _isLoadingDb;
 
         public DatabaseSettings(ConfigManager config)
         {
@@ -130,6 +132,7 @@ namespace SMS_Search.Settings
             btnTestConn.Click += btnTestConn_Click;
 
             cmbDbDatabase.DropDown += (s, e) => _ = GetDbNames();
+            cmbDbServer.Leave += (s, e) => _ = GetDbNames();
             this.Paint += DatabaseSettings_Paint;
         }
 
@@ -142,6 +145,7 @@ namespace SMS_Search.Settings
 
         private void SaveAuthSettings()
         {
+            _lastLoadedServer = null; // Invalidate cache so we reload DBs with new credentials
             if (!_isLoaded || _config == null) return;
 
             if (chkWindowsAuth.Checked)
@@ -242,7 +246,7 @@ namespace SMS_Search.Settings
             {
                 cmbDbDatabase.Enabled = true;
                 // Pre-fetch DB names if valid server
-                // await GetDbNames(); // Optional, original code did calling it
+                await GetDbNames();
             }
             else
             {
@@ -287,6 +291,18 @@ namespace SMS_Search.Settings
 
         private async Task GetDbNames()
         {
+            if (_isLoadingDb) return;
+            // Prevent reloading if the server hasn't changed and we have items
+            if (!string.IsNullOrEmpty(_lastLoadedServer) &&
+                _lastLoadedServer == cmbDbServer.Text &&
+                cmbDbDatabase.Items.Count > 0 &&
+                cmbDbDatabase.Items[0].ToString() != "Loading...")
+            {
+                return;
+            }
+
+            _isLoadingDb = true;
+
              // Logic to populate DB dropdown
              string currentDb = cmbDbDatabase.Text;
              cmbDbDatabase.Items.Clear();
@@ -314,6 +330,8 @@ namespace SMS_Search.Settings
                     cmbDbDatabase.Text = currentDb;
                  else
                     cmbDbDatabase.Text = "Select Database";
+
+                _lastLoadedServer = cmbDbServer.Text;
              }
              catch (Exception ex)
              {
@@ -324,6 +342,7 @@ namespace SMS_Search.Settings
              finally
              {
                  Cursor.Current = Cursors.Default;
+                 _isLoadingDb = false;
              }
         }
 
