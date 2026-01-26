@@ -119,10 +119,8 @@ namespace SMS_Search
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.btnPopGrid = new System.Windows.Forms.Button();
             this.dGrd = new System.Windows.Forms.DataGridView();
@@ -196,16 +194,16 @@ namespace SMS_Search
             this.tsInfo = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.tslblInfo = new System.Windows.Forms.ToolStripLabel();
             this.tsProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.tslblInfo = new System.Windows.Forms.ToolStripLabel();
             this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.bindingSourceTbl = new System.Windows.Forms.BindingSource(this.components);
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.chkToggleDesc = new System.Windows.Forms.CheckBox();
-            this.lblFilter = new System.Windows.Forms.Label();
-            this.txtGridFilter = new System.Windows.Forms.TextBox();
-            this.btnClearFilter = new System.Windows.Forms.Button();
             this.btnExport = new System.Windows.Forms.Button();
+            this.btnClearFilter = new System.Windows.Forms.Button();
+            this.txtGridFilter = new System.Windows.Forms.TextBox();
+            this.lblFilter = new System.Windows.Forms.Label();
+            this.chkToggleDesc = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -228,7 +226,7 @@ namespace SMS_Search
             // 
             this.btnPopGrid.Location = new System.Drawing.Point(3, 4);
             this.btnPopGrid.Name = "btnPopGrid";
-            this.btnPopGrid.Size = new System.Drawing.Size(75, 23);
+            this.btnPopGrid.Size = new System.Drawing.Size(78, 23);
             this.btnPopGrid.TabIndex = 0;
             this.btnPopGrid.Text = "Execute (F5)";
             this.btnPopGrid.UseVisualStyleBackColor = true;
@@ -240,47 +238,30 @@ namespace SMS_Search
             this.dGrd.AllowUserToDeleteRows = false;
             this.dGrd.AllowUserToOrderColumns = true;
             this.dGrd.AllowUserToResizeRows = false;
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.WhiteSmoke;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            this.dGrd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.WhiteSmoke;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            this.dGrd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dGrd.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dGrd.BackgroundColor = System.Drawing.SystemColors.ControlLight;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dGrd.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dGrd.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dGrd.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dGrd.DefaultCellStyle = dataGridViewCellStyle4;
             this.dGrd.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dGrd.Location = new System.Drawing.Point(2, 65);
             this.dGrd.Name = "dGrd";
             this.dGrd.ReadOnly = true;
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dGrd.RowHeadersDefaultCellStyle = dataGridViewCellStyle8;
             this.dGrd.RowHeadersVisible = false;
-            this.dGrd.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dGrd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dGrd.Size = new System.Drawing.Size(591, 330);
+            this.dGrd.Size = new System.Drawing.Size(591, 304);
             this.dGrd.TabIndex = 4;
             this.dGrd.TabStop = false;
             this.dGrd.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dGrd_CellDoubleClick);
@@ -341,7 +322,7 @@ namespace SMS_Search
             // 
             this.btnCleanSqlFct.Location = new System.Drawing.Point(6, 82);
             this.btnCleanSqlFct.Name = "btnCleanSqlFct";
-            this.btnCleanSqlFct.Size = new System.Drawing.Size(75, 23);
+            this.btnCleanSqlFct.Size = new System.Drawing.Size(85, 23);
             this.btnCleanSqlFct.TabIndex = 100;
             this.btnCleanSqlFct.Text = "Clean &Query";
             this.toolTip.SetToolTip(this.btnCleanSqlFct, "Click to remove HTML formatting from query");
@@ -352,7 +333,7 @@ namespace SMS_Search
             // 
             this.btnCleanSqlTlz.Location = new System.Drawing.Point(6, 82);
             this.btnCleanSqlTlz.Name = "btnCleanSqlTlz";
-            this.btnCleanSqlTlz.Size = new System.Drawing.Size(75, 23);
+            this.btnCleanSqlTlz.Size = new System.Drawing.Size(85, 23);
             this.btnCleanSqlTlz.TabIndex = 101;
             this.btnCleanSqlTlz.Text = "Clean &Query";
             this.toolTip.SetToolTip(this.btnCleanSqlTlz, "Click to remove HTML formatting from query");
@@ -363,7 +344,7 @@ namespace SMS_Search
             // 
             this.btnCleanSqlFld.Location = new System.Drawing.Point(6, 108);
             this.btnCleanSqlFld.Name = "btnCleanSqlFld";
-            this.btnCleanSqlFld.Size = new System.Drawing.Size(75, 23);
+            this.btnCleanSqlFld.Size = new System.Drawing.Size(85, 23);
             this.btnCleanSqlFld.TabIndex = 102;
             this.btnCleanSqlFld.Text = "Clean &Query";
             this.toolTip.SetToolTip(this.btnCleanSqlFld, "Click to remove HTML formatting from query");
@@ -402,7 +383,7 @@ namespace SMS_Search
             this.dateGregorian.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.dateGregorian.Location = new System.Drawing.Point(93, 11);
             this.dateGregorian.Name = "dateGregorian";
-            this.dateGregorian.Size = new System.Drawing.Size(96, 20);
+            this.dateGregorian.Size = new System.Drawing.Size(96, 23);
             this.dateGregorian.TabIndex = 0;
             this.dateGregorian.ValueChanged += new System.EventHandler(this.dateGregorian_ValueChanged);
             // 
@@ -410,16 +391,16 @@ namespace SMS_Search
             // 
             this.txtJulian.Location = new System.Drawing.Point(196, 11);
             this.txtJulian.Name = "txtJulian";
-            this.txtJulian.Size = new System.Drawing.Size(100, 20);
+            this.txtJulian.Size = new System.Drawing.Size(100, 23);
             this.txtJulian.TabIndex = 1;
             this.txtJulian.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtJulian_KeyDown);
             this.txtJulian.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Num_KeyPress);
             // 
             // btnClearResults
             // 
-            this.btnClearResults.Location = new System.Drawing.Point(81, 4);
+            this.btnClearResults.Location = new System.Drawing.Point(84, 4);
             this.btnClearResults.Name = "btnClearResults";
-            this.btnClearResults.Size = new System.Drawing.Size(77, 23);
+            this.btnClearResults.Size = new System.Drawing.Size(80, 23);
             this.btnClearResults.TabIndex = 1;
             this.btnClearResults.Text = "Clear Results";
             this.btnClearResults.UseVisualStyleBackColor = true;
@@ -444,7 +425,7 @@ namespace SMS_Search
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 14);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(81, 13);
+            this.label1.Size = new System.Drawing.Size(88, 15);
             this.label1.TabIndex = 28;
             this.label1.Text = "Date convertor:";
             // 
@@ -453,7 +434,7 @@ namespace SMS_Search
             this.rdbCustSqlFct.AutoSize = true;
             this.rdbCustSqlFct.Location = new System.Drawing.Point(6, 59);
             this.rdbCustSqlFct.Name = "rdbCustSqlFct";
-            this.rdbCustSqlFct.Size = new System.Drawing.Size(80, 17);
+            this.rdbCustSqlFct.Size = new System.Drawing.Size(90, 19);
             this.rdbCustSqlFct.TabIndex = 99;
             this.rdbCustSqlFct.Text = "&Custom qry:";
             this.rdbCustSqlFct.UseVisualStyleBackColor = true;
@@ -465,7 +446,7 @@ namespace SMS_Search
             this.rdbNumFct.Checked = true;
             this.rdbNumFct.Location = new System.Drawing.Point(6, 6);
             this.rdbNumFct.Name = "rdbNumFct";
-            this.rdbNumFct.Size = new System.Drawing.Size(65, 17);
+            this.rdbNumFct.Size = new System.Drawing.Size(72, 19);
             this.rdbNumFct.TabIndex = 99;
             this.rdbNumFct.TabStop = true;
             this.rdbNumFct.Text = "&Number:";
@@ -477,11 +458,11 @@ namespace SMS_Search
             this.txtCustSqlFct.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlFct.Location = new System.Drawing.Point(93, 59);
+            this.txtCustSqlFct.Location = new System.Drawing.Point(97, 59);
             this.txtCustSqlFct.Multiline = true;
             this.txtCustSqlFct.Name = "txtCustSqlFct";
             this.txtCustSqlFct.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtCustSqlFct.Size = new System.Drawing.Size(484, 79);
+            this.txtCustSqlFct.Size = new System.Drawing.Size(480, 77);
             this.txtCustSqlFct.TabIndex = 4;
             this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
             // 
@@ -498,9 +479,9 @@ namespace SMS_Search
             // 
             // txtNumFct
             // 
-            this.txtNumFct.Location = new System.Drawing.Point(93, 5);
+            this.txtNumFct.Location = new System.Drawing.Point(97, 5);
             this.txtNumFct.Name = "txtNumFct";
-            this.txtNumFct.Size = new System.Drawing.Size(70, 20);
+            this.txtNumFct.Size = new System.Drawing.Size(70, 23);
             this.txtNumFct.TabIndex = 0;
             this.txtNumFct.Enter += new System.EventHandler(this.txtNumFct_Enter);
             this.txtNumFct.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Num_KeyPress);
@@ -509,9 +490,9 @@ namespace SMS_Search
             // 
             this.txtDescFct.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDescFct.Location = new System.Drawing.Point(93, 31);
+            this.txtDescFct.Location = new System.Drawing.Point(97, 31);
             this.txtDescFct.Name = "txtDescFct";
-            this.txtDescFct.Size = new System.Drawing.Size(328, 20);
+            this.txtDescFct.Size = new System.Drawing.Size(324, 23);
             this.txtDescFct.TabIndex = 2;
             this.txtDescFct.Enter += new System.EventHandler(this.txtDescFct_Enter);
             // 
@@ -520,7 +501,7 @@ namespace SMS_Search
             this.rdbDescFct.AutoSize = true;
             this.rdbDescFct.Location = new System.Drawing.Point(6, 32);
             this.rdbDescFct.Name = "rdbDescFct";
-            this.rdbDescFct.Size = new System.Drawing.Size(81, 17);
+            this.rdbDescFct.Size = new System.Drawing.Size(88, 19);
             this.rdbDescFct.TabIndex = 99;
             this.rdbDescFct.Text = "&Description:";
             this.rdbDescFct.UseVisualStyleBackColor = true;
@@ -531,7 +512,7 @@ namespace SMS_Search
             this.rdbCustSqlTlz.AutoSize = true;
             this.rdbCustSqlTlz.Location = new System.Drawing.Point(6, 59);
             this.rdbCustSqlTlz.Name = "rdbCustSqlTlz";
-            this.rdbCustSqlTlz.Size = new System.Drawing.Size(80, 17);
+            this.rdbCustSqlTlz.Size = new System.Drawing.Size(90, 19);
             this.rdbCustSqlTlz.TabIndex = 99;
             this.rdbCustSqlTlz.Text = "&Custom qry:";
             this.rdbCustSqlTlz.UseVisualStyleBackColor = true;
@@ -543,7 +524,7 @@ namespace SMS_Search
             this.rdbNumTlz.Checked = true;
             this.rdbNumTlz.Location = new System.Drawing.Point(6, 6);
             this.rdbNumTlz.Name = "rdbNumTlz";
-            this.rdbNumTlz.Size = new System.Drawing.Size(65, 17);
+            this.rdbNumTlz.Size = new System.Drawing.Size(72, 19);
             this.rdbNumTlz.TabIndex = 99;
             this.rdbNumTlz.TabStop = true;
             this.rdbNumTlz.Text = "&Number:";
@@ -555,11 +536,11 @@ namespace SMS_Search
             this.txtCustSqlTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlTlz.Location = new System.Drawing.Point(93, 59);
+            this.txtCustSqlTlz.Location = new System.Drawing.Point(97, 59);
             this.txtCustSqlTlz.Multiline = true;
             this.txtCustSqlTlz.Name = "txtCustSqlTlz";
             this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtCustSqlTlz.Size = new System.Drawing.Size(484, 79);
+            this.txtCustSqlTlz.Size = new System.Drawing.Size(480, 77);
             this.txtCustSqlTlz.TabIndex = 4;
             this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
             // 
@@ -576,9 +557,9 @@ namespace SMS_Search
             // 
             // txtNumTlz
             // 
-            this.txtNumTlz.Location = new System.Drawing.Point(93, 5);
+            this.txtNumTlz.Location = new System.Drawing.Point(97, 5);
             this.txtNumTlz.Name = "txtNumTlz";
-            this.txtNumTlz.Size = new System.Drawing.Size(70, 20);
+            this.txtNumTlz.Size = new System.Drawing.Size(70, 23);
             this.txtNumTlz.TabIndex = 0;
             this.txtNumTlz.Enter += new System.EventHandler(this.txtNumTlz_Enter);
             this.txtNumTlz.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Num_KeyPress);
@@ -587,9 +568,9 @@ namespace SMS_Search
             // 
             this.txtDescTlz.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDescTlz.Location = new System.Drawing.Point(93, 31);
+            this.txtDescTlz.Location = new System.Drawing.Point(97, 31);
             this.txtDescTlz.Name = "txtDescTlz";
-            this.txtDescTlz.Size = new System.Drawing.Size(328, 20);
+            this.txtDescTlz.Size = new System.Drawing.Size(324, 23);
             this.txtDescTlz.TabIndex = 2;
             this.txtDescTlz.Enter += new System.EventHandler(this.txtDescTlz_Enter);
             // 
@@ -598,7 +579,7 @@ namespace SMS_Search
             this.rdbDescTlz.AutoSize = true;
             this.rdbDescTlz.Location = new System.Drawing.Point(6, 32);
             this.rdbDescTlz.Name = "rdbDescTlz";
-            this.rdbDescTlz.Size = new System.Drawing.Size(81, 17);
+            this.rdbDescTlz.Size = new System.Drawing.Size(88, 19);
             this.rdbDescTlz.TabIndex = 99;
             this.rdbDescTlz.Text = "&Description:";
             this.rdbDescTlz.UseVisualStyleBackColor = true;
@@ -653,10 +634,10 @@ namespace SMS_Search
             this.tabFct.Controls.Add(this.btnBuildQryFct);
             this.tabFct.Controls.Add(this.btnClearFct);
             this.tabFct.Controls.Add(this.txtCustSqlFct);
-            this.tabFct.Location = new System.Drawing.Point(4, 22);
+            this.tabFct.Location = new System.Drawing.Point(4, 24);
             this.tabFct.Name = "tabFct";
             this.tabFct.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFct.Size = new System.Drawing.Size(585, 140);
+            this.tabFct.Size = new System.Drawing.Size(585, 138);
             this.tabFct.TabIndex = 0;
             this.tabFct.Text = "Function";
             this.tabFct.ToolTipText = "<CRTL> + 1";
@@ -665,9 +646,9 @@ namespace SMS_Search
             // 
             this.chkSearchAnyFct.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkSearchAnyFct.AutoSize = true;
-            this.chkSearchAnyFct.Location = new System.Drawing.Point(427, 32);
+            this.chkSearchAnyFct.Location = new System.Drawing.Point(425, 32);
             this.chkSearchAnyFct.Name = "chkSearchAnyFct";
-            this.chkSearchAnyFct.Size = new System.Drawing.Size(73, 17);
+            this.chkSearchAnyFct.Size = new System.Drawing.Size(79, 19);
             this.chkSearchAnyFct.TabIndex = 3;
             this.chkSearchAnyFct.Text = "Anywhere";
             this.chkSearchAnyFct.UseVisualStyleBackColor = true;
@@ -679,7 +660,7 @@ namespace SMS_Search
             this.label5.ForeColor = System.Drawing.Color.DarkRed;
             this.label5.Location = new System.Drawing.Point(221, 6);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(175, 15);
+            this.label5.Size = new System.Drawing.Size(169, 15);
             this.label5.TabIndex = 1;
             this.label5.Text = "Wildcards supported ( * and ? )";
             // 
@@ -697,10 +678,10 @@ namespace SMS_Search
             this.tabTlz.Controls.Add(this.btnBuildQryTlz);
             this.tabTlz.Controls.Add(this.btnClearTlz);
             this.tabTlz.Controls.Add(this.txtCustSqlTlz);
-            this.tabTlz.Location = new System.Drawing.Point(4, 22);
+            this.tabTlz.Location = new System.Drawing.Point(4, 24);
             this.tabTlz.Name = "tabTlz";
             this.tabTlz.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTlz.Size = new System.Drawing.Size(585, 140);
+            this.tabTlz.Size = new System.Drawing.Size(585, 138);
             this.tabTlz.TabIndex = 1;
             this.tabTlz.Text = "Totalizer";
             // 
@@ -708,9 +689,9 @@ namespace SMS_Search
             // 
             this.chkSearchAnyTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkSearchAnyTlz.AutoSize = true;
-            this.chkSearchAnyTlz.Location = new System.Drawing.Point(427, 32);
+            this.chkSearchAnyTlz.Location = new System.Drawing.Point(425, 32);
             this.chkSearchAnyTlz.Name = "chkSearchAnyTlz";
-            this.chkSearchAnyTlz.Size = new System.Drawing.Size(73, 17);
+            this.chkSearchAnyTlz.Size = new System.Drawing.Size(79, 19);
             this.chkSearchAnyTlz.TabIndex = 3;
             this.chkSearchAnyTlz.Text = "Anywhere";
             this.chkSearchAnyTlz.UseVisualStyleBackColor = true;
@@ -722,7 +703,7 @@ namespace SMS_Search
             this.label3.ForeColor = System.Drawing.Color.DarkRed;
             this.label3.Location = new System.Drawing.Point(221, 6);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(175, 15);
+            this.label3.Size = new System.Drawing.Size(169, 15);
             this.label3.TabIndex = 1;
             this.label3.Text = "Wildcards supported ( * and ? )";
             // 
@@ -746,10 +727,10 @@ namespace SMS_Search
             this.tabFields.Controls.Add(this.txtCustSqlFld);
             this.tabFields.Controls.Add(this.label6);
             this.tabFields.Controls.Add(this.picRefresh);
-            this.tabFields.Location = new System.Drawing.Point(4, 22);
+            this.tabFields.Location = new System.Drawing.Point(4, 24);
             this.tabFields.Name = "tabFields";
             this.tabFields.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFields.Size = new System.Drawing.Size(585, 140);
+            this.tabFields.Size = new System.Drawing.Size(585, 138);
             this.tabFields.TabIndex = 2;
             this.tabFields.Text = "Fields";
             // 
@@ -758,7 +739,7 @@ namespace SMS_Search
             this.chkLastTransaction.AutoSize = true;
             this.chkLastTransaction.Location = new System.Drawing.Point(473, 60);
             this.chkLastTransaction.Name = "chkLastTransaction";
-            this.chkLastTransaction.Size = new System.Drawing.Size(105, 17);
+            this.chkLastTransaction.Size = new System.Drawing.Size(111, 19);
             this.chkLastTransaction.TabIndex = 103;
             this.chkLastTransaction.Text = "&Last Transaction";
             this.chkLastTransaction.UseVisualStyleBackColor = true;
@@ -776,9 +757,9 @@ namespace SMS_Search
             // rdbShowRecords
             // 
             this.rdbShowRecords.AutoSize = true;
-            this.rdbShowRecords.Location = new System.Drawing.Point(84, 4);
+            this.rdbShowRecords.Location = new System.Drawing.Point(86, 4);
             this.rdbShowRecords.Name = "rdbShowRecords";
-            this.rdbShowRecords.Size = new System.Drawing.Size(95, 17);
+            this.rdbShowRecords.Size = new System.Drawing.Size(99, 19);
             this.rdbShowRecords.TabIndex = 1;
             this.rdbShowRecords.Text = "Show &Records";
             this.rdbShowRecords.UseVisualStyleBackColor = true;
@@ -788,9 +769,9 @@ namespace SMS_Search
             // 
             this.rdbShowFields.AutoSize = true;
             this.rdbShowFields.Checked = true;
-            this.rdbShowFields.Location = new System.Drawing.Point(3, 4);
+            this.rdbShowFields.Location = new System.Drawing.Point(1, 4);
             this.rdbShowFields.Name = "rdbShowFields";
-            this.rdbShowFields.Size = new System.Drawing.Size(82, 17);
+            this.rdbShowFields.Size = new System.Drawing.Size(87, 19);
             this.rdbShowFields.TabIndex = 0;
             this.rdbShowFields.TabStop = true;
             this.rdbShowFields.Text = "Show &Fields";
@@ -801,9 +782,9 @@ namespace SMS_Search
             // 
             this.chkSearchAnyFld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkSearchAnyFld.AutoSize = true;
-            this.chkSearchAnyFld.Location = new System.Drawing.Point(427, 32);
+            this.chkSearchAnyFld.Location = new System.Drawing.Point(425, 32);
             this.chkSearchAnyFld.Name = "chkSearchAnyFld";
-            this.chkSearchAnyFld.Size = new System.Drawing.Size(73, 17);
+            this.chkSearchAnyFld.Size = new System.Drawing.Size(79, 19);
             this.chkSearchAnyFld.TabIndex = 3;
             this.chkSearchAnyFld.Text = "Anywhere";
             this.chkSearchAnyFld.UseVisualStyleBackColor = true;
@@ -813,9 +794,9 @@ namespace SMS_Search
             this.cmbTableFld.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
             this.cmbTableFld.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cmbTableFld.FormattingEnabled = true;
-            this.cmbTableFld.Location = new System.Drawing.Point(93, 58);
+            this.cmbTableFld.Location = new System.Drawing.Point(97, 58);
             this.cmbTableFld.Name = "cmbTableFld";
-            this.cmbTableFld.Size = new System.Drawing.Size(156, 21);
+            this.cmbTableFld.Size = new System.Drawing.Size(152, 23);
             this.cmbTableFld.TabIndex = 4;
             this.cmbTableFld.TextChanged += new System.EventHandler(this.cmbTableFld_TextChanged);
             this.cmbTableFld.Enter += new System.EventHandler(this.cmbTableFld_Enter);
@@ -825,7 +806,7 @@ namespace SMS_Search
             this.rdbTableFld.AutoSize = true;
             this.rdbTableFld.Location = new System.Drawing.Point(6, 59);
             this.rdbTableFld.Name = "rdbTableFld";
-            this.rdbTableFld.Size = new System.Drawing.Size(55, 17);
+            this.rdbTableFld.Size = new System.Drawing.Size(56, 19);
             this.rdbTableFld.TabIndex = 99;
             this.rdbTableFld.Text = "&Table:";
             this.rdbTableFld.UseVisualStyleBackColor = true;
@@ -838,7 +819,7 @@ namespace SMS_Search
             this.label4.ForeColor = System.Drawing.Color.DarkRed;
             this.label4.Location = new System.Drawing.Point(221, 6);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(175, 15);
+            this.label4.Size = new System.Drawing.Size(169, 15);
             this.label4.TabIndex = 1;
             this.label4.Text = "Wildcards supported ( * and ? )";
             // 
@@ -848,7 +829,7 @@ namespace SMS_Search
             this.rdbNumFld.Checked = true;
             this.rdbNumFld.Location = new System.Drawing.Point(6, 6);
             this.rdbNumFld.Name = "rdbNumFld";
-            this.rdbNumFld.Size = new System.Drawing.Size(65, 17);
+            this.rdbNumFld.Size = new System.Drawing.Size(72, 19);
             this.rdbNumFld.TabIndex = 99;
             this.rdbNumFld.TabStop = true;
             this.rdbNumFld.Text = "&Number:";
@@ -860,7 +841,7 @@ namespace SMS_Search
             this.rdbDescFld.AutoSize = true;
             this.rdbDescFld.Location = new System.Drawing.Point(6, 32);
             this.rdbDescFld.Name = "rdbDescFld";
-            this.rdbDescFld.Size = new System.Drawing.Size(81, 17);
+            this.rdbDescFld.Size = new System.Drawing.Size(88, 19);
             this.rdbDescFld.TabIndex = 99;
             this.rdbDescFld.Text = "&Description:";
             this.rdbDescFld.UseVisualStyleBackColor = true;
@@ -871,7 +852,7 @@ namespace SMS_Search
             this.rdbCustSqlFld.AutoSize = true;
             this.rdbCustSqlFld.Location = new System.Drawing.Point(6, 85);
             this.rdbCustSqlFld.Name = "rdbCustSqlFld";
-            this.rdbCustSqlFld.Size = new System.Drawing.Size(80, 17);
+            this.rdbCustSqlFld.Size = new System.Drawing.Size(90, 19);
             this.rdbCustSqlFld.TabIndex = 99;
             this.rdbCustSqlFld.Text = "&Custom qry:";
             this.rdbCustSqlFld.UseVisualStyleBackColor = true;
@@ -881,17 +862,17 @@ namespace SMS_Search
             // 
             this.txtDescFld.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDescFld.Location = new System.Drawing.Point(93, 31);
+            this.txtDescFld.Location = new System.Drawing.Point(97, 31);
             this.txtDescFld.Name = "txtDescFld";
-            this.txtDescFld.Size = new System.Drawing.Size(328, 20);
+            this.txtDescFld.Size = new System.Drawing.Size(322, 23);
             this.txtDescFld.TabIndex = 2;
             this.txtDescFld.Enter += new System.EventHandler(this.txtDescFld_Enter);
             // 
             // txtNumFld
             // 
-            this.txtNumFld.Location = new System.Drawing.Point(102, 5);
+            this.txtNumFld.Location = new System.Drawing.Point(110, 5);
             this.txtNumFld.Name = "txtNumFld";
-            this.txtNumFld.Size = new System.Drawing.Size(61, 20);
+            this.txtNumFld.Size = new System.Drawing.Size(61, 23);
             this.txtNumFld.TabIndex = 0;
             this.txtNumFld.Enter += new System.EventHandler(this.txtNumFld_Enter);
             this.txtNumFld.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Num_KeyPress);
@@ -912,22 +893,22 @@ namespace SMS_Search
             this.txtCustSqlFld.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlFld.Location = new System.Drawing.Point(93, 84);
+            this.txtCustSqlFld.Location = new System.Drawing.Point(97, 84);
             this.txtCustSqlFld.Multiline = true;
             this.txtCustSqlFld.Name = "txtCustSqlFld";
             this.txtCustSqlFld.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtCustSqlFld.Size = new System.Drawing.Size(485, 54);
+            this.txtCustSqlFld.Size = new System.Drawing.Size(481, 52);
             this.txtCustSqlFld.TabIndex = 6;
             this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.BackColor = System.Drawing.Color.White;
-            this.label6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(90, 7);
+            this.label6.BackColor = System.Drawing.Color.Transparent;
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(96, 5);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(14, 15);
+            this.label6.Size = new System.Drawing.Size(18, 21);
             this.label6.TabIndex = 45;
             this.label6.Text = "F";
             // 
@@ -994,7 +975,7 @@ namespace SMS_Search
             this.tscmbDbServer.Enabled = false;
             this.tscmbDbServer.Name = "tscmbDbServer";
             this.tscmbDbServer.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.tscmbDbServer.Size = new System.Drawing.Size(0, 23);
+            this.tscmbDbServer.Size = new System.Drawing.Size(0, 24);
             this.tscmbDbServer.ToolTipText = "Server";
             // 
             // tscmbDbDatabase
@@ -1060,19 +1041,19 @@ namespace SMS_Search
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
             // 
-            // tslblInfo
-            // 
-            this.tslblInfo.Name = "tslblInfo";
-            this.tslblInfo.Size = new System.Drawing.Size(46, 22);
-            this.tslblInfo.Text = "tslblInfo";
-            // 
             // tsProgressBar
-            //
+            // 
             this.tsProgressBar.Name = "tsProgressBar";
             this.tsProgressBar.Size = new System.Drawing.Size(100, 22);
             this.tsProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.tsProgressBar.Visible = false;
-            //
+            // 
+            // tslblInfo
+            // 
+            this.tslblInfo.Name = "tslblInfo";
+            this.tslblInfo.Size = new System.Drawing.Size(50, 22);
+            this.tslblInfo.Text = "tslblInfo";
+            // 
             // splitContainer
             // 
             this.splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1109,46 +1090,8 @@ namespace SMS_Search
             this.splitContainer.TabStop = false;
             this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
             // 
-            // chkToggleDesc
-            // 
-            this.chkToggleDesc.Appearance = System.Windows.Forms.Appearance.Button;
-            this.chkToggleDesc.Location = new System.Drawing.Point(164, 4);
-            this.chkToggleDesc.Name = "chkToggleDesc";
-            this.chkToggleDesc.Size = new System.Drawing.Size(74, 23);
-            this.chkToggleDesc.TabIndex = 2;
-            this.chkToggleDesc.Text = "Show Desc.";
-            this.chkToggleDesc.UseVisualStyleBackColor = true;
-            this.chkToggleDesc.CheckedChanged += new System.EventHandler(this.chkToggleDesc_CheckedChanged);
-            // 
-            // lblFilter
-            //
-            this.lblFilter.AutoSize = true;
-            this.lblFilter.Location = new System.Drawing.Point(5, 38);
-            this.lblFilter.Name = "lblFilter";
-            this.lblFilter.Size = new System.Drawing.Size(36, 15);
-            this.lblFilter.TabIndex = 10;
-            this.lblFilter.Text = "Filter:";
-            //
-            // txtGridFilter
-            //
-            this.txtGridFilter.Location = new System.Drawing.Point(45, 35);
-            this.txtGridFilter.Name = "txtGridFilter";
-            this.txtGridFilter.Size = new System.Drawing.Size(200, 23);
-            this.txtGridFilter.TabIndex = 11;
-            this.txtGridFilter.TextChanged += new System.EventHandler(this.txtGridFilter_TextChanged);
-            //
-            // btnClearFilter
-            //
-            this.btnClearFilter.Location = new System.Drawing.Point(251, 34);
-            this.btnClearFilter.Name = "btnClearFilter";
-            this.btnClearFilter.Size = new System.Drawing.Size(23, 23);
-            this.btnClearFilter.TabIndex = 13;
-            this.btnClearFilter.Text = "x";
-            this.btnClearFilter.UseVisualStyleBackColor = true;
-            this.btnClearFilter.Click += new System.EventHandler(this.btnClearFilter_Click);
-            //
             // btnExport
-            //
+            // 
             this.btnExport.Location = new System.Drawing.Point(280, 34);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(75, 25);
@@ -1156,13 +1099,52 @@ namespace SMS_Search
             this.btnExport.Text = "Export CSV";
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
-            //
+            // 
+            // btnClearFilter
+            // 
+            this.btnClearFilter.Location = new System.Drawing.Point(251, 34);
+            this.btnClearFilter.Name = "btnClearFilter";
+            this.btnClearFilter.Size = new System.Drawing.Size(23, 23);
+            this.btnClearFilter.TabIndex = 13;
+            this.btnClearFilter.Text = "x";
+            this.btnClearFilter.UseVisualStyleBackColor = true;
+            this.btnClearFilter.Click += new System.EventHandler(this.btnClearFilter_Click);
+            // 
+            // txtGridFilter
+            // 
+            this.txtGridFilter.Location = new System.Drawing.Point(45, 35);
+            this.txtGridFilter.Name = "txtGridFilter";
+            this.txtGridFilter.Size = new System.Drawing.Size(200, 23);
+            this.txtGridFilter.TabIndex = 11;
+            this.txtGridFilter.TextChanged += new System.EventHandler(this.txtGridFilter_TextChanged);
+            // 
+            // lblFilter
+            // 
+            this.lblFilter.AutoSize = true;
+            this.lblFilter.Location = new System.Drawing.Point(5, 38);
+            this.lblFilter.Name = "lblFilter";
+            this.lblFilter.Size = new System.Drawing.Size(36, 15);
+            this.lblFilter.TabIndex = 10;
+            this.lblFilter.Text = "Filter:";
+            // 
+            // chkToggleDesc
+            // 
+            this.chkToggleDesc.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkToggleDesc.Location = new System.Drawing.Point(167, 4);
+            this.chkToggleDesc.Name = "chkToggleDesc";
+            this.chkToggleDesc.Size = new System.Drawing.Size(77, 23);
+            this.chkToggleDesc.TabIndex = 2;
+            this.chkToggleDesc.Text = "Show Desc.";
+            this.chkToggleDesc.UseVisualStyleBackColor = true;
+            this.chkToggleDesc.CheckedChanged += new System.EventHandler(this.chkToggleDesc_CheckedChanged);
+            // 
             // frmMain
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(600, 580);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.splitContainer);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(600, 270);
@@ -1193,9 +1175,9 @@ namespace SMS_Search
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceTbl)).EndInit();
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel2.ResumeLayout(false);
+            this.splitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ResumeLayout(false);
             this.PerformLayout();
 
