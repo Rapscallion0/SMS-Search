@@ -56,6 +56,10 @@ namespace SMS_Search.Settings
             else if (startupLoc == "CURSOR") cmbStartupLocation.Text = "Cursor location";
             else cmbStartupLocation.Text = "Last location"; // Default
 
+            string autoResizeLimit = _config.GetValue("GENERAL", "AUTO_RESIZE_LIMIT");
+            if (string.IsNullOrEmpty(autoResizeLimit)) autoResizeLimit = "5000";
+            txtAutoResizeLimit.Text = autoResizeLimit;
+
             _isLoaded = true;
         }
 
@@ -92,6 +96,21 @@ namespace SMS_Search.Settings
                 else if (cmbStartupLocation.Text == "Active display") val = "ACTIVE";
                 else if (cmbStartupLocation.Text == "Cursor location") val = "CURSOR";
                 SaveSetting("GENERAL", "STARTUP_LOCATION", val);
+            };
+
+            txtAutoResizeLimit.Leave += (s, e) =>
+            {
+                if (int.TryParse(txtAutoResizeLimit.Text, out int val) && val >= 0)
+                {
+                    SaveSetting("GENERAL", "AUTO_RESIZE_LIMIT", val.ToString());
+                }
+                else
+                {
+                    // Revert to last saved value
+                    string saved = _config.GetValue("GENERAL", "AUTO_RESIZE_LIMIT");
+                    if (string.IsNullOrEmpty(saved)) saved = "5000";
+                    txtAutoResizeLimit.Text = saved;
+                }
             };
         }
 
