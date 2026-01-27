@@ -34,11 +34,11 @@ namespace SMS_Search.Settings
             this.btnResetCleanSql = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).BeginInit();
             this.SuspendLayout();
-            //
+            // 
             // dgvCleanSqlRules
-            //
-            this.dgvCleanSqlRules.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            // 
+            this.dgvCleanSqlRules.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvCleanSqlRules.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvCleanSqlRules.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -46,39 +46,39 @@ namespace SMS_Search.Settings
             this.colReplace});
             this.dgvCleanSqlRules.Location = new System.Drawing.Point(10, 10);
             this.dgvCleanSqlRules.Name = "dgvCleanSqlRules";
-            this.dgvCleanSqlRules.Size = new System.Drawing.Size(410, 350);
+            this.dgvCleanSqlRules.Size = new System.Drawing.Size(430, 350);
             this.dgvCleanSqlRules.TabIndex = 0;
-            //
+            // 
             // colRegex
-            //
+            // 
             this.colRegex.HeaderText = "Regex Pattern";
             this.colRegex.Name = "colRegex";
             this.colRegex.Width = 200;
-            //
+            // 
             // colReplace
-            //
+            // 
             this.colReplace.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.colReplace.HeaderText = "Replacement";
             this.colReplace.Name = "colReplace";
-            //
+            // 
             // btnResetCleanSql
-            //
+            // 
             this.btnResetCleanSql.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnResetCleanSql.Location = new System.Drawing.Point(335, 370);
+            this.btnResetCleanSql.Location = new System.Drawing.Point(355, 370);
             this.btnResetCleanSql.Name = "btnResetCleanSql";
             this.btnResetCleanSql.Size = new System.Drawing.Size(85, 23);
             this.btnResetCleanSql.TabIndex = 1;
             this.btnResetCleanSql.Text = "Reset Defaults";
             this.btnResetCleanSql.UseVisualStyleBackColor = true;
-            //
+            // 
             // CleanSqlSettings
-            //
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnResetCleanSql);
             this.Controls.Add(this.dgvCleanSqlRules);
             this.Name = "CleanSqlSettings";
-            this.Size = new System.Drawing.Size(430, 400);
+            this.Size = new System.Drawing.Size(450, 400);
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).EndInit();
             this.ResumeLayout(false);
 

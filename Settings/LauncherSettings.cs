@@ -93,7 +93,7 @@ namespace SMS_Search.Settings
         private void CheckAndMigrateLegacy()
         {
             string legacyPath = Path.Combine(Application.StartupPath, LegacyLauncherExe);
-            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string startupFolder = EnvironmentSettings.GetFolderPath(EnvironmentSettings.SpecialFolder.Startup);
             string oldShortcut = Path.Combine(startupFolder, "SMS Search Launcher.lnk"); // Very old
             // string legacyShortcut = Path.Combine(startupFolder, "SMSSearchLauncher.lnk"); // Recent old - matches current new shortcut name!
 
@@ -371,7 +371,7 @@ namespace SMS_Search.Settings
         private void CreateStartupShortcut()
         {
             _log.Logger(LogLevel.Info, "Creating Startup shortcut");
-            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string startupFolder = EnvironmentSettings.GetFolderPath(EnvironmentSettings.SpecialFolder.Startup);
             string shortcutPath = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
             string targetPath = Application.ExecutablePath; // Point to SELF
 
@@ -404,7 +404,7 @@ namespace SMS_Search.Settings
         private void RemoveStartupShortcut()
         {
             _log.Logger(LogLevel.Info, "Removing Startup shortcut");
-            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string startupFolder = EnvironmentSettings.GetFolderPath(EnvironmentSettings.SpecialFolder.Startup);
 
             string shortcutPath = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
             if (File.Exists(shortcutPath))
@@ -541,7 +541,7 @@ namespace SMS_Search.Settings
 
         private void UpdateLauncherStatusUI()
         {
-            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string startupFolder = EnvironmentSettings.GetFolderPath(EnvironmentSettings.SpecialFolder.Startup);
             string shortcutPath = Path.Combine(startupFolder, "SMSSearchLauncher.lnk");
 
             // Check if registered: Shortcut must exist.

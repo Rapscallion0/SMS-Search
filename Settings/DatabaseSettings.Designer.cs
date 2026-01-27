@@ -58,7 +58,7 @@ namespace SMS_Search.Settings
             this.cmbDbServer.FormattingEnabled = true;
             this.cmbDbServer.Location = new System.Drawing.Point(73, 12);
             this.cmbDbServer.Name = "cmbDbServer";
-            this.cmbDbServer.Size = new System.Drawing.Size(264, 21);
+            this.cmbDbServer.Size = new System.Drawing.Size(284, 21);
             this.cmbDbServer.TabIndex = 1;
             // 
             // chkScanNetwork
@@ -76,7 +76,7 @@ namespace SMS_Search.Settings
             // btnTestConn
             // 
             this.btnTestConn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTestConn.Location = new System.Drawing.Point(343, 15);
+            this.btnTestConn.Location = new System.Drawing.Point(363, 15);
             this.btnTestConn.Name = "btnTestConn";
             this.btnTestConn.Size = new System.Drawing.Size(71, 51);
             this.btnTestConn.TabIndex = 10;
@@ -101,7 +101,7 @@ namespace SMS_Search.Settings
             this.cmbDbDatabase.FormattingEnabled = true;
             this.cmbDbDatabase.Location = new System.Drawing.Point(73, 42);
             this.cmbDbDatabase.Name = "cmbDbDatabase";
-            this.cmbDbDatabase.Size = new System.Drawing.Size(264, 21);
+            this.cmbDbDatabase.Size = new System.Drawing.Size(284, 21);
             this.cmbDbDatabase.Sorted = true;
             this.cmbDbDatabase.TabIndex = 4;
             // 
@@ -174,7 +174,7 @@ namespace SMS_Search.Settings
             this.Controls.Add(this.cmbDbServer);
             this.Controls.Add(this.label3);
             this.Name = "DatabaseSettings";
-            this.Size = new System.Drawing.Size(430, 400);
+            this.Size = new System.Drawing.Size(450, 400);
             this.ResumeLayout(false);
             this.PerformLayout();
 
