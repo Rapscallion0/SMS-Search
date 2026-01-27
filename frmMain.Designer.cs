@@ -200,14 +200,14 @@ namespace SMS_Search
             this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.bindingSourceTbl = new System.Windows.Forms.BindingSource(this.components);
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.btnNextMatch = new System.Windows.Forms.Button();
+            this.btnPrevMatch = new System.Windows.Forms.Button();
+            this.lblMatchCount = new System.Windows.Forms.Label();
             this.btnExport = new System.Windows.Forms.Button();
             this.btnClearFilter = new System.Windows.Forms.Button();
             this.txtGridFilter = new System.Windows.Forms.TextBox();
             this.lblFilter = new System.Windows.Forms.Label();
             this.chkToggleDesc = new System.Windows.Forms.CheckBox();
-            this.lblMatchCount = new System.Windows.Forms.Label();
-            this.btnPrevMatch = new System.Windows.Forms.Button();
-            this.btnNextMatch = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -265,7 +265,7 @@ namespace SMS_Search
             this.dGrd.ReadOnly = true;
             this.dGrd.RowHeadersVisible = false;
             this.dGrd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dGrd.Size = new System.Drawing.Size(591, 304);
+            this.dGrd.Size = new System.Drawing.Size(594, 304);
             this.dGrd.TabIndex = 4;
             this.dGrd.TabStop = false;
             this.dGrd.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dGrd_CellDoubleClick);
@@ -274,7 +274,7 @@ namespace SMS_Search
             // 
             this.btnSetup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSetup.Image = global::SMS_Search.Properties.Resources.configure;
-            this.btnSetup.Location = new System.Drawing.Point(564, 0);
+            this.btnSetup.Location = new System.Drawing.Point(567, 0);
             this.btnSetup.Name = "btnSetup";
             this.btnSetup.Size = new System.Drawing.Size(28, 24);
             this.btnSetup.TabIndex = 3;
@@ -301,9 +301,9 @@ namespace SMS_Search
             // btnBuildQryFct
             // 
             this.btnBuildQryFct.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBuildQryFct.Location = new System.Drawing.Point(506, 29);
+            this.btnBuildQryFct.Location = new System.Drawing.Point(496, 29);
             this.btnBuildQryFct.Name = "btnBuildQryFct";
-            this.btnBuildQryFct.Size = new System.Drawing.Size(72, 23);
+            this.btnBuildQryFct.Size = new System.Drawing.Size(85, 23);
             this.btnBuildQryFct.TabIndex = 6;
             this.btnBuildQryFct.Text = "&Build Query";
             this.toolTip.SetToolTip(this.btnBuildQryFct, "Build custom query from active filter");
@@ -313,7 +313,7 @@ namespace SMS_Search
             // btnBuildQryTlz
             // 
             this.btnBuildQryTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBuildQryTlz.Location = new System.Drawing.Point(506, 29);
+            this.btnBuildQryTlz.Location = new System.Drawing.Point(509, 29);
             this.btnBuildQryTlz.Name = "btnBuildQryTlz";
             this.btnBuildQryTlz.Size = new System.Drawing.Size(72, 23);
             this.btnBuildQryTlz.TabIndex = 6;
@@ -358,7 +358,7 @@ namespace SMS_Search
             // btnBuildQryFld
             // 
             this.btnBuildQryFld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBuildQryFld.Location = new System.Drawing.Point(506, 29);
+            this.btnBuildQryFld.Location = new System.Drawing.Point(509, 29);
             this.btnBuildQryFld.Name = "btnBuildQryFld";
             this.btnBuildQryFld.Size = new System.Drawing.Size(72, 23);
             this.btnBuildQryFld.TabIndex = 8;
@@ -372,7 +372,7 @@ namespace SMS_Search
             this.btnShowTarget.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnShowTarget.Appearance = System.Windows.Forms.Appearance.Button;
             this.btnShowTarget.Image = global::SMS_Search.Properties.Resources.Unarchive1;
-            this.btnShowTarget.Location = new System.Drawing.Point(532, 0);
+            this.btnShowTarget.Location = new System.Drawing.Point(535, 0);
             this.btnShowTarget.Name = "btnShowTarget";
             this.btnShowTarget.Size = new System.Drawing.Size(28, 24);
             this.btnShowTarget.TabIndex = 101;
@@ -406,7 +406,7 @@ namespace SMS_Search
             this.groupBox1.Controls.Add(this.dateGregorian);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtJulian);
-            this.groupBox1.Location = new System.Drawing.Point(294, -4);
+            this.groupBox1.Location = new System.Drawing.Point(297, -4);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(302, 34);
@@ -456,16 +456,16 @@ namespace SMS_Search
             this.txtCustSqlFct.Multiline = true;
             this.txtCustSqlFct.Name = "txtCustSqlFct";
             this.txtCustSqlFct.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtCustSqlFct.Size = new System.Drawing.Size(480, 77);
+            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 77);
             this.txtCustSqlFct.TabIndex = 4;
             this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
             // 
             // btnClearFct
             // 
             this.btnClearFct.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClearFct.Location = new System.Drawing.Point(506, 3);
+            this.btnClearFct.Location = new System.Drawing.Point(496, 3);
             this.btnClearFct.Name = "btnClearFct";
-            this.btnClearFct.Size = new System.Drawing.Size(72, 23);
+            this.btnClearFct.Size = new System.Drawing.Size(85, 23);
             this.btnClearFct.TabIndex = 5;
             this.btnClearFct.Text = "Clear &all";
             this.btnClearFct.UseVisualStyleBackColor = true;
@@ -486,7 +486,7 @@ namespace SMS_Search
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDescFct.Location = new System.Drawing.Point(97, 31);
             this.txtDescFct.Name = "txtDescFct";
-            this.txtDescFct.Size = new System.Drawing.Size(324, 23);
+            this.txtDescFct.Size = new System.Drawing.Size(310, 23);
             this.txtDescFct.TabIndex = 2;
             this.txtDescFct.Enter += new System.EventHandler(this.txtDescFct_Enter);
             // 
@@ -534,14 +534,14 @@ namespace SMS_Search
             this.txtCustSqlTlz.Multiline = true;
             this.txtCustSqlTlz.Name = "txtCustSqlTlz";
             this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtCustSqlTlz.Size = new System.Drawing.Size(480, 77);
+            this.txtCustSqlTlz.Size = new System.Drawing.Size(483, 77);
             this.txtCustSqlTlz.TabIndex = 4;
             this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
             // 
             // btnClearTlz
             // 
             this.btnClearTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClearTlz.Location = new System.Drawing.Point(506, 3);
+            this.btnClearTlz.Location = new System.Drawing.Point(509, 3);
             this.btnClearTlz.Name = "btnClearTlz";
             this.btnClearTlz.Size = new System.Drawing.Size(72, 23);
             this.btnClearTlz.TabIndex = 5;
@@ -564,7 +564,7 @@ namespace SMS_Search
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDescTlz.Location = new System.Drawing.Point(97, 31);
             this.txtDescTlz.Name = "txtDescTlz";
-            this.txtDescTlz.Size = new System.Drawing.Size(324, 23);
+            this.txtDescTlz.Size = new System.Drawing.Size(310, 23);
             this.txtDescTlz.TabIndex = 2;
             this.txtDescTlz.Enter += new System.EventHandler(this.txtDescTlz_Enter);
             // 
@@ -610,7 +610,7 @@ namespace SMS_Search
             this.tabCtl.Location = new System.Drawing.Point(3, 4);
             this.tabCtl.Name = "tabCtl";
             this.tabCtl.SelectedIndex = 0;
-            this.tabCtl.Size = new System.Drawing.Size(593, 166);
+            this.tabCtl.Size = new System.Drawing.Size(596, 166);
             this.tabCtl.TabIndex = 0;
             this.tabCtl.SelectedIndexChanged += new System.EventHandler(this.tabCtl_SelectedIndexChanged);
             // 
@@ -631,7 +631,7 @@ namespace SMS_Search
             this.tabFct.Location = new System.Drawing.Point(4, 24);
             this.tabFct.Name = "tabFct";
             this.tabFct.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFct.Size = new System.Drawing.Size(585, 138);
+            this.tabFct.Size = new System.Drawing.Size(588, 138);
             this.tabFct.TabIndex = 0;
             this.tabFct.Text = "Function";
             this.tabFct.ToolTipText = "<CRTL> + 1";
@@ -640,7 +640,7 @@ namespace SMS_Search
             // 
             this.chkSearchAnyFct.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkSearchAnyFct.AutoSize = true;
-            this.chkSearchAnyFct.Location = new System.Drawing.Point(425, 32);
+            this.chkSearchAnyFct.Location = new System.Drawing.Point(409, 33);
             this.chkSearchAnyFct.Name = "chkSearchAnyFct";
             this.chkSearchAnyFct.Size = new System.Drawing.Size(79, 19);
             this.chkSearchAnyFct.TabIndex = 3;
@@ -675,7 +675,7 @@ namespace SMS_Search
             this.tabTlz.Location = new System.Drawing.Point(4, 24);
             this.tabTlz.Name = "tabTlz";
             this.tabTlz.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTlz.Size = new System.Drawing.Size(585, 138);
+            this.tabTlz.Size = new System.Drawing.Size(588, 138);
             this.tabTlz.TabIndex = 1;
             this.tabTlz.Text = "Totalizer";
             // 
@@ -683,7 +683,7 @@ namespace SMS_Search
             // 
             this.chkSearchAnyTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkSearchAnyTlz.AutoSize = true;
-            this.chkSearchAnyTlz.Location = new System.Drawing.Point(425, 32);
+            this.chkSearchAnyTlz.Location = new System.Drawing.Point(409, 33);
             this.chkSearchAnyTlz.Name = "chkSearchAnyTlz";
             this.chkSearchAnyTlz.Size = new System.Drawing.Size(79, 19);
             this.chkSearchAnyTlz.TabIndex = 3;
@@ -724,7 +724,7 @@ namespace SMS_Search
             this.tabFields.Location = new System.Drawing.Point(4, 24);
             this.tabFields.Name = "tabFields";
             this.tabFields.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFields.Size = new System.Drawing.Size(585, 138);
+            this.tabFields.Size = new System.Drawing.Size(588, 138);
             this.tabFields.TabIndex = 2;
             this.tabFields.Text = "Fields";
             // 
@@ -776,7 +776,7 @@ namespace SMS_Search
             // 
             this.chkSearchAnyFld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkSearchAnyFld.AutoSize = true;
-            this.chkSearchAnyFld.Location = new System.Drawing.Point(425, 32);
+            this.chkSearchAnyFld.Location = new System.Drawing.Point(409, 33);
             this.chkSearchAnyFld.Name = "chkSearchAnyFld";
             this.chkSearchAnyFld.Size = new System.Drawing.Size(79, 19);
             this.chkSearchAnyFld.TabIndex = 3;
@@ -858,7 +858,7 @@ namespace SMS_Search
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDescFld.Location = new System.Drawing.Point(97, 31);
             this.txtDescFld.Name = "txtDescFld";
-            this.txtDescFld.Size = new System.Drawing.Size(322, 23);
+            this.txtDescFld.Size = new System.Drawing.Size(310, 23);
             this.txtDescFld.TabIndex = 2;
             this.txtDescFld.Enter += new System.EventHandler(this.txtDescFld_Enter);
             // 
@@ -874,7 +874,7 @@ namespace SMS_Search
             // btnClearFld
             // 
             this.btnClearFld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClearFld.Location = new System.Drawing.Point(506, 3);
+            this.btnClearFld.Location = new System.Drawing.Point(509, 3);
             this.btnClearFld.Name = "btnClearFld";
             this.btnClearFld.Size = new System.Drawing.Size(72, 23);
             this.btnClearFld.TabIndex = 7;
@@ -891,7 +891,7 @@ namespace SMS_Search
             this.txtCustSqlFld.Multiline = true;
             this.txtCustSqlFld.Name = "txtCustSqlFld";
             this.txtCustSqlFld.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtCustSqlFld.Size = new System.Drawing.Size(481, 52);
+            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 52);
             this.txtCustSqlFld.TabIndex = 6;
             this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
             // 
@@ -946,7 +946,7 @@ namespace SMS_Search
             this.tslblInfo});
             this.toolStrip.Location = new System.Drawing.Point(0, 555);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(600, 25);
+            this.toolStrip.Size = new System.Drawing.Size(603, 25);
             this.toolStrip.TabIndex = 33;
             this.toolStrip.Text = "toolStrip";
             // 
@@ -969,7 +969,7 @@ namespace SMS_Search
             this.tscmbDbServer.Enabled = false;
             this.tscmbDbServer.Name = "tscmbDbServer";
             this.tscmbDbServer.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.tscmbDbServer.Size = new System.Drawing.Size(0, 24);
+            this.tscmbDbServer.Size = new System.Drawing.Size(0, 23);
             this.tscmbDbServer.ToolTipText = "Server";
             // 
             // tscmbDbDatabase
@@ -1080,11 +1080,42 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.dGrd);
             this.splitContainer.Panel2.Controls.Add(this.btnPopGrid);
             this.splitContainer.Panel2MinSize = 29;
-            this.splitContainer.Size = new System.Drawing.Size(600, 554);
+            this.splitContainer.Size = new System.Drawing.Size(603, 554);
             this.splitContainer.SplitterDistance = 177;
             this.splitContainer.TabIndex = 102;
             this.splitContainer.TabStop = false;
             this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
+            // 
+            // btnNextMatch
+            // 
+            this.btnNextMatch.Location = new System.Drawing.Point(500, 34);
+            this.btnNextMatch.Name = "btnNextMatch";
+            this.btnNextMatch.Size = new System.Drawing.Size(25, 25);
+            this.btnNextMatch.TabIndex = 16;
+            this.btnNextMatch.Text = ">";
+            this.btnNextMatch.UseVisualStyleBackColor = true;
+            this.btnNextMatch.Visible = false;
+            this.btnNextMatch.Click += new System.EventHandler(this.btnNextMatch_Click);
+            // 
+            // btnPrevMatch
+            // 
+            this.btnPrevMatch.Location = new System.Drawing.Point(470, 34);
+            this.btnPrevMatch.Name = "btnPrevMatch";
+            this.btnPrevMatch.Size = new System.Drawing.Size(25, 25);
+            this.btnPrevMatch.TabIndex = 15;
+            this.btnPrevMatch.Text = "<";
+            this.btnPrevMatch.UseVisualStyleBackColor = true;
+            this.btnPrevMatch.Visible = false;
+            this.btnPrevMatch.Click += new System.EventHandler(this.btnPrevMatch_Click);
+            // 
+            // lblMatchCount
+            // 
+            this.lblMatchCount.AutoSize = true;
+            this.lblMatchCount.Location = new System.Drawing.Point(365, 39);
+            this.lblMatchCount.Name = "lblMatchCount";
+            this.lblMatchCount.Size = new System.Drawing.Size(0, 15);
+            this.lblMatchCount.TabIndex = 14;
+            this.lblMatchCount.Visible = false;
             // 
             // btnExport
             // 
@@ -1096,37 +1127,6 @@ namespace SMS_Search
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
-            // lblMatchCount
-            //
-            this.lblMatchCount.AutoSize = true;
-            this.lblMatchCount.Location = new System.Drawing.Point(365, 39);
-            this.lblMatchCount.Name = "lblMatchCount";
-            this.lblMatchCount.Size = new System.Drawing.Size(0, 15);
-            this.lblMatchCount.TabIndex = 14;
-            this.lblMatchCount.Visible = false;
-            //
-            // btnPrevMatch
-            //
-            this.btnPrevMatch.Location = new System.Drawing.Point(470, 34);
-            this.btnPrevMatch.Name = "btnPrevMatch";
-            this.btnPrevMatch.Size = new System.Drawing.Size(25, 25);
-            this.btnPrevMatch.TabIndex = 15;
-            this.btnPrevMatch.Text = "<";
-            this.btnPrevMatch.UseVisualStyleBackColor = true;
-            this.btnPrevMatch.Visible = false;
-            this.btnPrevMatch.Click += new System.EventHandler(this.btnPrevMatch_Click);
-            //
-            // btnNextMatch
-            //
-            this.btnNextMatch.Location = new System.Drawing.Point(500, 34);
-            this.btnNextMatch.Name = "btnNextMatch";
-            this.btnNextMatch.Size = new System.Drawing.Size(25, 25);
-            this.btnNextMatch.TabIndex = 16;
-            this.btnNextMatch.Text = ">";
-            this.btnNextMatch.UseVisualStyleBackColor = true;
-            this.btnNextMatch.Visible = false;
-            this.btnNextMatch.Click += new System.EventHandler(this.btnNextMatch_Click);
-            //
             // btnClearFilter
             // 
             this.btnClearFilter.Location = new System.Drawing.Point(251, 34);
@@ -1157,7 +1157,7 @@ namespace SMS_Search
             // chkToggleDesc
             // 
             this.chkToggleDesc.Appearance = System.Windows.Forms.Appearance.Button;
-            this.chkToggleDesc.Location = new System.Drawing.Point(167, 4);
+            this.chkToggleDesc.Location = new System.Drawing.Point(87, 4);
             this.chkToggleDesc.Name = "chkToggleDesc";
             this.chkToggleDesc.Size = new System.Drawing.Size(77, 23);
             this.chkToggleDesc.TabIndex = 2;
@@ -1168,7 +1168,7 @@ namespace SMS_Search
             // frmMain
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(600, 580);
+            this.ClientSize = new System.Drawing.Size(603, 580);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.splitContainer);
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
