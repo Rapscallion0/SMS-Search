@@ -107,7 +107,6 @@ namespace SMS_Search
         private Label lblFilter;
         private TextBox txtGridFilter;
         private Button btnClearFilter;
-        private Button btnExport;
         private Label lblMatchCount;
         private Button btnPrevMatch;
         private Button btnNextMatch;
@@ -203,7 +202,6 @@ namespace SMS_Search
             this.btnNextMatch = new System.Windows.Forms.Button();
             this.btnPrevMatch = new System.Windows.Forms.Button();
             this.lblMatchCount = new System.Windows.Forms.Label();
-            this.btnExport = new System.Windows.Forms.Button();
             this.btnClearFilter = new System.Windows.Forms.Button();
             this.txtGridFilter = new System.Windows.Forms.TextBox();
             this.lblFilter = new System.Windows.Forms.Label();
@@ -1071,7 +1069,6 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.btnNextMatch);
             this.splitContainer.Panel2.Controls.Add(this.btnPrevMatch);
             this.splitContainer.Panel2.Controls.Add(this.lblMatchCount);
-            this.splitContainer.Panel2.Controls.Add(this.btnExport);
             this.splitContainer.Panel2.Controls.Add(this.btnClearFilter);
             this.splitContainer.Panel2.Controls.Add(this.txtGridFilter);
             this.splitContainer.Panel2.Controls.Add(this.lblFilter);
@@ -1116,16 +1113,6 @@ namespace SMS_Search
             this.lblMatchCount.Size = new System.Drawing.Size(0, 15);
             this.lblMatchCount.TabIndex = 14;
             this.lblMatchCount.Visible = false;
-            // 
-            // btnExport
-            // 
-            this.btnExport.Location = new System.Drawing.Point(280, 34);
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(75, 25);
-            this.btnExport.TabIndex = 12;
-            this.btnExport.Text = "Export CSV";
-            this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
             // btnClearFilter
             // 
