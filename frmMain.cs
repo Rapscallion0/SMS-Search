@@ -653,7 +653,7 @@ namespace SMS_Search
 			}
 			setTabTextFocus();
 			await setColumnArrayAsync();
-			setHeaders();
+			await setHeadersAsync();
 			SetBusy(false);
 		}
 
@@ -1297,7 +1297,7 @@ namespace SMS_Search
             }
 		}
 
-		private void setHeaders()
+		private async Task setHeadersAsync()
 		{
             bool showDesc = chkToggleDesc.Checked;
 
@@ -1335,7 +1335,7 @@ namespace SMS_Search
                 }
                 else
                 {
-                    ResizeColumnsBasedOnFirstRows(100);
+                    await ResizeColumnsBasedOnFirstRowsAsync(100);
                 }
 
 			    if (firstDisplayedScrollingColumnIndex >= 0)
@@ -1345,9 +1345,15 @@ namespace SMS_Search
 			}
 		}
 
-        private void ResizeColumnsBasedOnFirstRows(int rowLimit)
+        private async Task ResizeColumnsBasedOnFirstRowsAsync(int rowLimit)
         {
             if (dGrd.RowCount == 0) return;
+
+            // In Virtual Mode, we must ensure data is loaded before measuring
+            if (dGrd.VirtualMode)
+            {
+                await _gridContext.WaitForRowAsync(0);
+            }
 
             int rowsToCheck = Math.Min(dGrd.RowCount, rowLimit);
 
@@ -1370,9 +1376,9 @@ namespace SMS_Search
             }
         }
 
-		private void chkToggleDesc_CheckedChanged(object sender, EventArgs e)
+		private async void chkToggleDesc_CheckedChanged(object sender, EventArgs e)
 		{
-			setHeaders();
+			await setHeadersAsync();
 			setTabTextFocus();
 		}
 
