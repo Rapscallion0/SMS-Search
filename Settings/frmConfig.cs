@@ -83,7 +83,6 @@ namespace SMS_Search.Settings
             log.Logger(LogLevel.Info, "Settings window opened");
 
             // Icons
-            tvSettings.ImageList = null;
             imgListIcons.Images.Clear();
             imgListIcons.Images.Add("General", IconLoader.GetIcon("General"));
             imgListIcons.Images.Add("Application", IconLoader.GetIcon("Application"));
@@ -94,7 +93,9 @@ namespace SMS_Search.Settings
             imgListIcons.Images.Add("CleanSql", IconLoader.GetIcon("CleanSql"));
             imgListIcons.Images.Add("Launcher", IconLoader.GetIcon("Launcher"));
             imgListIcons.Images.Add("Logging", IconLoader.GetIcon("Logging"));
-            tvSettings.ImageList = imgListIcons;
+
+            // Refresh node icons to ensure keys are resolved
+            RefreshNodeIcons(tvSettings.Nodes);
 
             // Expand all nodes
             tvSettings.ExpandAll();
@@ -188,6 +189,27 @@ namespace SMS_Search.Settings
                 case "Launcher":
                     if (launcherSettings != null) launcherSettings.Visible = true;
                     break;
+            }
+        }
+
+        private void RefreshNodeIcons(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                string key = node.ImageKey;
+                string selKey = node.SelectedImageKey;
+
+                // Toggle keys to force re-resolution
+                node.ImageKey = "";
+                node.ImageKey = key;
+
+                node.SelectedImageKey = "";
+                node.SelectedImageKey = selKey;
+
+                if (node.Nodes.Count > 0)
+                {
+                    RefreshNodeIcons(node.Nodes);
+                }
             }
         }
 
