@@ -40,26 +40,15 @@ namespace SMS_Search.Settings
             this.SuspendLayout();
             // 
             // lblDescription
-            //
+            // 
             this.lblDescription.AutoSize = true;
             this.lblDescription.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDescription.Location = new System.Drawing.Point(10, 10);
             this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(350, 15);
+            this.lblDescription.Size = new System.Drawing.Size(230, 15);
             this.lblDescription.TabIndex = 0;
-            this.lblDescription.Text = "Define Regex rules to clean SQL queries before copying to clipboard.";
-            //
-            // chkCopyCleanSql
-            //
-            this.chkCopyCleanSql.AutoSize = true;
-            this.chkCopyCleanSql.Location = new System.Drawing.Point(13, 35);
-            this.chkCopyCleanSql.Name = "chkCopyCleanSql";
-            this.chkCopyCleanSql.Size = new System.Drawing.Size(202, 17);
-            this.chkCopyCleanSql.TabIndex = 1;
-            this.chkCopyCleanSql.Text = "Copy cleaned SQL query to clipboard";
-            this.toolTip1.SetToolTip(this.chkCopyCleanSql, "When copying SQL from the application, automatically apply configured cleaning rules.");
-            this.chkCopyCleanSql.UseVisualStyleBackColor = true;
-            //
+            this.lblDescription.Text = "Define Regex rules to clean SQL queries";
+            // 
             // dgvCleanSqlRules
             // 
             this.dgvCleanSqlRules.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -97,6 +86,17 @@ namespace SMS_Search.Settings
             this.btnResetCleanSql.Text = "Reset Defaults";
             this.toolTip1.SetToolTip(this.btnResetCleanSql, "Restore the default set of cleaning rules.");
             this.btnResetCleanSql.UseVisualStyleBackColor = true;
+            // 
+            // chkCopyCleanSql
+            // 
+            this.chkCopyCleanSql.AutoSize = true;
+            this.chkCopyCleanSql.Location = new System.Drawing.Point(13, 35);
+            this.chkCopyCleanSql.Name = "chkCopyCleanSql";
+            this.chkCopyCleanSql.Size = new System.Drawing.Size(202, 17);
+            this.chkCopyCleanSql.TabIndex = 1;
+            this.chkCopyCleanSql.Text = "Copy cleaned SQL query to clipboard";
+            this.toolTip1.SetToolTip(this.chkCopyCleanSql, "When cleaning SQL copy the cleaned query to the windows clipboard");
+            this.chkCopyCleanSql.UseVisualStyleBackColor = true;
             // 
             // CleanSqlSettings
             // 

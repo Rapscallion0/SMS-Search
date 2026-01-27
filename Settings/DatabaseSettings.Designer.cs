@@ -46,15 +46,15 @@ namespace SMS_Search.Settings
             this.SuspendLayout();
             // 
             // lblDescription
-            //
+            // 
             this.lblDescription.AutoSize = true;
             this.lblDescription.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDescription.Location = new System.Drawing.Point(12, 15);
             this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(220, 15);
+            this.lblDescription.Size = new System.Drawing.Size(204, 15);
             this.lblDescription.TabIndex = 0;
             this.lblDescription.Text = "Configure the database connection.";
-            //
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -79,7 +79,7 @@ namespace SMS_Search.Settings
             // 
             this.chkScanNetwork.AutoSize = true;
             this.chkScanNetwork.Enabled = false;
-            this.chkScanNetwork.Location = new System.Drawing.Point(162, 110);
+            this.chkScanNetwork.Location = new System.Drawing.Point(15, 193);
             this.chkScanNetwork.Name = "chkScanNetwork";
             this.chkScanNetwork.Size = new System.Drawing.Size(131, 17);
             this.chkScanNetwork.TabIndex = 6;
@@ -170,11 +170,12 @@ namespace SMS_Search.Settings
             // 
             // lblConnStatus
             // 
-            this.lblConnStatus.AutoSize = true;
-            this.lblConnStatus.Location = new System.Drawing.Point(200, 185);
+            this.lblConnStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblConnStatus.Location = new System.Drawing.Point(236, 96);
             this.lblConnStatus.Name = "lblConnStatus";
-            this.lblConnStatus.Size = new System.Drawing.Size(0, 13);
+            this.lblConnStatus.Size = new System.Drawing.Size(198, 17);
             this.lblConnStatus.TabIndex = 12;
+            this.lblConnStatus.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // DatabaseSettings
             // 

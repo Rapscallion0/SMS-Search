@@ -174,10 +174,6 @@ namespace SMS_Search.Settings
 
             string currentServer = cmbDbServer.Text;
 
-            // Detach to prevent triggering TextChanged
-            // Actually, setting DataSource might trigger it. We want to avoid overwriting Config if text changes due to binding?
-            // But if we restore text, it should be fine.
-
             _serverNames.Clear();
             _serverNames.AddRange(servers);
             _serverNames.Sort();
@@ -252,33 +248,6 @@ namespace SMS_Search.Settings
             }
             else
             {
-                // cmbDbDatabase.Enabled = false; // Original disabled it.
-                // cmbDbDatabase.Text = "Select a valid Server";
-                // BUT, if user types a custom server that is valid but not in list?
-                // Original logic:
-                /*
-                if (!flag) {
-                    cmbDbDatabase.Enabled = false;
-                    cmbDbDatabase.Text = "Select a valid Server";
-                }
-                */
-                // I will replicate logic but be careful not to annoy user typing.
-                // TextChanged fires on every char.
-                // Only disable if we are sure?
-                // If I type "M", it's not in list.
-                // The original code ran validateServer on TextChanged.
-                // So as I type "L...o...c...a...l", it disables DB.
-                // Only when it matches list it enables.
-                // This means custom servers are hard to use?
-                // The original code seemed to rely on `ServerNames` list.
-                // I'll stick to it.
-
-                // If the user types a server that IS valid but not in list, they are blocked?
-                // Seems so.
-                // I will replicate, but maybe just leave enabled if text is not empty?
-                // User requirement is "edit each panel". I shouldn't change logic significantly.
-
-                // However, I'll stick to logic:
                 if (!found)
                 {
                      // cmbDbDatabase.Enabled = false;
@@ -373,13 +342,13 @@ namespace SMS_Search.Settings
 
                 lblConnStatus.Text = "Connection Successful";
                 lblConnStatus.ForeColor = Color.Green;
-                MessageBox.Show($"Connection successful to {cmbDbDatabase.Text}", "Connection Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //MessageBox.Show($"Connection successful to {cmbDbDatabase.Text}", "Connection Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 lblConnStatus.Text = "Connection Failed";
                 lblConnStatus.ForeColor = Color.Red;
-                MessageBox.Show(ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                //MessageBox.Show(ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             finally
             {

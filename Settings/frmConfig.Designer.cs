@@ -16,23 +16,20 @@ namespace SMS_Search.Settings
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode nodeApp = new System.Windows.Forms.TreeNode("Application");
-            System.Windows.Forms.TreeNode nodeDisplay = new System.Windows.Forms.TreeNode("Display");
-            System.Windows.Forms.TreeNode nodeLogging = new System.Windows.Forms.TreeNode("Logging");
-            System.Windows.Forms.TreeNode nodeGeneral = new System.Windows.Forms.TreeNode("General", new System.Windows.Forms.TreeNode[] {
-            nodeApp,
-            nodeDisplay,
-            nodeLogging});
-
-            System.Windows.Forms.TreeNode nodeBehavior = new System.Windows.Forms.TreeNode("Behavior");
-            System.Windows.Forms.TreeNode nodeCleanSql = new System.Windows.Forms.TreeNode("Clean SQL");
-            System.Windows.Forms.TreeNode nodeSearch = new System.Windows.Forms.TreeNode("Search", new System.Windows.Forms.TreeNode[] {
-            nodeBehavior,
-            nodeCleanSql});
-
-            System.Windows.Forms.TreeNode nodeDatabase = new System.Windows.Forms.TreeNode("Database");
-            System.Windows.Forms.TreeNode nodeLauncher = new System.Windows.Forms.TreeNode("Launcher");
-
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Application");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Display");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Logging");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("General", new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode3});
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Behavior");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Clean SQL");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Search", new System.Windows.Forms.TreeNode[] {
+            treeNode5,
+            treeNode6});
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Database");
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Launcher");
             this.splitConfig = new System.Windows.Forms.SplitContainer();
             this.tvSettings = new System.Windows.Forms.TreeView();
             this.imgListIcons = new System.Windows.Forms.ImageList(this.components);
@@ -71,57 +68,47 @@ namespace SMS_Search.Settings
             this.tvSettings.ImageList = this.imgListIcons;
             this.tvSettings.Location = new System.Drawing.Point(0, 0);
             this.tvSettings.Name = "tvSettings";
-
-            nodeApp.Name = "Application";
-            nodeApp.Text = "Application";
-            nodeApp.ImageKey = "Application";
-            nodeApp.SelectedImageKey = "Application";
-
-            nodeDisplay.Name = "Display";
-            nodeDisplay.Text = "Display";
-            nodeDisplay.ImageKey = "Display";
-            nodeDisplay.SelectedImageKey = "Display";
-
-            nodeLogging.Name = "Logging";
-            nodeLogging.Text = "Logging";
-            nodeLogging.ImageKey = "Logging";
-            nodeLogging.SelectedImageKey = "Logging";
-
-            nodeGeneral.Name = "General";
-            nodeGeneral.Text = "General";
-            nodeGeneral.ImageKey = "General";
-            nodeGeneral.SelectedImageKey = "General";
-
-            nodeBehavior.Name = "Behavior";
-            nodeBehavior.Text = "Behavior";
-            nodeBehavior.ImageKey = "Behavior";
-            nodeBehavior.SelectedImageKey = "Behavior";
-
-            nodeCleanSql.Name = "CleanSql";
-            nodeCleanSql.Text = "Clean SQL";
-            nodeCleanSql.ImageKey = "CleanSql";
-            nodeCleanSql.SelectedImageKey = "CleanSql";
-
-            nodeSearch.Name = "Search";
-            nodeSearch.Text = "Search";
-            nodeSearch.ImageKey = "Search";
-            nodeSearch.SelectedImageKey = "Search";
-
-            nodeDatabase.Name = "Database";
-            nodeDatabase.Text = "Database";
-            nodeDatabase.ImageKey = "Database";
-            nodeDatabase.SelectedImageKey = "Database";
-
-            nodeLauncher.Name = "Launcher";
-            nodeLauncher.Text = "Launcher";
-            nodeLauncher.ImageKey = "Launcher";
-            nodeLauncher.SelectedImageKey = "Launcher";
-
+            treeNode1.ImageKey = "Application";
+            treeNode1.Name = "Application";
+            treeNode1.SelectedImageKey = "Application";
+            treeNode1.Text = "Application";
+            treeNode2.ImageKey = "Display";
+            treeNode2.Name = "Display";
+            treeNode2.SelectedImageKey = "Display";
+            treeNode2.Text = "Display";
+            treeNode3.ImageKey = "Logging";
+            treeNode3.Name = "Logging";
+            treeNode3.SelectedImageKey = "Logging";
+            treeNode3.Text = "Logging";
+            treeNode4.ImageKey = "General";
+            treeNode4.Name = "General";
+            treeNode4.SelectedImageKey = "General";
+            treeNode4.Text = "General";
+            treeNode5.ImageKey = "Behavior";
+            treeNode5.Name = "Behavior";
+            treeNode5.SelectedImageKey = "Behavior";
+            treeNode5.Text = "Behavior";
+            treeNode6.ImageKey = "CleanSql";
+            treeNode6.Name = "CleanSql";
+            treeNode6.SelectedImageKey = "CleanSql";
+            treeNode6.Text = "Clean SQL";
+            treeNode7.ImageKey = "Search";
+            treeNode7.Name = "Search";
+            treeNode7.SelectedImageKey = "Search";
+            treeNode7.Text = "Search";
+            treeNode8.ImageKey = "Database";
+            treeNode8.Name = "Database";
+            treeNode8.SelectedImageKey = "Database";
+            treeNode8.Text = "Database";
+            treeNode9.ImageKey = "Launcher";
+            treeNode9.Name = "Launcher";
+            treeNode9.SelectedImageKey = "Launcher";
+            treeNode9.Text = "Launcher";
             this.tvSettings.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            nodeGeneral,
-            nodeSearch,
-            nodeDatabase,
-            nodeLauncher});
+            treeNode4,
+            treeNode7,
+            treeNode8,
+            treeNode9});
             this.tvSettings.SelectedImageIndex = 0;
             this.tvSettings.Size = new System.Drawing.Size(150, 400);
             this.tvSettings.TabIndex = 0;
@@ -136,7 +123,7 @@ namespace SMS_Search.Settings
             // btnRevert
             // 
             this.btnRevert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRevert.Location = new System.Drawing.Point(356, 415);
+            this.btnRevert.Location = new System.Drawing.Point(372, 415);
             this.btnRevert.Name = "btnRevert";
             this.btnRevert.Size = new System.Drawing.Size(120, 23);
             this.btnRevert.TabIndex = 1;
@@ -168,27 +155,27 @@ namespace SMS_Search.Settings
             this.btnOpenConfig.Text = "Open Settings File";
             this.btnOpenConfig.UseVisualStyleBackColor = true;
             this.btnOpenConfig.Click += new System.EventHandler(this.btnOpenConfig_Click);
-            //
+            // 
             // lblAutoSave
-            //
+            // 
             this.lblAutoSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblAutoSave.AutoSize = true;
             this.lblAutoSave.ForeColor = System.Drawing.SystemColors.GrayText;
             this.lblAutoSave.Location = new System.Drawing.Point(135, 419);
             this.lblAutoSave.Name = "lblAutoSave";
-            this.lblAutoSave.Size = new System.Drawing.Size(180, 15);
+            this.lblAutoSave.Size = new System.Drawing.Size(176, 15);
             this.lblAutoSave.TabIndex = 4;
             this.lblAutoSave.Text = "Settings are saved automatically";
-            //
+            // 
             // lblSavedStatus
-            //
+            // 
             this.lblSavedStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblSavedStatus.AutoSize = true;
             this.lblSavedStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblSavedStatus.ForeColor = System.Drawing.Color.Green;
-            this.lblSavedStatus.Location = new System.Drawing.Point(315, 419);
+            this.lblSavedStatus.Location = new System.Drawing.Point(312, 420);
             this.lblSavedStatus.Name = "lblSavedStatus";
-            this.lblSavedStatus.Size = new System.Drawing.Size(43, 15);
+            this.lblSavedStatus.Size = new System.Drawing.Size(45, 15);
             this.lblSavedStatus.TabIndex = 5;
             this.lblSavedStatus.Text = "Saved!";
             this.lblSavedStatus.Visible = false;
