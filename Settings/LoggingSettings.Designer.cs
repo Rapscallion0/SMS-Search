@@ -36,6 +36,10 @@ namespace SMS_Search.Settings
             this.lblRetention = new System.Windows.Forms.Label();
             this.numRetention = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.lblLogFile = new System.Windows.Forms.Label();
+            this.txtLogFile = new System.Windows.Forms.TextBox();
+            this.btnOpenLog = new System.Windows.Forms.Button();
+            this.btnOpenLogFolder = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numRetention)).BeginInit();
             this.SuspendLayout();
             //

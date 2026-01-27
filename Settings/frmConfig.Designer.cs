@@ -39,6 +39,9 @@ namespace SMS_Search.Settings
             this.btnRevert = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.btnOpenConfig = new System.Windows.Forms.Button();
+            this.lblAutoSave = new System.Windows.Forms.Label();
+            this.lblSavedStatus = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitConfig)).BeginInit();
             this.splitConfig.Panel1.SuspendLayout();
             this.splitConfig.SuspendLayout();
