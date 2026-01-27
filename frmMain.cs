@@ -1031,6 +1031,10 @@ namespace SMS_Search
 			if (e.KeyCode == Keys.F5 || (e.KeyCode == Keys.Return && (txtNumFct.Focused || txtDescFct.Focused || txtNumTlz.Focused || txtDescTlz.Focused || txtNumFld.Focused || txtDescFld.Focused || cmbTableFld.Focused)))
 			{
 				btnPopGrid.PerformClick();
+				if (e.KeyCode == Keys.Return)
+				{
+					e.SuppressKeyPress = true;
+				}
 			}
 		}
         #endregion
