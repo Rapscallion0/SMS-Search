@@ -166,23 +166,11 @@ namespace SMS_Search.Settings
             this.toolTip1.SetToolTip(this.btnChkUpdate, "Manually check for updates now.");
             this.btnChkUpdate.UseVisualStyleBackColor = true;
             //
-            // chkCopyCleanSql
-            //
-            this.chkCopyCleanSql.AutoSize = true;
-            this.chkCopyCleanSql.Location = new System.Drawing.Point(18, 290);
-            this.chkCopyCleanSql.Name = "chkCopyCleanSql";
-            this.chkCopyCleanSql.Size = new System.Drawing.Size(202, 17);
-            this.chkCopyCleanSql.TabIndex = 11;
-            this.chkCopyCleanSql.Text = "Copy cleaned SQL query to clipboard";
-            this.toolTip1.SetToolTip(this.chkCopyCleanSql, "When copying SQL from the application, automatically apply configured cleaning rules.");
-            this.chkCopyCleanSql.UseVisualStyleBackColor = true;
-            //
             // ApplicationSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.Controls.Add(this.chkCopyCleanSql);
             this.Controls.Add(this.btnChkUpdate);
             this.Controls.Add(this.chkCheckUpdate);
             this.Controls.Add(this.chkUnarchiveTarget);
@@ -214,7 +202,6 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.CheckBox chkUnarchiveTarget;
         private System.Windows.Forms.CheckBox chkCheckUpdate;
         private System.Windows.Forms.Button btnChkUpdate;
-        private System.Windows.Forms.CheckBox chkCopyCleanSql;
         private System.Windows.Forms.ToolTip toolTip1;
     }
 }

@@ -44,6 +44,8 @@ namespace SMS_Search.Settings
             if (int.TryParse(retentionStr, out int r)) retention = r;
             numRetention.Value = retention;
 
+            txtLogFile.Text = GetCurrentLogPath();
+
             ToggleControls();
 
             _isLoaded = true;
@@ -68,6 +70,16 @@ namespace SMS_Search.Settings
 
             cmbLogLevel.SelectedIndexChanged += (s, e) => SaveSetting("GENERAL", "LOG_LEVEL", cmbLogLevel.Text);
             numRetention.ValueChanged += (s, e) => SaveSetting("GENERAL", "LOG_RETENTION", numRetention.Value.ToString());
+
+            btnOpenLog.Click += (s, e) =>
+            {
+                try { System.Diagnostics.Process.Start(txtLogFile.Text); } catch { }
+            };
+
+            btnOpenLogFolder.Click += (s, e) =>
+            {
+                try { System.Diagnostics.Process.Start(System.IO.Path.GetDirectoryName(txtLogFile.Text)); } catch { }
+            };
         }
 
         private void SaveSetting(string section, string key, string value)
@@ -78,6 +90,28 @@ namespace SMS_Search.Settings
 
             // Reload logger configuration
             new Logfile().ReloadConfig();
+
+            (this.ParentForm as frmConfig)?.FlashSaved();
+        }
+
+        private string GetCurrentLogPath()
+        {
+             try
+             {
+                 string folder = Application.StartupPath;
+                 var files = System.IO.Directory.GetFiles(folder, "SMSSearch_log*.json");
+                 if (files.Length > 0)
+                 {
+                     Array.Sort(files);
+                     return files[files.Length - 1];
+                 }
+                 // Fallback
+                 return System.IO.Path.Combine(folder, "SMSSearch_log" + DateTime.Now.ToString("yyyyMMdd") + ".json");
+             }
+             catch
+             {
+                 return "";
+             }
         }
     }
 }

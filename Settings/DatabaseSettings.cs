@@ -141,6 +141,7 @@ namespace SMS_Search.Settings
             if (!_isLoaded || _config == null) return;
             _config.SetValue(section, key, value);
             _config.Save();
+            (this.ParentForm as frmConfig)?.FlashSaved();
         }
 
         private void SaveAuthSettings()
@@ -161,6 +162,7 @@ namespace SMS_Search.Settings
                 _config.SetValue("CONNECTION", "SQLPASSWORD", Utils.Encrypt(txtDbPassword.Text));
             }
             _config.Save();
+            (this.ParentForm as frmConfig)?.FlashSaved();
         }
 
         private async Task PopulateDbServersAsync()
@@ -371,6 +373,7 @@ namespace SMS_Search.Settings
 
                 lblConnStatus.Text = "Connection Successful";
                 lblConnStatus.ForeColor = Color.Green;
+                MessageBox.Show($"Connection successful to {cmbDbDatabase.Text}", "Connection Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {

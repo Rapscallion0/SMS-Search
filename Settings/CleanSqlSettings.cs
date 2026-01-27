@@ -35,6 +35,8 @@ namespace SMS_Search.Settings
             if (_config == null && !useDefaults) return;
             _isLoaded = false;
 
+            chkCopyCleanSql.Checked = _config.GetValue("GENERAL", "COPYCLEANSQL") == "1";
+
             dgvCleanSqlRules.Rows.Clear();
             List<SqlCleaningRule> rules = new List<SqlCleaningRule>();
 
@@ -75,6 +77,13 @@ namespace SMS_Search.Settings
              dgvCleanSqlRules.CellValueChanged += (s, e) => SaveRules();
              dgvCleanSqlRules.RowsAdded += (s, e) => SaveRules();
              dgvCleanSqlRules.RowsRemoved += (s, e) => SaveRules();
+
+             chkCopyCleanSql.CheckedChanged += (s, e) => {
+                 if (!_isLoaded || _config == null) return;
+                 _config.SetValue("GENERAL", "COPYCLEANSQL", chkCopyCleanSql.Checked ? "1" : "0");
+                 _config.Save();
+                 (this.ParentForm as frmConfig)?.FlashSaved();
+             };
         }
 
         private void SaveRules()
@@ -98,6 +107,7 @@ namespace SMS_Search.Settings
             }
             _config.SetValue("CLEAN_SQL", "Count", ruleCount.ToString());
             _config.Save();
+            (this.ParentForm as frmConfig)?.FlashSaved();
         }
 
         private void btnResetCleanSql_Click(object sender, EventArgs e)

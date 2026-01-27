@@ -117,11 +117,54 @@ namespace SMS_Search.Settings
             0,
             0});
             //
+            // lblLogFile
+            //
+            this.lblLogFile.AutoSize = true;
+            this.lblLogFile.Location = new System.Drawing.Point(20, 120);
+            this.lblLogFile.Name = "lblLogFile";
+            this.lblLogFile.Size = new System.Drawing.Size(84, 13);
+            this.lblLogFile.TabIndex = 6;
+            this.lblLogFile.Text = "Current Log File:";
+            //
+            // txtLogFile
+            //
+            this.txtLogFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtLogFile.Location = new System.Drawing.Point(20, 136);
+            this.txtLogFile.Name = "txtLogFile";
+            this.txtLogFile.ReadOnly = true;
+            this.txtLogFile.Size = new System.Drawing.Size(410, 20);
+            this.txtLogFile.TabIndex = 7;
+            //
+            // btnOpenLog
+            //
+            this.btnOpenLog.Location = new System.Drawing.Point(20, 165);
+            this.btnOpenLog.Name = "btnOpenLog";
+            this.btnOpenLog.Size = new System.Drawing.Size(75, 23);
+            this.btnOpenLog.TabIndex = 8;
+            this.btnOpenLog.Text = "Open Log";
+            this.toolTip1.SetToolTip(this.btnOpenLog, "Open the current log file.");
+            this.btnOpenLog.UseVisualStyleBackColor = true;
+            //
+            // btnOpenLogFolder
+            //
+            this.btnOpenLogFolder.Location = new System.Drawing.Point(101, 165);
+            this.btnOpenLogFolder.Name = "btnOpenLogFolder";
+            this.btnOpenLogFolder.Size = new System.Drawing.Size(90, 23);
+            this.btnOpenLogFolder.TabIndex = 9;
+            this.btnOpenLogFolder.Text = "Open Folder";
+            this.toolTip1.SetToolTip(this.btnOpenLogFolder, "Open the directory containing log files.");
+            this.btnOpenLogFolder.UseVisualStyleBackColor = true;
+            //
             // LoggingSettings
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
+            this.Controls.Add(this.btnOpenLogFolder);
+            this.Controls.Add(this.btnOpenLog);
+            this.Controls.Add(this.txtLogFile);
+            this.Controls.Add(this.lblLogFile);
             this.Controls.Add(this.numRetention);
             this.Controls.Add(this.lblRetention);
             this.Controls.Add(this.cmbLogLevel);
@@ -145,5 +188,9 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.Label lblRetention;
         private System.Windows.Forms.NumericUpDown numRetention;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label lblLogFile;
+        private System.Windows.Forms.TextBox txtLogFile;
+        private System.Windows.Forms.Button btnOpenLog;
+        private System.Windows.Forms.Button btnOpenLogFolder;
     }
 }

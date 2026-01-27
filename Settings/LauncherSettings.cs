@@ -245,6 +245,7 @@ namespace SMS_Search.Settings
 
                  // If running, restart to pick up new hotkey
                  ReloadLauncherIfRunning();
+                 (this.ParentForm as frmConfig)?.FlashSaved();
             }
         }
 
@@ -554,6 +555,7 @@ namespace SMS_Search.Settings
             {
                  btnRegister.Enabled = false;
                  btnUnregister.Enabled = true;
+                 lblWarning.Visible = false;
 
                  if (isRunning)
                  {
@@ -572,6 +574,7 @@ namespace SMS_Search.Settings
                  DrawStatusLight(Color.Red);
                  btnRegister.Enabled = true;
                  btnUnregister.Enabled = false;
+                 lblWarning.Visible = true;
             }
         }
     }

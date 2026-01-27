@@ -23,20 +23,27 @@ namespace SMS_Search.Settings
 
         public bool ForceDatabaseSetup { get; set; } = false;
 
+        private Timer _timerSaved;
+
         public frmConfig()
         {
             InitializeComponent();
             base.StartPosition = FormStartPosition.Manual;
             base.Top = (Screen.PrimaryScreen.WorkingArea.Height - base.Height) / 2;
             base.Left = (Screen.PrimaryScreen.WorkingArea.Width - base.Width) / 2;
-            lblConfigFilePath.Text = Path.Combine(Application.StartupPath, "SMSSearch_settings.json");
-            toolTip1.SetToolTip(lblConfigFilePath, Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
+
+            toolTip1.SetToolTip(btnOpenConfig, Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
+
+            _timerSaved = new Timer();
+            _timerSaved.Interval = 2000;
+            _timerSaved.Tick += (s, e) => { lblSavedStatus.Visible = false; _timerSaved.Stop(); };
 
             InitializeUserControls();
         }
 
         private void InitializeUserControls()
         {
+            // Pass FlashSaved action to controls if constructors support it, or they can call parent method
             applicationSettings = new ApplicationSettings(config);
             displaySettings = new DisplaySettings(config);
             loggingSettings = new LoggingSettings(config);
@@ -54,6 +61,18 @@ namespace SMS_Search.Settings
             AddControl(launcherSettings);
         }
 
+        public void FlashSaved()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(FlashSaved));
+                return;
+            }
+            lblSavedStatus.Visible = true;
+            _timerSaved.Stop();
+            _timerSaved.Start();
+        }
+
         private void AddControl(UserControl ctrl)
         {
             ctrl.Dock = DockStyle.Fill;
@@ -63,18 +82,20 @@ namespace SMS_Search.Settings
 
         private void frmConfig_Load(object sender, EventArgs e)
         {
+            try { this.Icon = new Icon(Path.Combine(Application.StartupPath, "SMS Search.ico")); } catch { }
             log.Logger(LogLevel.Info, "Settings window opened");
 
             // Icons
             imgListIcons.Images.Clear();
             imgListIcons.Images.Add("General", IconLoader.GetIcon("General"));
-            imgListIcons.Images.Add("Environment", IconLoader.GetIcon("Environment"));
+            imgListIcons.Images.Add("Application", IconLoader.GetIcon("Application"));
+            imgListIcons.Images.Add("Display", IconLoader.GetIcon("Display"));
             imgListIcons.Images.Add("Database", IconLoader.GetIcon("Database"));
-            imgListIcons.Images.Add("Advanced", IconLoader.GetIcon("Advanced"));
-            imgListIcons.Images.Add("Update", IconLoader.GetIcon("Update"));
-            imgListIcons.Images.Add("Logging", IconLoader.GetIcon("Logging"));
+            imgListIcons.Images.Add("Search", IconLoader.GetIcon("Search"));
+            imgListIcons.Images.Add("Behavior", IconLoader.GetIcon("Behavior"));
             imgListIcons.Images.Add("CleanSql", IconLoader.GetIcon("CleanSql"));
             imgListIcons.Images.Add("Launcher", IconLoader.GetIcon("Launcher"));
+            imgListIcons.Images.Add("Logging", IconLoader.GetIcon("Logging"));
 
             // Expand all nodes
             tvSettings.ExpandAll();
@@ -200,7 +221,7 @@ namespace SMS_Search.Settings
             this.Close();
         }
 
-        private void lblConfigFilePath_Click(object sender, EventArgs e)
+        private void btnOpenConfig_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start(Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
         }
