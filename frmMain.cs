@@ -70,6 +70,7 @@ namespace SMS_Search
         private bool _highlightMatches = false;
         private Color _matchHighlightColor = Color.Yellow;
         private long _lastTotalMatchCount = 0;
+        private bool _showRowNumbers = false;
 
 		public frmMain(string[] Params)
 		{
@@ -81,6 +82,7 @@ namespace SMS_Search
             dGrd.CellValueNeeded += dGrd_CellValueNeeded;
             dGrd.ColumnHeaderMouseClick += dGrd_ColumnHeaderMouseClick;
             dGrd.RowPrePaint += dGrd_RowPrePaint;
+            dGrd.RowPostPaint += dGrd_RowPostPaint;
             dGrd.CellPainting += dGrd_CellPainting;
             dGrd.CurrentCellChanged += dGrd_CurrentCellChanged;
 
@@ -489,6 +491,9 @@ namespace SMS_Search
                 _matchHighlightColor = Color.Yellow;
             }
 
+            _showRowNumbers = config.GetValue("GENERAL", "SHOW_ROW_NUMBERS") == "1";
+            UpdateRowHeaderWidth();
+
 			SetBusy(false);
 		}
 
@@ -610,6 +615,7 @@ namespace SMS_Search
 
                         bindingSource.DataSource = dataTable;
                         dGrd.DataSource = bindingSource;
+                        UpdateRowHeaderWidth();
 
                         sw.Stop();
                         tslblRecordCnt.Text = dataTable.Rows.Count.ToString();
@@ -667,6 +673,7 @@ namespace SMS_Search
                 return;
             }
             dGrd.RowCount = _gridContext.TotalCount;
+            UpdateRowHeaderWidth();
 
             if (!string.IsNullOrEmpty(_gridContext.FilterText))
             {
@@ -1160,6 +1167,7 @@ namespace SMS_Search
         private void ClearResults()
         {
             dGrd.DataSource = null;
+            UpdateRowHeaderWidth();
             tslblRecordCnt.Text = "0";
             Height = FormHeightMin;
         }
@@ -1760,6 +1768,48 @@ namespace SMS_Search
                 // Reset to default
                 dGrd.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Empty;
             }
+        }
+
+        private void dGrd_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
+        {
+            if (_showRowNumbers)
+            {
+                var grid = sender as DataGridView;
+                var rowIdx = (e.RowIndex + 1).ToString();
+                using (var centerFormat = new StringFormat())
+                {
+                    centerFormat.Alignment = StringAlignment.Far;
+                    centerFormat.LineAlignment = StringAlignment.Center;
+
+                    // Calculate position to center vertically, right align in header
+                    // Padding 4 pixels from right edge. Use 0 for X to ensure it stays fixed in the header area.
+                    var headerBounds = new Rectangle(0, e.RowBounds.Top, grid.RowHeadersWidth - 4, e.RowBounds.Height);
+                    e.Graphics.DrawString(rowIdx, grid.DefaultCellStyle.Font, SystemBrushes.ControlText, headerBounds, centerFormat);
+                }
+            }
+        }
+
+        private void UpdateRowHeaderWidth()
+        {
+            if (!_showRowNumbers)
+            {
+                dGrd.RowHeadersVisible = false;
+                return;
+            }
+
+            dGrd.RowHeadersVisible = true;
+            int rowCount = dGrd.RowCount;
+            if (rowCount == 0) rowCount = 1; // Minimum width
+
+            // Measure string of max row count
+            string maxString = rowCount.ToString();
+            Size size = TextRenderer.MeasureText(maxString, dGrd.Font);
+
+            // Add some padding
+            int width = size.Width + 20;
+            if (width < 25) width = 25; // Min width
+
+            dGrd.RowHeadersWidth = width;
         }
 
         private void dGrd_CurrentCellChanged(object sender, EventArgs e)

@@ -42,6 +42,7 @@ namespace SMS_Search.Settings
 
             chkDescriptionColumns.Checked = _config.GetValue("GENERAL", "DESCRIPTIONCOLUMNS") == "1";
             chkResizeColumns.Checked = _config.GetValue("GENERAL", "RESIZECOLUMNS") == "1";
+            chkShowRowNumbers.Checked = _config.GetValue("GENERAL", "SHOW_ROW_NUMBERS") == "1";
             chkCopyCleanSql.Checked = _config.GetValue("GENERAL", "COPYCLEANSQL") == "1";
             chkSearchAny.Checked = _config.GetValue("GENERAL", "SEARCHANY") == "1";
 
@@ -71,6 +72,7 @@ namespace SMS_Search.Settings
         {
             chkDescriptionColumns.CheckedChanged += (s, e) => SaveSetting("GENERAL", "DESCRIPTIONCOLUMNS", chkDescriptionColumns.Checked ? "1" : "0");
             chkResizeColumns.CheckedChanged += (s, e) => SaveSetting("GENERAL", "RESIZECOLUMNS", chkResizeColumns.Checked ? "1" : "0");
+            chkShowRowNumbers.CheckedChanged += (s, e) => SaveSetting("GENERAL", "SHOW_ROW_NUMBERS", chkShowRowNumbers.Checked ? "1" : "0");
             chkCopyCleanSql.CheckedChanged += (s, e) => SaveSetting("GENERAL", "COPYCLEANSQL", chkCopyCleanSql.Checked ? "1" : "0");
             chkSearchAny.CheckedChanged += (s, e) => SaveSetting("GENERAL", "SEARCHANY", chkSearchAny.Checked ? "1" : "0");
 
