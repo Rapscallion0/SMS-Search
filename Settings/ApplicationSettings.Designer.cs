@@ -40,7 +40,6 @@ namespace SMS_Search.Settings
             this.chkUnarchiveTarget = new System.Windows.Forms.CheckBox();
             this.chkCheckUpdate = new System.Windows.Forms.CheckBox();
             this.btnChkUpdate = new System.Windows.Forms.Button();
-            this.chkCopyCleanSql = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
