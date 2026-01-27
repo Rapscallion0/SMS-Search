@@ -30,6 +30,7 @@ namespace SMS_Search.Settings
             treeNode6});
             System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Database");
             System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Launcher");
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmConfig));
             this.splitConfig = new System.Windows.Forms.SplitContainer();
             this.tvSettings = new System.Windows.Forms.TreeView();
             this.imgListIcons = new System.Windows.Forms.ImageList(this.components);
@@ -56,7 +57,7 @@ namespace SMS_Search.Settings
             // splitConfig.Panel1
             // 
             this.splitConfig.Panel1.Controls.Add(this.tvSettings);
-            this.splitConfig.Size = new System.Drawing.Size(600, 400);
+            this.splitConfig.Size = new System.Drawing.Size(604, 401);
             this.splitConfig.SplitterDistance = 150;
             this.splitConfig.TabIndex = 0;
             // 
@@ -110,7 +111,7 @@ namespace SMS_Search.Settings
             treeNode8,
             treeNode9});
             this.tvSettings.SelectedImageIndex = 0;
-            this.tvSettings.Size = new System.Drawing.Size(150, 400);
+            this.tvSettings.Size = new System.Drawing.Size(150, 401);
             this.tvSettings.TabIndex = 0;
             this.tvSettings.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvSettings_AfterSelect);
             // 
@@ -123,7 +124,7 @@ namespace SMS_Search.Settings
             // btnRevert
             // 
             this.btnRevert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRevert.Location = new System.Drawing.Point(372, 415);
+            this.btnRevert.Location = new System.Drawing.Point(376, 416);
             this.btnRevert.Name = "btnRevert";
             this.btnRevert.Size = new System.Drawing.Size(120, 23);
             this.btnRevert.TabIndex = 1;
@@ -136,7 +137,7 @@ namespace SMS_Search.Settings
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnClose.Location = new System.Drawing.Point(513, 415);
+            this.btnClose.Location = new System.Drawing.Point(517, 416);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 2;
@@ -148,7 +149,7 @@ namespace SMS_Search.Settings
             // btnOpenConfig
             // 
             this.btnOpenConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOpenConfig.Location = new System.Drawing.Point(12, 415);
+            this.btnOpenConfig.Location = new System.Drawing.Point(12, 416);
             this.btnOpenConfig.Name = "btnOpenConfig";
             this.btnOpenConfig.Size = new System.Drawing.Size(110, 23);
             this.btnOpenConfig.TabIndex = 3;
@@ -161,7 +162,7 @@ namespace SMS_Search.Settings
             this.lblAutoSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblAutoSave.AutoSize = true;
             this.lblAutoSave.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.lblAutoSave.Location = new System.Drawing.Point(135, 419);
+            this.lblAutoSave.Location = new System.Drawing.Point(135, 420);
             this.lblAutoSave.Name = "lblAutoSave";
             this.lblAutoSave.Size = new System.Drawing.Size(176, 15);
             this.lblAutoSave.TabIndex = 4;
@@ -173,7 +174,7 @@ namespace SMS_Search.Settings
             this.lblSavedStatus.AutoSize = true;
             this.lblSavedStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblSavedStatus.ForeColor = System.Drawing.Color.Green;
-            this.lblSavedStatus.Location = new System.Drawing.Point(312, 420);
+            this.lblSavedStatus.Location = new System.Drawing.Point(312, 421);
             this.lblSavedStatus.Name = "lblSavedStatus";
             this.lblSavedStatus.Size = new System.Drawing.Size(45, 15);
             this.lblSavedStatus.TabIndex = 5;
@@ -185,7 +186,7 @@ namespace SMS_Search.Settings
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnClose;
-            this.ClientSize = new System.Drawing.Size(600, 450);
+            this.ClientSize = new System.Drawing.Size(604, 451);
             this.Controls.Add(this.lblSavedStatus);
             this.Controls.Add(this.lblAutoSave);
             this.Controls.Add(this.btnOpenConfig);
@@ -193,9 +194,10 @@ namespace SMS_Search.Settings
             this.Controls.Add(this.btnRevert);
             this.Controls.Add(this.splitConfig);
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(600, 480);
+            this.MinimumSize = new System.Drawing.Size(620, 490);
             this.Name = "frmConfig";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

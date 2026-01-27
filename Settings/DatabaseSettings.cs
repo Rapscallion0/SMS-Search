@@ -344,7 +344,7 @@ namespace SMS_Search.Settings
                 lblConnStatus.ForeColor = Color.Green;
                 //MessageBox.Show($"Connection successful to {cmbDbDatabase.Text}", "Connection Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 lblConnStatus.Text = "Connection Failed";
                 lblConnStatus.ForeColor = Color.Red;
