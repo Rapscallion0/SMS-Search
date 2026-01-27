@@ -1203,6 +1203,13 @@ namespace SMS_Search
             var itemClear = menu.Items.Add("Clear result");
             itemClear.Click += (s, e) => ClearResults();
 
+            // 7. Separator
+            menu.Items.Add(new ToolStripSeparator());
+
+            // 8. Export to CSV
+            var itemExport = menu.Items.Add("Export results to CSV");
+            itemExport.Click += (s, e) => ExportToCsv();
+
             dGrd.ContextMenuStrip = menu;
             _headerContextMenu = menu; // Reuse for header
         }
@@ -1982,7 +1989,7 @@ namespace SMS_Search
             }
         }
 
-        private async void btnExport_Click(object sender, EventArgs e)
+        private async void ExportToCsv()
         {
             if (dGrd.RowCount == 0) return;
 
