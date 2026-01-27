@@ -199,7 +199,7 @@ namespace SMS_Search
                 using (frmConfig frmConfig = new frmConfig())
                 {
                     frmConfig.ForceDatabaseSetup = true;
-                    if (frmConfig.ShowDialog() != DialogResult.OK)
+                    if (frmConfig.ShowDialog(this) != DialogResult.OK)
                     {
                         Application.Exit();
                         return;
@@ -409,7 +409,7 @@ namespace SMS_Search
 			{
 				using (var cfg = new frmConfig())
 				{
-					cfg.ShowDialog();
+					cfg.ShowDialog(this);
 				}
                 config.Load(); // Re-load config in case it was changed
                 log.ReloadConfig();
@@ -1238,7 +1238,7 @@ namespace SMS_Search
 			{
 				frmConfig frmConfig = new frmConfig();
 				frmConfig.StartPosition = FormStartPosition.CenterParent;
-				frmConfig.ShowDialog();
+				frmConfig.ShowDialog(this);
 
                 bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
                 string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");

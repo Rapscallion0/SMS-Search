@@ -28,9 +28,6 @@ namespace SMS_Search.Settings
         public frmConfig()
         {
             InitializeComponent();
-            base.StartPosition = FormStartPosition.Manual;
-            base.Top = (Screen.PrimaryScreen.WorkingArea.Height - base.Height) / 2;
-            base.Left = (Screen.PrimaryScreen.WorkingArea.Width - base.Width) / 2;
 
             toolTip1.SetToolTip(btnOpenConfig, Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
 
@@ -86,6 +83,7 @@ namespace SMS_Search.Settings
             log.Logger(LogLevel.Info, "Settings window opened");
 
             // Icons
+            tvSettings.ImageList = null;
             imgListIcons.Images.Clear();
             imgListIcons.Images.Add("General", IconLoader.GetIcon("General"));
             imgListIcons.Images.Add("Application", IconLoader.GetIcon("Application"));
@@ -96,6 +94,7 @@ namespace SMS_Search.Settings
             imgListIcons.Images.Add("CleanSql", IconLoader.GetIcon("CleanSql"));
             imgListIcons.Images.Add("Launcher", IconLoader.GetIcon("Launcher"));
             imgListIcons.Images.Add("Logging", IconLoader.GetIcon("Logging"));
+            tvSettings.ImageList = imgListIcons;
 
             // Expand all nodes
             tvSettings.ExpandAll();
