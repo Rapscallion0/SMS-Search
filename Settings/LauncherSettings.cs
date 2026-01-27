@@ -27,7 +27,6 @@ namespace SMS_Search.Settings
         private string _currentValidHotkey = "";
         private bool _isCurrentHotkeyValid = false;
         private bool _isLoaded = false;
-        private ToolTip toolTip1 = new ToolTip();
 
         public LauncherSettings(ConfigManager config)
         {

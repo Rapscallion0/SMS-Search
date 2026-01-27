@@ -13,13 +13,12 @@ namespace SMS_Search.Settings
         private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));
         private Logfile log = new Logfile();
 
-        private GeneralSettings generalSettings;
-        private EnvironmentSettings environmentSettings;
-        private DatabaseSettings databaseSettings;
-        private AdvancedSettings advancedSettings;
-        private UpdateSettings updateSettings;
+        private ApplicationSettings applicationSettings;
+        private DisplaySettings displaySettings;
         private LoggingSettings loggingSettings;
+        private SearchBehaviorSettings searchBehaviorSettings;
         private CleanSqlSettings cleanSqlSettings;
+        private DatabaseSettings databaseSettings;
         private LauncherSettings launcherSettings;
 
         public bool ForceDatabaseSetup { get; set; } = false;
@@ -38,23 +37,20 @@ namespace SMS_Search.Settings
 
         private void InitializeUserControls()
         {
-            generalSettings = new GeneralSettings(config);
-            environmentSettings = new EnvironmentSettings(config);
-            databaseSettings = new DatabaseSettings(config);
-            advancedSettings = new AdvancedSettings(config);
-            updateSettings = new UpdateSettings(config);
+            applicationSettings = new ApplicationSettings(config);
+            displaySettings = new DisplaySettings(config);
             loggingSettings = new LoggingSettings(config);
+            searchBehaviorSettings = new SearchBehaviorSettings(config);
             cleanSqlSettings = new CleanSqlSettings(config);
+            databaseSettings = new DatabaseSettings(config);
             launcherSettings = new LauncherSettings(config);
 
-            // Add to Panel2
-            AddControl(generalSettings);
-            AddControl(environmentSettings);
-            AddControl(databaseSettings);
-            AddControl(advancedSettings);
-            AddControl(updateSettings);
+            AddControl(applicationSettings);
+            AddControl(displaySettings);
             AddControl(loggingSettings);
+            AddControl(searchBehaviorSettings);
             AddControl(cleanSqlSettings);
+            AddControl(databaseSettings);
             AddControl(launcherSettings);
         }
 
@@ -80,19 +76,23 @@ namespace SMS_Search.Settings
             imgListIcons.Images.Add("CleanSql", IconLoader.GetIcon("CleanSql"));
             imgListIcons.Images.Add("Launcher", IconLoader.GetIcon("Launcher"));
 
-            // Ensure selected icons don't change
-            foreach (TreeNode node in tvSettings.Nodes)
-            {
-                node.SelectedImageKey = node.ImageKey;
-            }
+            // Expand all nodes
+            tvSettings.ExpandAll();
 
             // Select default
             if (tvSettings.Nodes.Count > 0)
             {
                 if (ForceDatabaseSetup)
-                    tvSettings.SelectedNode = tvSettings.Nodes["Database"];
+                {
+                    TreeNode[] nodes = tvSettings.Nodes.Find("Database", true);
+                    if (nodes.Length > 0) tvSettings.SelectedNode = nodes[0];
+                }
                 else
-                    tvSettings.SelectedNode = tvSettings.Nodes["General"];
+                {
+                    // Select Application by default (Node "Application" is child of "General")
+                    TreeNode[] nodes = tvSettings.Nodes.Find("Application", true);
+                    if (nodes.Length > 0) tvSettings.SelectedNode = nodes[0];
+                }
             }
         }
 
@@ -131,25 +131,43 @@ namespace SMS_Search.Settings
             if (e.Node == null) return;
 
             // Hide all
-            if (generalSettings != null) generalSettings.Visible = false;
-            if (environmentSettings != null) environmentSettings.Visible = false;
-            if (databaseSettings != null) databaseSettings.Visible = false;
-            if (advancedSettings != null) advancedSettings.Visible = false;
-            if (updateSettings != null) updateSettings.Visible = false;
+            if (applicationSettings != null) applicationSettings.Visible = false;
+            if (displaySettings != null) displaySettings.Visible = false;
             if (loggingSettings != null) loggingSettings.Visible = false;
+            if (searchBehaviorSettings != null) searchBehaviorSettings.Visible = false;
             if (cleanSqlSettings != null) cleanSqlSettings.Visible = false;
+            if (databaseSettings != null) databaseSettings.Visible = false;
             if (launcherSettings != null) launcherSettings.Visible = false;
+
+            // Mapping Node Name to Control
+            // General -> Application (Default behavior if parent selected)
+            // Search -> Behavior (Default behavior if parent selected)
 
             switch (e.Node.Name)
             {
-                case "General": if (generalSettings != null) generalSettings.Visible = true; break;
-                case "Environment": if (environmentSettings != null) environmentSettings.Visible = true; break;
-                case "Database": if (databaseSettings != null) databaseSettings.Visible = true; break;
-                case "Advanced": if (advancedSettings != null) advancedSettings.Visible = true; break;
-                case "Update": if (updateSettings != null) updateSettings.Visible = true; break;
-                case "Logging": if (loggingSettings != null) loggingSettings.Visible = true; break;
-                case "CleanSql": if (cleanSqlSettings != null) cleanSqlSettings.Visible = true; break;
-                case "Launcher": if (launcherSettings != null) launcherSettings.Visible = true; break;
+                case "General":
+                case "Application":
+                    if (applicationSettings != null) applicationSettings.Visible = true;
+                    break;
+                case "Display":
+                    if (displaySettings != null) displaySettings.Visible = true;
+                    break;
+                case "Logging":
+                    if (loggingSettings != null) loggingSettings.Visible = true;
+                    break;
+                case "Search":
+                case "Behavior":
+                    if (searchBehaviorSettings != null) searchBehaviorSettings.Visible = true;
+                    break;
+                case "CleanSql":
+                    if (cleanSqlSettings != null) cleanSqlSettings.Visible = true;
+                    break;
+                case "Database":
+                    if (databaseSettings != null) databaseSettings.Visible = true;
+                    break;
+                case "Launcher":
+                    if (launcherSettings != null) launcherSettings.Visible = true;
+                    break;
             }
         }
 
