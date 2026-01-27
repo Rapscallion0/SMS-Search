@@ -34,9 +34,13 @@ namespace SMS_Search.Settings
         {
             switch (name)
             {
-                case "General": return LoadImage(ICON_GENERAL);
+                case "General": return SystemIcons.Application.ToBitmap();
+                case "Application": return SystemIcons.Application.ToBitmap();
+                case "Display": return LoadImage(ICON_GENERAL);
                 case "Database": return LoadImage(ICON_DATABASE);
                 case "Advanced": return LoadImage(ICON_ADVANCED);
+                case "Search": return LoadImage(ICON_ADVANCED);
+                case "Behavior": return LoadImage(ICON_ADVANCED);
                 case "CleanSql": return LoadImage(ICON_CLEANSQL);
                 case "Launcher": return LoadImage(ICON_LAUNCHER);
                 case "Update": return LoadImage(ICON_UPDATE);

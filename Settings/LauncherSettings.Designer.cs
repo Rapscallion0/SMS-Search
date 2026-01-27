@@ -38,6 +38,7 @@ namespace SMS_Search.Settings
             this.lblLauncherStatus = new System.Windows.Forms.Label();
             this.pbLauncherStatus = new System.Windows.Forms.PictureBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.lblWarning = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbLauncherStatus)).BeginInit();
             this.SuspendLayout();
             //
@@ -76,6 +77,17 @@ namespace SMS_Search.Settings
             this.txtHotkey.Size = new System.Drawing.Size(200, 20);
             this.txtHotkey.TabIndex = 3;
             this.toolTip1.SetToolTip(this.txtHotkey, "Enter the global hotkey combination.");
+            //
+            // lblWarning
+            //
+            this.lblWarning.AutoSize = true;
+            this.lblWarning.ForeColor = System.Drawing.Color.Red;
+            this.lblWarning.Location = new System.Drawing.Point(276, 80);
+            this.lblWarning.Name = "lblWarning";
+            this.lblWarning.Size = new System.Drawing.Size(200, 13);
+            this.lblWarning.TabIndex = 8;
+            this.lblWarning.Text = "Service must be registered for hotkey to work";
+            this.lblWarning.Visible = false;
             //
             // btnRegister
             //
@@ -118,6 +130,7 @@ namespace SMS_Search.Settings
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblWarning);
             this.Controls.Add(this.lblDescription);
             this.Controls.Add(this.lblLauncherStatus);
             this.Controls.Add(this.pbLauncherStatus);
@@ -145,5 +158,6 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.Label lblLauncherStatus;
         private System.Windows.Forms.PictureBox pbLauncherStatus;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label lblWarning;
     }
 }

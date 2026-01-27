@@ -35,6 +35,7 @@ namespace SMS_Search.Settings
             this.colReplace = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnResetCleanSql = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.chkCopyCleanSql = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).BeginInit();
             this.SuspendLayout();
             // 
@@ -48,6 +49,17 @@ namespace SMS_Search.Settings
             this.lblDescription.TabIndex = 0;
             this.lblDescription.Text = "Define Regex rules to clean SQL queries before copying to clipboard.";
             //
+            // chkCopyCleanSql
+            //
+            this.chkCopyCleanSql.AutoSize = true;
+            this.chkCopyCleanSql.Location = new System.Drawing.Point(13, 35);
+            this.chkCopyCleanSql.Name = "chkCopyCleanSql";
+            this.chkCopyCleanSql.Size = new System.Drawing.Size(202, 17);
+            this.chkCopyCleanSql.TabIndex = 1;
+            this.chkCopyCleanSql.Text = "Copy cleaned SQL query to clipboard";
+            this.toolTip1.SetToolTip(this.chkCopyCleanSql, "When copying SQL from the application, automatically apply configured cleaning rules.");
+            this.chkCopyCleanSql.UseVisualStyleBackColor = true;
+            //
             // dgvCleanSqlRules
             // 
             this.dgvCleanSqlRules.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -57,10 +69,10 @@ namespace SMS_Search.Settings
             this.dgvCleanSqlRules.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colRegex,
             this.colReplace});
-            this.dgvCleanSqlRules.Location = new System.Drawing.Point(10, 40);
+            this.dgvCleanSqlRules.Location = new System.Drawing.Point(10, 60);
             this.dgvCleanSqlRules.Name = "dgvCleanSqlRules";
-            this.dgvCleanSqlRules.Size = new System.Drawing.Size(430, 320);
-            this.dgvCleanSqlRules.TabIndex = 1;
+            this.dgvCleanSqlRules.Size = new System.Drawing.Size(430, 300);
+            this.dgvCleanSqlRules.TabIndex = 2;
             this.toolTip1.SetToolTip(this.dgvCleanSqlRules, "List of Regex patterns and their replacements.");
             // 
             // colRegex
@@ -81,7 +93,7 @@ namespace SMS_Search.Settings
             this.btnResetCleanSql.Location = new System.Drawing.Point(355, 370);
             this.btnResetCleanSql.Name = "btnResetCleanSql";
             this.btnResetCleanSql.Size = new System.Drawing.Size(85, 23);
-            this.btnResetCleanSql.TabIndex = 2;
+            this.btnResetCleanSql.TabIndex = 3;
             this.btnResetCleanSql.Text = "Reset Defaults";
             this.toolTip1.SetToolTip(this.btnResetCleanSql, "Restore the default set of cleaning rules.");
             this.btnResetCleanSql.UseVisualStyleBackColor = true;
@@ -90,6 +102,7 @@ namespace SMS_Search.Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkCopyCleanSql);
             this.Controls.Add(this.lblDescription);
             this.Controls.Add(this.btnResetCleanSql);
             this.Controls.Add(this.dgvCleanSqlRules);
@@ -104,6 +117,7 @@ namespace SMS_Search.Settings
         #endregion
 
         private System.Windows.Forms.Label lblDescription;
+        private System.Windows.Forms.CheckBox chkCopyCleanSql;
         private System.Windows.Forms.DataGridView dgvCleanSqlRules;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRegex;
         private System.Windows.Forms.DataGridViewTextBoxColumn colReplace;

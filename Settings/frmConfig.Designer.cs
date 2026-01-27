@@ -64,6 +64,7 @@ namespace SMS_Search.Settings
             // tvSettings
             // 
             this.tvSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tvSettings.HideSelection = false;
             this.tvSettings.ImageIndex = 0;
             this.tvSettings.ImageList = this.imgListIcons;
             this.tvSettings.Location = new System.Drawing.Point(0, 0);
@@ -71,13 +72,13 @@ namespace SMS_Search.Settings
 
             nodeApp.Name = "Application";
             nodeApp.Text = "Application";
-            nodeApp.ImageKey = "General";
-            nodeApp.SelectedImageKey = "General";
+            nodeApp.ImageKey = "Application";
+            nodeApp.SelectedImageKey = "Application";
 
             nodeDisplay.Name = "Display";
             nodeDisplay.Text = "Display";
-            nodeDisplay.ImageKey = "General";
-            nodeDisplay.SelectedImageKey = "General";
+            nodeDisplay.ImageKey = "Display";
+            nodeDisplay.SelectedImageKey = "Display";
 
             nodeLogging.Name = "Logging";
             nodeLogging.Text = "Logging";
@@ -91,8 +92,8 @@ namespace SMS_Search.Settings
 
             nodeBehavior.Name = "Behavior";
             nodeBehavior.Text = "Behavior";
-            nodeBehavior.ImageKey = "Advanced";
-            nodeBehavior.SelectedImageKey = "Advanced";
+            nodeBehavior.ImageKey = "Behavior";
+            nodeBehavior.SelectedImageKey = "Behavior";
 
             nodeCleanSql.Name = "CleanSql";
             nodeCleanSql.Text = "Clean SQL";
@@ -101,8 +102,8 @@ namespace SMS_Search.Settings
 
             nodeSearch.Name = "Search";
             nodeSearch.Text = "Search";
-            nodeSearch.ImageKey = "Advanced";
-            nodeSearch.SelectedImageKey = "Advanced";
+            nodeSearch.ImageKey = "Search";
+            nodeSearch.SelectedImageKey = "Search";
 
             nodeDatabase.Name = "Database";
             nodeDatabase.Text = "Database";
@@ -155,21 +156,40 @@ namespace SMS_Search.Settings
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // lblConfigFilePath
+            // btnOpenConfig
             // 
-            this.lblConfigFilePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblConfigFilePath.AutoEllipsis = true;
-            this.lblConfigFilePath.AutoSize = true;
-            this.lblConfigFilePath.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblConfigFilePath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblConfigFilePath.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.lblConfigFilePath.Location = new System.Drawing.Point(12, 420);
-            this.lblConfigFilePath.MaximumSize = new System.Drawing.Size(240, 13);
-            this.lblConfigFilePath.Name = "lblConfigFilePath";
-            this.lblConfigFilePath.Size = new System.Drawing.Size(98, 13);
-            this.lblConfigFilePath.TabIndex = 3;
-            this.lblConfigFilePath.Text = "lblConfigFilePath";
-            this.lblConfigFilePath.Click += new System.EventHandler(this.lblConfigFilePath_Click);
+            this.btnOpenConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnOpenConfig.Location = new System.Drawing.Point(12, 415);
+            this.btnOpenConfig.Name = "btnOpenConfig";
+            this.btnOpenConfig.Size = new System.Drawing.Size(110, 23);
+            this.btnOpenConfig.TabIndex = 3;
+            this.btnOpenConfig.Text = "Open Settings File";
+            this.btnOpenConfig.UseVisualStyleBackColor = true;
+            this.btnOpenConfig.Click += new System.EventHandler(this.btnOpenConfig_Click);
+            //
+            // lblAutoSave
+            //
+            this.lblAutoSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblAutoSave.AutoSize = true;
+            this.lblAutoSave.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.lblAutoSave.Location = new System.Drawing.Point(135, 419);
+            this.lblAutoSave.Name = "lblAutoSave";
+            this.lblAutoSave.Size = new System.Drawing.Size(180, 15);
+            this.lblAutoSave.TabIndex = 4;
+            this.lblAutoSave.Text = "Settings are saved automatically";
+            //
+            // lblSavedStatus
+            //
+            this.lblSavedStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblSavedStatus.AutoSize = true;
+            this.lblSavedStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSavedStatus.ForeColor = System.Drawing.Color.Green;
+            this.lblSavedStatus.Location = new System.Drawing.Point(315, 419);
+            this.lblSavedStatus.Name = "lblSavedStatus";
+            this.lblSavedStatus.Size = new System.Drawing.Size(43, 15);
+            this.lblSavedStatus.TabIndex = 5;
+            this.lblSavedStatus.Text = "Saved!";
+            this.lblSavedStatus.Visible = false;
             // 
             // frmConfig
             // 
@@ -177,7 +197,9 @@ namespace SMS_Search.Settings
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(600, 450);
-            this.Controls.Add(this.lblConfigFilePath);
+            this.Controls.Add(this.lblSavedStatus);
+            this.Controls.Add(this.lblAutoSave);
+            this.Controls.Add(this.btnOpenConfig);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnRevert);
             this.Controls.Add(this.splitConfig);
@@ -203,7 +225,9 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.Button btnRevert;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.Label lblConfigFilePath;
+        private System.Windows.Forms.Button btnOpenConfig;
+        private System.Windows.Forms.Label lblAutoSave;
+        private System.Windows.Forms.Label lblSavedStatus;
         private System.Windows.Forms.SplitContainer splitConfig;
     }
 }

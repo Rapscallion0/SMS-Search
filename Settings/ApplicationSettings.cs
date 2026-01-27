@@ -53,9 +53,6 @@ namespace SMS_Search.Settings
             // Update
             chkCheckUpdate.Checked = _config.GetValue("GENERAL", "CHECKUPDATE") == "1";
 
-            // Misc
-            chkCopyCleanSql.Checked = _config.GetValue("GENERAL", "COPYCLEANSQL") == "1";
-
             _isLoaded = true;
         }
 
@@ -87,9 +84,6 @@ namespace SMS_Search.Settings
             // Update
             chkCheckUpdate.CheckedChanged += (s, e) => SaveSetting("GENERAL", "CHECKUPDATE", chkCheckUpdate.Checked ? "1" : "0");
             btnChkUpdate.Click += btnChkUpdate_Click;
-
-            // Misc
-            chkCopyCleanSql.CheckedChanged += (s, e) => SaveSetting("GENERAL", "COPYCLEANSQL", chkCopyCleanSql.Checked ? "1" : "0");
         }
 
         private void SaveSetting(string section, string key, string value)
@@ -97,6 +91,8 @@ namespace SMS_Search.Settings
             if (!_isLoaded || _config == null) return;
             _config.SetValue(section, key, value);
             _config.Save();
+
+            (this.ParentForm as frmConfig)?.FlashSaved();
         }
 
         private async void btnChkUpdate_Click(object sender, EventArgs e)
