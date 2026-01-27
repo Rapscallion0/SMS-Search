@@ -52,7 +52,9 @@ namespace SMS_Search.Settings
             this.btnHighlightColor = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.grpEnvironment = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.picHighlightWarning)).BeginInit();
+            this.grpEnvironment.SuspendLayout();
             this.SuspendLayout();
             // 
             // label6
@@ -68,7 +70,7 @@ namespace SMS_Search.Settings
             // 
             this.chkAlwaysOnTop.AutoSize = true;
             this.chkAlwaysOnTop.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkAlwaysOnTop.Location = new System.Drawing.Point(18, 318);
+            this.chkAlwaysOnTop.Location = new System.Drawing.Point(-10, 59);
             this.chkAlwaysOnTop.Name = "chkAlwaysOnTop";
             this.chkAlwaysOnTop.Size = new System.Drawing.Size(92, 17);
             this.chkAlwaysOnTop.TabIndex = 1;
@@ -101,7 +103,7 @@ namespace SMS_Search.Settings
             // 
             this.chkShowInTray.AutoSize = true;
             this.chkShowInTray.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkShowInTray.Location = new System.Drawing.Point(131, 318);
+            this.chkShowInTray.Location = new System.Drawing.Point(103, 59);
             this.chkShowInTray.Name = "chkShowInTray";
             this.chkShowInTray.Size = new System.Drawing.Size(119, 17);
             this.chkShowInTray.TabIndex = 4;
@@ -136,7 +138,7 @@ namespace SMS_Search.Settings
             // 
             this.chkMultiInstance.AutoSize = true;
             this.chkMultiInstance.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkMultiInstance.Location = new System.Drawing.Point(256, 318);
+            this.chkMultiInstance.Location = new System.Drawing.Point(228, 59);
             this.chkMultiInstance.Name = "chkMultiInstance";
             this.chkMultiInstance.Size = new System.Drawing.Size(137, 17);
             this.chkMultiInstance.TabIndex = 7;
@@ -146,7 +148,7 @@ namespace SMS_Search.Settings
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(242, 287);
+            this.label7.Location = new System.Drawing.Point(214, 28);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(59, 13);
             this.label7.TabIndex = 8;
@@ -160,7 +162,7 @@ namespace SMS_Search.Settings
             "Function",
             "Totalizer",
             "Fields"});
-            this.cmbStartTab.Location = new System.Drawing.Point(317, 284);
+            this.cmbStartTab.Location = new System.Drawing.Point(289, 25);
             this.cmbStartTab.Name = "cmbStartTab";
             this.cmbStartTab.Size = new System.Drawing.Size(85, 21);
             this.cmbStartTab.TabIndex = 9;
@@ -169,7 +171,7 @@ namespace SMS_Search.Settings
             // 
             this.chkUnarchiveTarget.AutoSize = true;
             this.chkUnarchiveTarget.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.chkUnarchiveTarget.Location = new System.Drawing.Point(19, 352);
+            this.chkUnarchiveTarget.Location = new System.Drawing.Point(-9, 93);
             this.chkUnarchiveTarget.Name = "chkUnarchiveTarget";
             this.chkUnarchiveTarget.Size = new System.Drawing.Size(183, 17);
             this.chkUnarchiveTarget.TabIndex = 10;
@@ -200,7 +202,7 @@ namespace SMS_Search.Settings
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(220, 353);
+            this.label8.Location = new System.Drawing.Point(192, 94);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(81, 13);
             this.label8.TabIndex = 13;
@@ -215,7 +217,7 @@ namespace SMS_Search.Settings
             "Primary display",
             "Active display",
             "Cursor location"});
-            this.cmbStartupLocation.Location = new System.Drawing.Point(307, 350);
+            this.cmbStartupLocation.Location = new System.Drawing.Point(279, 91);
             this.cmbStartupLocation.Name = "cmbStartupLocation";
             this.cmbStartupLocation.Size = new System.Drawing.Size(100, 21);
             this.cmbStartupLocation.TabIndex = 14;
@@ -274,34 +276,46 @@ namespace SMS_Search.Settings
             this.btnHighlightColor.TabIndex = 20;
             this.btnHighlightColor.UseVisualStyleBackColor = true;
             // 
+            // grpEnvironment
+            // 
+            this.grpEnvironment.Controls.Add(this.label7);
+            this.grpEnvironment.Controls.Add(this.chkAlwaysOnTop);
+            this.grpEnvironment.Controls.Add(this.chkShowInTray);
+            this.grpEnvironment.Controls.Add(this.chkMultiInstance);
+            this.grpEnvironment.Controls.Add(this.cmbStartTab);
+            this.grpEnvironment.Controls.Add(this.chkUnarchiveTarget);
+            this.grpEnvironment.Controls.Add(this.label8);
+            this.grpEnvironment.Controls.Add(this.cmbStartupLocation);
+            this.grpEnvironment.Location = new System.Drawing.Point(18, 414);
+            this.grpEnvironment.Name = "grpEnvironment";
+            this.grpEnvironment.Size = new System.Drawing.Size(389, 143);
+            this.grpEnvironment.TabIndex = 21;
+            this.grpEnvironment.TabStop = false;
+            this.grpEnvironment.Text = "Environment";
+            // 
             // GeneralSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.grpEnvironment);
             this.Controls.Add(this.btnHighlightColor);
             this.Controls.Add(this.lblHighlightColor);
             this.Controls.Add(this.picHighlightWarning);
             this.Controls.Add(this.chkHighlightMatches);
             this.Controls.Add(this.txtAutoResizeLimit);
             this.Controls.Add(this.lblAutoResizeLimit);
-            this.Controls.Add(this.cmbStartupLocation);
-            this.Controls.Add(this.label8);
             this.Controls.Add(this.cmbTableLookup);
             this.Controls.Add(this.lblTableLookup);
-            this.Controls.Add(this.chkUnarchiveTarget);
-            this.Controls.Add(this.cmbStartTab);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.chkMultiInstance);
             this.Controls.Add(this.chkSearchAny);
             this.Controls.Add(this.chkCopyCleanSql);
-            this.Controls.Add(this.chkShowInTray);
             this.Controls.Add(this.chkResizeColumns);
             this.Controls.Add(this.chkDescriptionColumns);
-            this.Controls.Add(this.chkAlwaysOnTop);
             this.Controls.Add(this.label6);
             this.Name = "GeneralSettings";
-            this.Size = new System.Drawing.Size(430, 400);
+            this.Size = new System.Drawing.Size(430, 696);
             ((System.ComponentModel.ISupportInitialize)(this.picHighlightWarning)).EndInit();
+            this.grpEnvironment.ResumeLayout(false);
+            this.grpEnvironment.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -332,5 +346,6 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.Button btnHighlightColor;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ColorDialog colorDialog1;
+        private System.Windows.Forms.GroupBox grpEnvironment;
     }
 }

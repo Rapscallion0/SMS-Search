@@ -14,6 +14,7 @@ namespace SMS_Search.Settings
         private Logfile log = new Logfile();
 
         private GeneralSettings generalSettings;
+        private EnvironmentSettings environmentSettings;
         private DatabaseSettings databaseSettings;
         private AdvancedSettings advancedSettings;
         private UpdateSettings updateSettings;
@@ -38,6 +39,7 @@ namespace SMS_Search.Settings
         private void InitializeUserControls()
         {
             generalSettings = new GeneralSettings(config);
+            environmentSettings = new EnvironmentSettings(config);
             databaseSettings = new DatabaseSettings(config);
             advancedSettings = new AdvancedSettings(config);
             updateSettings = new UpdateSettings(config);
@@ -47,6 +49,7 @@ namespace SMS_Search.Settings
 
             // Add to Panel2
             AddControl(generalSettings);
+            AddControl(environmentSettings);
             AddControl(databaseSettings);
             AddControl(advancedSettings);
             AddControl(updateSettings);
@@ -69,6 +72,7 @@ namespace SMS_Search.Settings
             // Icons
             imgListIcons.Images.Clear();
             imgListIcons.Images.Add("General", IconLoader.GetIcon("General"));
+            imgListIcons.Images.Add("Environment", IconLoader.GetIcon("Environment"));
             imgListIcons.Images.Add("Database", IconLoader.GetIcon("Database"));
             imgListIcons.Images.Add("Advanced", IconLoader.GetIcon("Advanced"));
             imgListIcons.Images.Add("Update", IconLoader.GetIcon("Update"));
@@ -128,6 +132,7 @@ namespace SMS_Search.Settings
 
             // Hide all
             if (generalSettings != null) generalSettings.Visible = false;
+            if (environmentSettings != null) environmentSettings.Visible = false;
             if (databaseSettings != null) databaseSettings.Visible = false;
             if (advancedSettings != null) advancedSettings.Visible = false;
             if (updateSettings != null) updateSettings.Visible = false;
@@ -138,6 +143,7 @@ namespace SMS_Search.Settings
             switch (e.Node.Name)
             {
                 case "General": if (generalSettings != null) generalSettings.Visible = true; break;
+                case "Environment": if (environmentSettings != null) environmentSettings.Visible = true; break;
                 case "Database": if (databaseSettings != null) databaseSettings.Visible = true; break;
                 case "Advanced": if (advancedSettings != null) advancedSettings.Visible = true; break;
                 case "Update": if (updateSettings != null) updateSettings.Visible = true; break;

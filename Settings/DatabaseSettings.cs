@@ -206,9 +206,9 @@ namespace SMS_Search.Settings
                             foreach(string sqlInstance in key.GetValueNames())
                             {
                                 if (sqlInstance == "MSSQLSERVER")
-                                    list.Add(EnvironmentSettings.MachineName);
+                                    list.Add(Environment.MachineName);
                                 else
-                                    list.Add(EnvironmentSettings.MachineName + "\\" + sqlInstance);
+                                    list.Add(Environment.MachineName + "\\" + sqlInstance);
                             }
                         }
                     }
