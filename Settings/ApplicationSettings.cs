@@ -4,12 +4,13 @@ using SMS_Search;
 
 namespace SMS_Search.Settings
 {
-    public partial class EnvironmentSettings : UserControl
+    public partial class ApplicationSettings : UserControl
     {
         private ConfigManager _config;
+        private UpdateChecker _versions = new UpdateChecker();
         private bool _isLoaded = false;
 
-        public EnvironmentSettings(ConfigManager config)
+        public ApplicationSettings(ConfigManager config)
         {
             InitializeComponent();
             _config = config;
@@ -17,7 +18,7 @@ namespace SMS_Search.Settings
             WireUpEvents();
         }
 
-        public EnvironmentSettings()
+        public ApplicationSettings()
         {
             InitializeComponent();
         }
@@ -32,6 +33,7 @@ namespace SMS_Search.Settings
             if (_config == null) return;
             _isLoaded = false;
 
+            // Environment
             chkAlwaysOnTop.Checked = _config.GetValue("GENERAL", "ALWAYSONTOP") == "1";
             chkShowInTray.Checked = _config.GetValue("GENERAL", "SHOWINTRAY") == "1";
             chkMultiInstance.Checked = _config.GetValue("GENERAL", "MULTI_INSTANCE") == "1";
@@ -48,11 +50,18 @@ namespace SMS_Search.Settings
             else if (startupLoc == "CURSOR") cmbStartupLocation.Text = "Cursor location";
             else cmbStartupLocation.Text = "Last location"; // Default
 
+            // Update
+            chkCheckUpdate.Checked = _config.GetValue("GENERAL", "CHECKUPDATE") == "1";
+
+            // Misc
+            chkCopyCleanSql.Checked = _config.GetValue("GENERAL", "COPYCLEANSQL") == "1";
+
             _isLoaded = true;
         }
 
         private void WireUpEvents()
         {
+            // Environment
             chkAlwaysOnTop.CheckedChanged += (s, e) => SaveSetting("GENERAL", "ALWAYSONTOP", chkAlwaysOnTop.Checked ? "1" : "0");
             chkShowInTray.CheckedChanged += (s, e) => SaveSetting("GENERAL", "SHOWINTRAY", chkShowInTray.Checked ? "1" : "0");
             chkMultiInstance.CheckedChanged += (s, e) => SaveSetting("GENERAL", "MULTI_INSTANCE", chkMultiInstance.Checked ? "1" : "0");
@@ -74,6 +83,13 @@ namespace SMS_Search.Settings
                 else if (cmbStartupLocation.Text == "Cursor location") val = "CURSOR";
                 SaveSetting("GENERAL", "STARTUP_LOCATION", val);
             };
+
+            // Update
+            chkCheckUpdate.CheckedChanged += (s, e) => SaveSetting("GENERAL", "CHECKUPDATE", chkCheckUpdate.Checked ? "1" : "0");
+            btnChkUpdate.Click += btnChkUpdate_Click;
+
+            // Misc
+            chkCopyCleanSql.CheckedChanged += (s, e) => SaveSetting("GENERAL", "COPYCLEANSQL", chkCopyCleanSql.Checked ? "1" : "0");
         }
 
         private void SaveSetting(string section, string key, string value)
@@ -81,6 +97,32 @@ namespace SMS_Search.Settings
             if (!_isLoaded || _config == null) return;
             _config.SetValue(section, key, value);
             _config.Save();
+        }
+
+        private async void btnChkUpdate_Click(object sender, EventArgs e)
+        {
+            Cursor = Cursors.WaitCursor;
+            UpdateInfo updateInfo = await _versions.CheckForUpdatesAsync();
+
+            if (updateInfo.IsNewer)
+            {
+                string text = "There is an update available for download.\n\nCurrent Version:\t" +
+                    Application.ProductVersion +
+                    "\nNew Version:\t" +
+                    updateInfo.Version +
+                    "\n\nWould you like to update now?";
+
+                if (MessageBox.Show(text, "SMS Search update checker", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                {
+                    await _versions.PerformUpdate(updateInfo);
+                }
+            }
+            else
+            {
+                string text = "You are running the latest version.\n\nCurrent Version:\t" + Application.ProductVersion;
+                MessageBox.Show(text, "SMS Search update checker", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            }
+            Cursor = Cursors.Default;
         }
     }
 }

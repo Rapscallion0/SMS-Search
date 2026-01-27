@@ -16,15 +16,23 @@ namespace SMS_Search.Settings
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Environment");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("General", new System.Windows.Forms.TreeNode[] {
-            treeNode1});
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Database");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Advanced");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Update");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Logging");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Clean SQL");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Launcher");
+            System.Windows.Forms.TreeNode nodeApp = new System.Windows.Forms.TreeNode("Application");
+            System.Windows.Forms.TreeNode nodeDisplay = new System.Windows.Forms.TreeNode("Display");
+            System.Windows.Forms.TreeNode nodeLogging = new System.Windows.Forms.TreeNode("Logging");
+            System.Windows.Forms.TreeNode nodeGeneral = new System.Windows.Forms.TreeNode("General", new System.Windows.Forms.TreeNode[] {
+            nodeApp,
+            nodeDisplay,
+            nodeLogging});
+
+            System.Windows.Forms.TreeNode nodeBehavior = new System.Windows.Forms.TreeNode("Behavior");
+            System.Windows.Forms.TreeNode nodeCleanSql = new System.Windows.Forms.TreeNode("Clean SQL");
+            System.Windows.Forms.TreeNode nodeSearch = new System.Windows.Forms.TreeNode("Search", new System.Windows.Forms.TreeNode[] {
+            nodeBehavior,
+            nodeCleanSql});
+
+            System.Windows.Forms.TreeNode nodeDatabase = new System.Windows.Forms.TreeNode("Database");
+            System.Windows.Forms.TreeNode nodeLauncher = new System.Windows.Forms.TreeNode("Launcher");
+
             this.splitConfig = new System.Windows.Forms.SplitContainer();
             this.tvSettings = new System.Windows.Forms.TreeView();
             this.imgListIcons = new System.Windows.Forms.ImageList(this.components);
@@ -60,44 +68,57 @@ namespace SMS_Search.Settings
             this.tvSettings.ImageList = this.imgListIcons;
             this.tvSettings.Location = new System.Drawing.Point(0, 0);
             this.tvSettings.Name = "tvSettings";
-            treeNode1.Name = "Environment";
-            treeNode1.Text = "Environment";
-            treeNode2.ImageKey = "General";
-            treeNode2.Name = "General";
-            treeNode2.SelectedImageKey = "General";
-            treeNode2.Text = "General";
-            treeNode3.ImageKey = "Database";
-            treeNode3.Name = "Database";
-            treeNode3.SelectedImageKey = "Database";
-            treeNode3.Text = "Database";
-            treeNode4.ImageKey = "Advanced";
-            treeNode4.Name = "Advanced";
-            treeNode4.SelectedImageKey = "Advanced";
-            treeNode4.Text = "Advanced";
-            treeNode5.ImageKey = "Update";
-            treeNode5.Name = "Update";
-            treeNode5.SelectedImageKey = "Update";
-            treeNode5.Text = "Update";
-            treeNode6.ImageKey = "Logging";
-            treeNode6.Name = "Logging";
-            treeNode6.SelectedImageKey = "Logging";
-            treeNode6.Text = "Logging";
-            treeNode7.ImageKey = "CleanSql";
-            treeNode7.Name = "CleanSql";
-            treeNode7.SelectedImageKey = "CleanSql";
-            treeNode7.Text = "Clean SQL";
-            treeNode8.ImageKey = "Launcher";
-            treeNode8.Name = "Launcher";
-            treeNode8.SelectedImageKey = "Launcher";
-            treeNode8.Text = "Launcher";
+
+            nodeApp.Name = "Application";
+            nodeApp.Text = "Application";
+            nodeApp.ImageKey = "General";
+            nodeApp.SelectedImageKey = "General";
+
+            nodeDisplay.Name = "Display";
+            nodeDisplay.Text = "Display";
+            nodeDisplay.ImageKey = "General";
+            nodeDisplay.SelectedImageKey = "General";
+
+            nodeLogging.Name = "Logging";
+            nodeLogging.Text = "Logging";
+            nodeLogging.ImageKey = "Logging";
+            nodeLogging.SelectedImageKey = "Logging";
+
+            nodeGeneral.Name = "General";
+            nodeGeneral.Text = "General";
+            nodeGeneral.ImageKey = "General";
+            nodeGeneral.SelectedImageKey = "General";
+
+            nodeBehavior.Name = "Behavior";
+            nodeBehavior.Text = "Behavior";
+            nodeBehavior.ImageKey = "Advanced";
+            nodeBehavior.SelectedImageKey = "Advanced";
+
+            nodeCleanSql.Name = "CleanSql";
+            nodeCleanSql.Text = "Clean SQL";
+            nodeCleanSql.ImageKey = "CleanSql";
+            nodeCleanSql.SelectedImageKey = "CleanSql";
+
+            nodeSearch.Name = "Search";
+            nodeSearch.Text = "Search";
+            nodeSearch.ImageKey = "Advanced";
+            nodeSearch.SelectedImageKey = "Advanced";
+
+            nodeDatabase.Name = "Database";
+            nodeDatabase.Text = "Database";
+            nodeDatabase.ImageKey = "Database";
+            nodeDatabase.SelectedImageKey = "Database";
+
+            nodeLauncher.Name = "Launcher";
+            nodeLauncher.Text = "Launcher";
+            nodeLauncher.ImageKey = "Launcher";
+            nodeLauncher.SelectedImageKey = "Launcher";
+
             this.tvSettings.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2,
-            treeNode3,
-            treeNode4,
-            treeNode5,
-            treeNode6,
-            treeNode7,
-            treeNode8});
+            nodeGeneral,
+            nodeSearch,
+            nodeDatabase,
+            nodeLauncher});
             this.tvSettings.SelectedImageIndex = 0;
             this.tvSettings.Size = new System.Drawing.Size(150, 400);
             this.tvSettings.TabIndex = 0;
