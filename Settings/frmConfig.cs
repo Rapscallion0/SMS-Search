@@ -82,19 +82,35 @@ namespace SMS_Search.Settings
             try { this.Icon = new Icon(Path.Combine(Application.StartupPath, "SMS Search.ico")); } catch { }
             log.Logger(LogLevel.Info, "Settings window opened");
 
-            // Icons
-            tvSettings.ImageList = null;
-            imgListIcons.Images.Clear();
-            imgListIcons.Images.Add("General", IconLoader.GetIcon("General"));
-            imgListIcons.Images.Add("Application", IconLoader.GetIcon("Application"));
-            imgListIcons.Images.Add("Display", IconLoader.GetIcon("Display"));
-            imgListIcons.Images.Add("Database", IconLoader.GetIcon("Database"));
-            imgListIcons.Images.Add("Search", IconLoader.GetIcon("Search"));
-            imgListIcons.Images.Add("Behavior", IconLoader.GetIcon("Behavior"));
-            imgListIcons.Images.Add("CleanSql", IconLoader.GetIcon("CleanSql"));
-            imgListIcons.Images.Add("Launcher", IconLoader.GetIcon("Launcher"));
-            imgListIcons.Images.Add("Logging", IconLoader.GetIcon("Logging"));
-            tvSettings.ImageList = imgListIcons;
+            // Icons - Create a new ImageList to avoid state corruption or fallback issues
+            var icons = new ImageList();
+            icons.ColorDepth = ColorDepth.Depth32Bit;
+            icons.ImageSize = new Size(16, 16);
+            icons.TransparentColor = Color.Transparent;
+
+            icons.Images.Add("General", IconLoader.GetIcon("General"));
+            icons.Images.Add("Application", IconLoader.GetIcon("Application"));
+            icons.Images.Add("Display", IconLoader.GetIcon("Display"));
+            icons.Images.Add("Database", IconLoader.GetIcon("Database"));
+            icons.Images.Add("Search", IconLoader.GetIcon("Search"));
+            icons.Images.Add("Behavior", IconLoader.GetIcon("Behavior"));
+            icons.Images.Add("CleanSql", IconLoader.GetIcon("CleanSql"));
+            icons.Images.Add("Launcher", IconLoader.GetIcon("Launcher"));
+            icons.Images.Add("Logging", IconLoader.GetIcon("Logging"));
+
+            tvSettings.ImageList = icons;
+
+            // Force refresh of node keys to ensure binding
+            void RefreshNodeKeys(TreeNodeCollection nodes)
+            {
+                foreach (TreeNode node in nodes)
+                {
+                    if (!string.IsNullOrEmpty(node.ImageKey)) node.ImageKey = node.ImageKey;
+                    if (!string.IsNullOrEmpty(node.SelectedImageKey)) node.SelectedImageKey = node.SelectedImageKey;
+                    if (node.Nodes.Count > 0) RefreshNodeKeys(node.Nodes);
+                }
+            }
+            RefreshNodeKeys(tvSettings.Nodes);
 
             // Expand all nodes
             tvSettings.ExpandAll();
