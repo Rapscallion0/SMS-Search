@@ -48,6 +48,7 @@ namespace SMS_Search.Settings
             this.splitConfig.Panel1.Controls.Add(this.tvSettings);
             this.splitConfig.Size = new System.Drawing.Size(584, 400);
             this.splitConfig.SplitterDistance = 150;
+            this.splitConfig.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitConfig.TabIndex = 0;
             //
             // tvSettings
