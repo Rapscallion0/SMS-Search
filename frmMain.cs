@@ -1335,6 +1335,10 @@ namespace SMS_Search
 
                 if (dGrd.RowCount <= limit)
                 {
+                    if (dGrd.VirtualMode)
+                    {
+                        await _gridContext.EnsureRangeLoadedAsync(0, dGrd.RowCount);
+                    }
 				    dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
                 }
                 else

@@ -129,6 +129,27 @@ namespace SMS_Search
             }
         }
 
+        public async Task EnsureRangeLoadedAsync(int startIndex, int count)
+        {
+            if (count <= 0) return;
+            var tasks = new List<Task>();
+            int endRow = startIndex + count;
+
+            // Trigger fetch for all pages in range first
+            for (int i = startIndex; i < endRow; i += PageSize)
+            {
+                GetValue(i, 0);
+            }
+
+            // Then wait for all of them
+            for (int i = startIndex; i < endRow; i += PageSize)
+            {
+                tasks.Add(WaitForRowAsync(i));
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
         public async Task ApplySortAsync(string column)
         {
             if (SortColumn == column)
