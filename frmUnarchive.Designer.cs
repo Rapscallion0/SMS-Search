@@ -78,6 +78,8 @@ namespace SMS_Search
             // 
             // frmUnarchive
             // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AllowDrop = true;
             this.BackColor = System.Drawing.Color.DarkRed;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
