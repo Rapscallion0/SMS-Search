@@ -5,6 +5,21 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Prompt user for confirmation before proceeding with publish
+Add-Type -AssemblyName System.Windows.Forms
+$confirm = [System.Windows.Forms.MessageBox]::Show(
+    "Do you want to publish this release to GitHub?" + [Environment]::NewLine +
+    "This will bump version, push to git, and create a release.",
+    "Confirm Publish",
+    [System.Windows.Forms.MessageBoxButtons]::YesNo,
+    [System.Windows.Forms.MessageBoxIcon]::Question
+)
+
+if ($confirm -ne 'Yes') {
+    Write-Host "Publish cancelled by user."
+    exit 0
+}
+
 try {
     Write-Host "Starting GitHub Release process..."
 
