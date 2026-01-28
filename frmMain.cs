@@ -618,12 +618,17 @@ namespace SMS_Search
                 var criteria = GetSearchCriteriaFromUI();
                 var queryResult = _queryBuilder.Build(criteria);
 
+                log.Logger(LogLevel.Info, "Starting search...");
+
                 Stopwatch sw = Stopwatch.StartNew();
 
 				try
 				{
                     // 1. Get Schema to setup columns
+                    log.Logger(LogLevel.Debug, "Fetching schema...");
                     var schemaDt = await _gridContext.GetSchemaAsync(queryResult.Sql, queryResult.Parameters);
+                    log.Logger(LogLevel.Debug, $"Schema fetched. Columns: {schemaDt.Columns.Count}");
+
                     foreach (DataColumn col in schemaDt.Columns)
                     {
                         dGrd.Columns.Add(new DataGridViewTextBoxColumn { Name = col.ColumnName, HeaderText = col.ColumnName });
@@ -633,7 +638,10 @@ namespace SMS_Search
                     dGrd.VirtualMode = true;
                     tslblRecordCnt.Text = "Loading...";
                     string defaultSort = dGrd.Columns.Count > 0 ? dGrd.Columns[0].Name : null;
+
+                    log.Logger(LogLevel.Debug, "Loading data (Count)...");
                     await _gridContext.LoadAsync(queryResult.Sql, queryResult.Parameters, defaultSort);
+                    log.Logger(LogLevel.Debug, $"LoadAsync complete. TotalCount: {_gridContext.TotalCount}");
 
                     if (dGrd.Columns.Count > 0)
                     {
@@ -646,7 +654,7 @@ namespace SMS_Search
 				catch (Exception ex)
 				{
                     // Fallback to legacy load
-                    log.Logger(LogLevel.Warning, "Virtual Mode Load failed, attempting legacy load: " + ex.Message);
+                    log.Logger(LogLevel.Warning, "Virtual Mode Load failed, attempting legacy load: " + ex.ToString());
                     try
                     {
                         dGrd.VirtualMode = false;

@@ -4,11 +4,14 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Dapper;
+using Log;
 
 namespace SMS_Search
 {
     public class DataRepository
     {
+        private Logfile log = new Logfile("DataRepo");
+
         public string GetConnectionString(string server, string database, string user, string pass)
         {
             if (string.IsNullOrEmpty(user))
@@ -75,10 +78,22 @@ namespace SMS_Search
             // We will rely on the caller (QueryBuilder) to provide clean SQL, or fallback if it fails.
             string countSql = $"SELECT COUNT(*) FROM ({finalSql}) AS _CountQ";
 
-            using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+            LogQuery("GetQueryCountAsync", countSql, parameters);
+
+            try
             {
-                await conn.OpenAsync();
-                return await conn.ExecuteScalarAsync<int>(countSql, parameters);
+                using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+                {
+                    await conn.OpenAsync();
+                    int count = await conn.ExecuteScalarAsync<int>(countSql, parameters);
+                    log.Logger(LogLevel.Debug, $"GetQueryCountAsync: Returned {count}");
+                    return count;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Logger(LogLevel.Error, $"GetQueryCountAsync: Error: {ex.Message}");
+                throw;
             }
         }
 
@@ -117,6 +132,8 @@ namespace SMS_Search
             // Get schema (0 rows)
             string schemaSql = $"SELECT TOP 0 * FROM ({sql}) AS _SchemaQ";
 
+            LogQuery("GetQuerySchemaAsync", schemaSql, parameters);
+
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
                 await conn.OpenAsync();
@@ -124,9 +141,26 @@ namespace SMS_Search
                 {
                     var dt = new DataTable();
                     dt.Load(reader);
+                    log.Logger(LogLevel.Debug, $"GetQuerySchemaAsync: Returned {dt.Columns.Count} columns");
                     return dt;
                 }
             }
+        }
+
+        private void LogQuery(string method, string sql, object parameters)
+        {
+            string paramLog = "";
+            if (parameters is DynamicParameters dp)
+            {
+                var list = new List<string>();
+                foreach (var name in dp.ParameterNames)
+                {
+                    var val = dp.Get<object>(name);
+                    list.Add($"{name}={val}");
+                }
+                paramLog = string.Join(", ", list);
+            }
+            log.Logger(LogLevel.Debug, $"{method}: Executing SQL: {sql} | Params: {paramLog}");
         }
 
         public async Task<SqlDataReader> GetQueryDataReaderAsync(string server, string database, string user, string pass, string sql, object parameters)

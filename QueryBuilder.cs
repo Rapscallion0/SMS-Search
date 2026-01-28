@@ -80,7 +80,7 @@ GROUP BY
                     HandleWildcards(ref fldNum, out string op);
 
                     sql = $"{FieldSelectBase} AND RBF.F1452 = TAB.name {FieldSelectJoinPKey} WHERE col.name {op} @Val {FieldSelectGroupBy}";
-                    p.Add("@Val", fldNum);
+                    p.Add("Val", fldNum);
                 }
                 else if (criteria.Type == SearchType.Description)
                 {
@@ -89,7 +89,7 @@ GROUP BY
                     HandleWildcards(ref desc, out string op);
 
                     sql = $"{FieldSelectBase} AND RBF.F1452 = TAB.name {FieldSelectJoinPKey} WHERE RBF.F1454 {op} @Val {FieldSelectGroupBy}";
-                    p.Add("@Val", desc);
+                    p.Add("Val", desc);
                 }
                 else if (criteria.Type == SearchType.Table)
                 {
@@ -99,7 +99,7 @@ GROUP BY
                         HandleWildcards(ref table, out string op);
 
                         sql = $"{FieldSelectBase} AND RBF.F1452 {op} @Table {FieldSelectJoinPKey} WHERE TAB.name {op} @Table {FieldSelectGroupBy}";
-                        p.Add("@Table", table);
+                        p.Add("Table", table);
                     }
                     else
                     {
@@ -125,7 +125,7 @@ GROUP BY
                     string val = criteria.Value;
                     HandleWildcards(ref val, out string op);
                     sql += $" WHERE F1034 {op} @Val";
-                    p.Add("@Val", val);
+                    p.Add("Val", val);
                 }
                 else if (criteria.Type == SearchType.Description)
                 {
@@ -133,7 +133,7 @@ GROUP BY
                      if (criteria.AnyMatch) val = $"*{val}*";
                      HandleWildcards(ref val, out string op);
                      sql += $" WHERE F1039 {op} @Val";
-                     p.Add("@Val", val);
+                     p.Add("Val", val);
                 }
                 else if (criteria.Type == SearchType.CustomSql)
                 {
@@ -148,7 +148,7 @@ GROUP BY
                     string val = criteria.Value;
                     HandleWildcards(ref val, out string op);
                     sql += $" WHERE F1063 {op} @Val";
-                    p.Add("@Val", val);
+                    p.Add("Val", val);
                 }
                 else if (criteria.Type == SearchType.Description)
                 {
@@ -156,7 +156,7 @@ GROUP BY
                      if (criteria.AnyMatch) val = $"*{val}*";
                      HandleWildcards(ref val, out string op);
                      sql += $" WHERE F1064 {op} @Val";
-                     p.Add("@Val", val);
+                     p.Add("Val", val);
                 }
                 else if (criteria.Type == SearchType.CustomSql)
                 {
