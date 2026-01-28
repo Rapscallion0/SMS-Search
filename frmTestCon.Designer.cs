@@ -44,7 +44,8 @@ namespace SMS_Search
             label1.Size = new Size(219, 13);
             label1.TabIndex = 0;
             label1.Text = "Testing configuration and SQL connection . . .";
-            AutoScaleDimensions = new SizeF(6f, 13f);
+            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(243, 34);
             ControlBox = false;
