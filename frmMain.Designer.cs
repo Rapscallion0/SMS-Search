@@ -967,7 +967,7 @@ namespace SMS_Search
             this.tscmbDbServer.Enabled = false;
             this.tscmbDbServer.Name = "tscmbDbServer";
             this.tscmbDbServer.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.tscmbDbServer.Size = new System.Drawing.Size(0, 23);
+            this.tscmbDbServer.Size = new System.Drawing.Size(150, 23);
             this.tscmbDbServer.ToolTipText = "Server";
             // 
             // tscmbDbDatabase
