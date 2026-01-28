@@ -12,6 +12,7 @@
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <Target Name="KillLauncher" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
