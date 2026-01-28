@@ -43,7 +43,7 @@
 ## Getting Started
 
 ### First Run
-Upon the first launch, if no valid configuration is found, the **Configuration** window will open automatically. You must configure the database connection to proceed.
+Upon the first launch, if no valid configuration is found, the **Settings** window will open automatically. You must configure the database connection to proceed.
 
 ![Database Configuration Screen](docs/images/placeholder_db_config.png)
 
@@ -53,7 +53,7 @@ Upon the first launch, if no valid configuration is found, the **Configuration**
    - **Integrated Security (Recommended):** Check "Use Windows Authentication" to use your current Windows credentials.
    - **SQL Authentication:** Uncheck the box and provide the `User` and `Password`.
 4. Click **Test Connection** to verify settings.
-5. Click **Save** to launch the main application.
+5. Click **Close** to launch the main application.
 
 ---
 
@@ -64,7 +64,7 @@ The main window is divided into three primary tabs, each tailored for a specific
 ### Functions & Totalizers
 The **FCT** (Functions) and **TLZ** (Totalizers) tabs operate similarly:
 
-- **Number:** Search by the specific ID (e.g., `F1063`).
+- **Number:** Search by the specific ID (e.g., `F1063` or `F1034`).
 - **Description:** Search by text description. Supports wildcards:
   - `*` : Matches any string of characters.
   - `?` : Matches any single character.
@@ -81,7 +81,7 @@ The **Fields** tab provides schema exploration tools:
 
 ### Custom SQL
 All tabs include a "Custom SQL" input area.
-- You can type a partial `WHERE` clause (e.g., `fct_id LIKE '%10%'`) or a full `SELECT` statement.
+- You can type a full SQL `SELECT` statement.
 - **Build Query Buttons:** Clicking the `Build Query` button (icon) will generate the SQL statement based on your current inputs and display it in the Custom SQL box for inspection or modification.
 
 ---
@@ -99,7 +99,7 @@ The results grid includes a powerful client-side filter box at the bottom.
 ![Match Highlighting Example](docs/images/placeholder_highlight.png)
 
 ### Grid Features
-- **Sorting:** Click any column header to sort. Shift-click for multi-column sorting.
+- **Sorting:** Click any column header to sort.
 - **Row Numbers:** Displayed in the row header (toggleable in Settings).
 - **Context Menu:** Right-click anywhere in the grid for options:
   - **Copy:** Copy selected cells (with or without headers).
@@ -121,12 +121,12 @@ To export large datasets:
 ## Advanced Features
 
 ### Clean SQL
-A utility to format or "clean" SQL queries, useful when copying code from other tools (like trace logs).
-- **Usage:** Paste dirty SQL into the Custom SQL box and click the **Clean SQL** button (broom icon).
+A utility to format or "clean" SQL queries, useful when copying code from other tools (like SMS logs).
+- **Usage:** Paste dirty SQL into the Custom SQL box and click the **Clean SQL** button.
 - **Configuration:** You can define Regex-based replacement rules in **Settings > Search > Clean SQL**.
 
 ### Unarchive Tool
-Accessible via the target icon (or `Ctrl+T`), this opens a separate window for retrieving archived transaction data. It allows cross-referencing between live and archive tables.
+Accessible via the target icon (or `Ctrl+T`), this opens a separate target for removing the archive bit from files. Simple drag and drops files on the target to remove the archive bit.
 
 ### Keyboard Shortcuts
 - **Switch Tabs:** `Ctrl+1` (Functions), `Ctrl+2` (Totalizers), `Ctrl+3` (Fields).
@@ -139,12 +139,12 @@ The application can run a lightweight background listener to allow quick access 
 - **Status:** The colored dot in the Settings > Launcher screen indicates status:
   - 🟢 **Green:** Running & Registered.
   - 🟠 **Orange:** Stopped.
-  - ⚪ **Gray:** Not configured.
-- **Hotkey:** Configurable global hotkey to bring the app to the front (Default: `Ctrl+Alt+S`).
+  - ⚪ **Gray:** Not configured. 
+- **Hotkey:** Configurable global hotkey to bring the app to the front (Default: `` Ctrl+Alt+` ``).
 
 ---
 
-## Configuration
+## Settings
 
 Access settings via the **Gear Icon** in the top-right corner.
 
