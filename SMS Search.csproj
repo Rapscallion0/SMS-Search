@@ -9,7 +9,6 @@
     <ApplicationIcon>SMS Search.ico</ApplicationIcon>
     <RootNamespace>SMS_Search</RootNamespace>
     <AssemblyName>SMSSearch</AssemblyName>
-    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
@@ -56,7 +55,6 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
     <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
