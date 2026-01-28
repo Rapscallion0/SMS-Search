@@ -48,7 +48,7 @@ namespace SMS_Search
 
 		private List<ReplacementRule> _cleanSqlRules = new List<ReplacementRule>();
 
-		private int FormHeightMin = 275 + SystemInformation.FrameBorderSize.Height * 2;
+		private int FormHeightMin;
 		private int FormHeightExpanded = 600;
 		private int FormWidthMin = 600 + SystemInformation.FrameBorderSize.Width * 2;
 		private int GridMinRowHeight = 92;
@@ -93,10 +93,29 @@ namespace SMS_Search
             SetupGridContextMenu();
 
 			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " initialized");
+
+            // Calculate required height for the search panel (Panel1)
+            int requiredPanel1Height = GetRequiredSearchPanelHeight();
+
+            // Calculate window chrome overhead (Title bar, borders, etc.)
+            int frameOverhead = this.Height - this.ClientSize.Height;
+
+            // Set FormHeightMin dynamically
+            // Panel1 content + ToolStrip + Window Frame + Padding
+            FormHeightMin = requiredPanel1Height + toolStrip.Height + frameOverhead + 5;
+
 			MinimumSize = new Size(FormWidthMin, FormHeightMin);
 			Height = FormHeightMin;
 			Width = FormWidthMin;
-			splitContainer.Panel2MinSize = splitContainer.Height - splitContainer.Panel1.Height - splitContainer.SplitterWidth - 3;
+
+            // Hide the results panel initially
+            splitContainer.Panel2Collapsed = true;
+            try
+            {
+                splitContainer.SplitterDistance = requiredPanel1Height;
+            }
+            catch { } // Ignore if splitter distance invalid initially
+
 			StartPosition = FormStartPosition.Manual;
             toolStrip.Renderer = new ToolStripSystemRenderer();
 
@@ -162,6 +181,29 @@ namespace SMS_Search
 
 			txtNumFct.Focus();
 		}
+
+        private int GetRequiredSearchPanelHeight()
+        {
+            int maxBottom = 0;
+            if (tabCtl != null && tabCtl.TabPages.Count > 0)
+            {
+                foreach (TabPage tab in tabCtl.TabPages)
+                {
+                    foreach (Control c in tab.Controls)
+                    {
+                        if (c.Bottom > maxBottom) maxBottom = c.Bottom;
+                    }
+                }
+                // Calculate tab control chrome (headers, borders)
+                int tabChrome = tabCtl.Height - tabCtl.DisplayRectangle.Height;
+                // Required height for TabControl = Content Bottom + Chrome + Padding
+                int requiredTabHeight = maxBottom + tabChrome + 12;
+
+                // Panel 1 minimum height (tabCtl.Top is the offset from Panel1 top)
+                return requiredTabHeight + tabCtl.Top + 12;
+            }
+            return 200; // Fallback
+        }
 
         private void splitContainer_SplitterMoved(object sender, SplitterEventArgs e)
 		{
@@ -634,14 +676,19 @@ namespace SMS_Search
 					dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.ColumnHeader);
 				}
 				
-                if (Height < FormHeightMin + GridMinRowHeight && dGrd.RowCount > 0)
+                if (dGrd.RowCount > 0)
 				{
-					Height = FormHeightExpanded;
+                    splitContainer.Panel2Collapsed = false;
+                    if (Height < FormHeightMin + GridMinRowHeight)
+                    {
+					    Height = FormHeightExpanded;
+                    }
 				}
 				else
 				{
 					if (dGrd.RowCount < 1)
 					{
+                        splitContainer.Panel2Collapsed = true;
 						Height = FormHeightMin;
 					}
 				}
@@ -1173,6 +1220,7 @@ namespace SMS_Search
             dGrd.DataSource = null;
             UpdateRowHeaderWidth();
             tslblRecordCnt.Text = "0";
+            splitContainer.Panel2Collapsed = true;
             Height = FormHeightMin;
         }
 
