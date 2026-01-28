@@ -46,6 +46,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="2.0.0" />
@@ -61,8 +65,26 @@
     <Reference Include="System.Management" />
   </ItemGroup>
 
+  <Target Name="RunILRepack" BeforeTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+        <MergedDlls Include="$(OutputPath)*.dll" />
+        <InputAssemblies Include="$(OutputPath)$(AssemblyName).exe" />
+        <InputAssemblies Include="@(MergedDlls)" />
+    </ItemGroup>
+    <ILRepack
+        Parallel="true"
+        Internalize="true"
+        Union="true"
+        InputAssemblies="@(InputAssemblies)"
+        TargetKind="SameAsPrimaryAssembly"
+        OutputFile="$(OutputPath)$(AssemblyName).Merged.exe"
+    />
+    <Delete Files="@(MergedDlls)" />
+    <Delete Files="$(OutputPath)$(AssemblyName).Merged.exe.config" />
+    <Move SourceFiles="$(OutputPath)$(AssemblyName).Merged.exe" DestinationFiles="$(OutputPath)$(AssemblyName).exe" OverwriteReadOnlyFiles="true" />
+  </Target>
 
-  <Target Name="PostBuildRelease" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="PostBuildRelease" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
      <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\publish_release.ps1&quot; -AssemblyInfoPath &quot;$(MSBuildProjectDirectory)\Properties\AssemblyInfo.cs&quot; -ExePath &quot;$(TargetPath)&quot;" />
   </Target>
 
