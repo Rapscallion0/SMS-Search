@@ -200,7 +200,8 @@ namespace SMS_Search
                 int requiredTabHeight = maxBottom + tabChrome + 12;
 
                 // Panel 1 minimum height (tabCtl.Top is the offset from Panel1 top)
-                return requiredTabHeight + tabCtl.Top + 12;
+                // Add extra height for the Execute button below the tab control
+                return requiredTabHeight + tabCtl.Top + 12 + 40;
             }
             return 200; // Fallback
         }
