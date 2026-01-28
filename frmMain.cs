@@ -684,14 +684,7 @@ namespace SMS_Search
 					    Height = FormHeightExpanded;
                     }
 				}
-				else
-				{
-					if (dGrd.RowCount < 1)
-					{
-                        splitContainer.Panel2Collapsed = true;
-						Height = FormHeightMin;
-					}
-				}
+
 				if (dGrd.RowCount < 1)
 				{
 					tslblInfo.Text = "Query returned no records!";
