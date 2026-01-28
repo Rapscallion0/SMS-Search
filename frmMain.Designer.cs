@@ -226,10 +226,11 @@ namespace SMS_Search
             // 
             // btnPopGrid
             // 
-            this.btnPopGrid.Location = new System.Drawing.Point(3, 4);
+            this.btnPopGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPopGrid.Location = new System.Drawing.Point(3, 145);
             this.btnPopGrid.Name = "btnPopGrid";
             this.btnPopGrid.Size = new System.Drawing.Size(78, 23);
-            this.btnPopGrid.TabIndex = 0;
+            this.btnPopGrid.TabIndex = 10;
             this.btnPopGrid.Text = "Execute (F5)";
             this.btnPopGrid.UseVisualStyleBackColor = true;
             this.btnPopGrid.Click += new System.EventHandler(this.btnPopGrid_Click);
@@ -608,7 +609,7 @@ namespace SMS_Search
             this.tabCtl.Location = new System.Drawing.Point(3, 4);
             this.tabCtl.Name = "tabCtl";
             this.tabCtl.SelectedIndex = 0;
-            this.tabCtl.Size = new System.Drawing.Size(596, 166);
+            this.tabCtl.Size = new System.Drawing.Size(596, 136);
             this.tabCtl.TabIndex = 0;
             this.tabCtl.SelectedIndexChanged += new System.EventHandler(this.tabCtl_SelectedIndexChanged);
             // 
@@ -1059,6 +1060,7 @@ namespace SMS_Search
             // 
             // splitContainer.Panel1
             // 
+            this.splitContainer.Panel1.Controls.Add(this.btnPopGrid);
             this.splitContainer.Panel1.Controls.Add(this.btnShowTarget);
             this.splitContainer.Panel1.Controls.Add(this.btnSetup);
             this.splitContainer.Panel1.Controls.Add(this.tabCtl);
@@ -1075,7 +1077,6 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.chkToggleDesc);
             this.splitContainer.Panel2.Controls.Add(this.groupBox1);
             this.splitContainer.Panel2.Controls.Add(this.dGrd);
-            this.splitContainer.Panel2.Controls.Add(this.btnPopGrid);
             this.splitContainer.Panel2MinSize = 29;
             this.splitContainer.Size = new System.Drawing.Size(603, 554);
             this.splitContainer.SplitterDistance = 177;
