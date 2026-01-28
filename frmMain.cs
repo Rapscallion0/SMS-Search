@@ -698,6 +698,12 @@ namespace SMS_Search
 					tslblInfo.ForeColor = Color.Red;
 				}
 			}
+			else
+			{
+				tslblInfo.Text = "Connection failed!";
+				tslblInfo.ForeColor = Color.Red;
+				MessageBox.Show("Failed to connect to data source.\nPlease check your connection settings.", "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+			}
 			setTabTextFocus();
 			await setColumnArrayAsync();
 			await setHeadersAsync();
