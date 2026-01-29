@@ -38,8 +38,11 @@ namespace SMS_Search
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(20, 20);
             this.btnClear.TabIndex = 1;
-            this.btnClear.Text = "x";
-            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Text = "";
+            this.btnClear.BackgroundImage = SMS_Search.Properties.Resources.Round_X;
+            this.btnClear.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnClear.BackColor = System.Drawing.SystemColors.Window;
+            this.btnClear.UseVisualStyleBackColor = false;
             this.btnClear.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnClear.Visible = false;
             this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
