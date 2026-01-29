@@ -118,8 +118,8 @@ namespace SMS_Search
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.btnPopGrid = new System.Windows.Forms.Button();
             this.dGrd = new SMS_Search.ExDataGridView();
@@ -207,7 +207,6 @@ namespace SMS_Search
             this.groupBox1.SuspendLayout();
             this.tabCtl.SuspendLayout();
             this.tabFct.SuspendLayout();
-            this.tabFct.SuspendLayout();
             this.tabTlz.SuspendLayout();
             this.tabFields.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -238,30 +237,30 @@ namespace SMS_Search
             this.dGrd.AllowUserToDeleteRows = false;
             this.dGrd.AllowUserToOrderColumns = true;
             this.dGrd.AllowUserToResizeRows = false;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.WhiteSmoke;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            this.dGrd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.WhiteSmoke;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            this.dGrd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle5;
             this.dGrd.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dGrd.BackgroundColor = System.Drawing.SystemColors.ControlLight;
             this.dGrd.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dGrd.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dGrd.DefaultCellStyle = dataGridViewCellStyle6;
             this.dGrd.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.dGrd.Location = new System.Drawing.Point(2, 65);
+            this.dGrd.Location = new System.Drawing.Point(2, 35);
             this.dGrd.Name = "dGrd";
             this.dGrd.ReadOnly = true;
             this.dGrd.RowHeadersVisible = false;
             this.dGrd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dGrd.Size = new System.Drawing.Size(594, 304);
+            this.dGrd.Size = new System.Drawing.Size(594, 334);
             this.dGrd.TabIndex = 4;
             this.dGrd.TabStop = false;
             this.dGrd.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dGrd_CellDoubleClick);
@@ -381,7 +380,7 @@ namespace SMS_Search
             // 
             this.dateGregorian.CustomFormat = "MM/dd/yyyy";
             this.dateGregorian.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateGregorian.Location = new System.Drawing.Point(93, 11);
+            this.dateGregorian.Location = new System.Drawing.Point(94, 9);
             this.dateGregorian.Name = "dateGregorian";
             this.dateGregorian.Size = new System.Drawing.Size(96, 23);
             this.dateGregorian.TabIndex = 0;
@@ -389,23 +388,24 @@ namespace SMS_Search
             // 
             // txtJulian
             // 
-            this.txtJulian.Location = new System.Drawing.Point(196, 11);
+            this.txtJulian.Location = new System.Drawing.Point(196, 9);
             this.txtJulian.Name = "txtJulian";
-            this.txtJulian.Size = new System.Drawing.Size(100, 23);
+            this.txtJulian.Size = new System.Drawing.Size(74, 23);
             this.txtJulian.TabIndex = 1;
             this.txtJulian.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtJulian_KeyDown);
             this.txtJulian.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Num_KeyPress);
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.dateGregorian);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtJulian);
-            this.groupBox1.Location = new System.Drawing.Point(297, -4);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
+            this.groupBox1.Location = new System.Drawing.Point(318, 135);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(302, 34);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(0);
+            this.groupBox1.Size = new System.Drawing.Size(278, 34);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             // 
@@ -413,7 +413,7 @@ namespace SMS_Search
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 14);
+            this.label1.Location = new System.Drawing.Point(4, 14);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(88, 15);
             this.label1.TabIndex = 28;
@@ -530,7 +530,7 @@ namespace SMS_Search
             this.txtCustSqlTlz.Multiline = true;
             this.txtCustSqlTlz.Name = "txtCustSqlTlz";
             this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtCustSqlTlz.Size = new System.Drawing.Size(483, 77);
+            this.txtCustSqlTlz.Size = new System.Drawing.Size(483, 49);
             this.txtCustSqlTlz.TabIndex = 4;
             this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
             // 
@@ -627,7 +627,7 @@ namespace SMS_Search
             this.tabFct.Location = new System.Drawing.Point(4, 24);
             this.tabFct.Name = "tabFct";
             this.tabFct.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFct.Size = new System.Drawing.Size(588, 138);
+            this.tabFct.Size = new System.Drawing.Size(588, 108);
             this.tabFct.TabIndex = 0;
             this.tabFct.Text = "Function";
             this.tabFct.ToolTipText = "<CRTL> + 1";
@@ -671,7 +671,7 @@ namespace SMS_Search
             this.tabTlz.Location = new System.Drawing.Point(4, 24);
             this.tabTlz.Name = "tabTlz";
             this.tabTlz.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTlz.Size = new System.Drawing.Size(588, 138);
+            this.tabTlz.Size = new System.Drawing.Size(588, 108);
             this.tabTlz.TabIndex = 1;
             this.tabTlz.Text = "Totalizer";
             // 
@@ -720,7 +720,7 @@ namespace SMS_Search
             this.tabFields.Location = new System.Drawing.Point(4, 24);
             this.tabFields.Name = "tabFields";
             this.tabFields.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFields.Size = new System.Drawing.Size(588, 138);
+            this.tabFields.Size = new System.Drawing.Size(588, 108);
             this.tabFields.TabIndex = 2;
             this.tabFields.Text = "Fields";
             // 
@@ -887,7 +887,7 @@ namespace SMS_Search
             this.txtCustSqlFld.Multiline = true;
             this.txtCustSqlFld.Name = "txtCustSqlFld";
             this.txtCustSqlFld.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 52);
+            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 24);
             this.txtCustSqlFld.TabIndex = 6;
             this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
             // 
@@ -965,8 +965,9 @@ namespace SMS_Search
             this.tscmbDbServer.Enabled = false;
             this.tscmbDbServer.Name = "tscmbDbServer";
             this.tscmbDbServer.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.tscmbDbServer.Size = new System.Drawing.Size(150, 23);
+            this.tscmbDbServer.Size = new System.Drawing.Size(130, 23);
             this.tscmbDbServer.ToolTipText = "Server";
+            this.tscmbDbServer.Visible = false;
             // 
             // tscmbDbDatabase
             // 
@@ -1061,6 +1062,7 @@ namespace SMS_Search
             this.splitContainer.Panel1.Controls.Add(this.btnShowTarget);
             this.splitContainer.Panel1.Controls.Add(this.btnSetup);
             this.splitContainer.Panel1.Controls.Add(this.tabCtl);
+            this.splitContainer.Panel1.Controls.Add(this.groupBox1);
             this.splitContainer.Panel1MinSize = 177;
             // 
             // splitContainer.Panel2
@@ -1070,7 +1072,6 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.lblMatchCount);
             this.splitContainer.Panel2.Controls.Add(this.txtGridFilter);
             this.splitContainer.Panel2.Controls.Add(this.lblFilter);
-            this.splitContainer.Panel2.Controls.Add(this.groupBox1);
             this.splitContainer.Panel2.Controls.Add(this.dGrd);
             this.splitContainer.Panel2MinSize = 29;
             this.splitContainer.Size = new System.Drawing.Size(603, 554);
@@ -1081,7 +1082,7 @@ namespace SMS_Search
             // 
             // btnNextMatch
             // 
-            this.btnNextMatch.Location = new System.Drawing.Point(500, 34);
+            this.btnNextMatch.Location = new System.Drawing.Point(500, 4);
             this.btnNextMatch.Name = "btnNextMatch";
             this.btnNextMatch.Size = new System.Drawing.Size(25, 25);
             this.btnNextMatch.TabIndex = 16;
@@ -1092,7 +1093,7 @@ namespace SMS_Search
             // 
             // btnPrevMatch
             // 
-            this.btnPrevMatch.Location = new System.Drawing.Point(470, 34);
+            this.btnPrevMatch.Location = new System.Drawing.Point(470, 4);
             this.btnPrevMatch.Name = "btnPrevMatch";
             this.btnPrevMatch.Size = new System.Drawing.Size(25, 25);
             this.btnPrevMatch.TabIndex = 15;
@@ -1104,7 +1105,7 @@ namespace SMS_Search
             // lblMatchCount
             // 
             this.lblMatchCount.AutoSize = true;
-            this.lblMatchCount.Location = new System.Drawing.Point(365, 39);
+            this.lblMatchCount.Location = new System.Drawing.Point(365, 9);
             this.lblMatchCount.Name = "lblMatchCount";
             this.lblMatchCount.Size = new System.Drawing.Size(0, 15);
             this.lblMatchCount.TabIndex = 14;
@@ -1114,7 +1115,7 @@ namespace SMS_Search
             // 
             this.txtGridFilter.BackColor = System.Drawing.SystemColors.Window;
             this.txtGridFilter.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.txtGridFilter.Location = new System.Drawing.Point(45, 35);
+            this.txtGridFilter.Location = new System.Drawing.Point(45, 5);
             this.txtGridFilter.Name = "txtGridFilter";
             this.txtGridFilter.Padding = new System.Windows.Forms.Padding(2);
             this.txtGridFilter.Size = new System.Drawing.Size(229, 23);
@@ -1124,7 +1125,7 @@ namespace SMS_Search
             // lblFilter
             // 
             this.lblFilter.AutoSize = true;
-            this.lblFilter.Location = new System.Drawing.Point(5, 38);
+            this.lblFilter.Location = new System.Drawing.Point(5, 8);
             this.lblFilter.Name = "lblFilter";
             this.lblFilter.Size = new System.Drawing.Size(36, 15);
             this.lblFilter.TabIndex = 10;
@@ -1132,13 +1133,13 @@ namespace SMS_Search
             // 
             // frmMain
             // 
-            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(603, 580);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.splitContainer);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(600, 270);
