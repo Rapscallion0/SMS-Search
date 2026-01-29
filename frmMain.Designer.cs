@@ -1,4 +1,4 @@
-﻿using SMS_Search.Properties;
+using SMS_Search.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -104,8 +104,7 @@ namespace SMS_Search
         private SplitContainer splitContainer;
         private CheckBox chkLastTransaction;
         private Label lblFilter;
-        private TextBox txtGridFilter;
-        private Button btnClearFilter;
+        private SMS_Search.SearchTextBox txtGridFilter;
         private Label lblMatchCount;
         private Button btnPrevMatch;
         private Button btnNextMatch;
@@ -201,13 +200,13 @@ namespace SMS_Search
             this.btnNextMatch = new System.Windows.Forms.Button();
             this.btnPrevMatch = new System.Windows.Forms.Button();
             this.lblMatchCount = new System.Windows.Forms.Label();
-            this.btnClearFilter = new System.Windows.Forms.Button();
-            this.txtGridFilter = new System.Windows.Forms.TextBox();
+            this.txtGridFilter = new SMS_Search.SearchTextBox();
             this.lblFilter = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.tabCtl.SuspendLayout();
+            this.tabFct.SuspendLayout();
             this.tabFct.SuspendLayout();
             this.tabTlz.SuspendLayout();
             this.tabFields.SuspendLayout();
@@ -1069,7 +1068,6 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.btnNextMatch);
             this.splitContainer.Panel2.Controls.Add(this.btnPrevMatch);
             this.splitContainer.Panel2.Controls.Add(this.lblMatchCount);
-            this.splitContainer.Panel2.Controls.Add(this.btnClearFilter);
             this.splitContainer.Panel2.Controls.Add(this.txtGridFilter);
             this.splitContainer.Panel2.Controls.Add(this.lblFilter);
             this.splitContainer.Panel2.Controls.Add(this.groupBox1);
@@ -1112,21 +1110,14 @@ namespace SMS_Search
             this.lblMatchCount.TabIndex = 14;
             this.lblMatchCount.Visible = false;
             // 
-            // btnClearFilter
-            // 
-            this.btnClearFilter.Location = new System.Drawing.Point(251, 34);
-            this.btnClearFilter.Name = "btnClearFilter";
-            this.btnClearFilter.Size = new System.Drawing.Size(23, 23);
-            this.btnClearFilter.TabIndex = 13;
-            this.btnClearFilter.Text = "x";
-            this.btnClearFilter.UseVisualStyleBackColor = true;
-            this.btnClearFilter.Click += new System.EventHandler(this.btnClearFilter_Click);
-            // 
             // txtGridFilter
             // 
+            this.txtGridFilter.BackColor = System.Drawing.SystemColors.Window;
+            this.txtGridFilter.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.txtGridFilter.Location = new System.Drawing.Point(45, 35);
             this.txtGridFilter.Name = "txtGridFilter";
-            this.txtGridFilter.Size = new System.Drawing.Size(200, 23);
+            this.txtGridFilter.Padding = new System.Windows.Forms.Padding(2);
+            this.txtGridFilter.Size = new System.Drawing.Size(229, 23);
             this.txtGridFilter.TabIndex = 11;
             this.txtGridFilter.TextChanged += new System.EventHandler(this.txtGridFilter_TextChanged);
             // 
@@ -1191,7 +1182,3 @@ namespace SMS_Search
         private ToolStripButton ReconnectDB;
     }
 }
-
-
-
-
