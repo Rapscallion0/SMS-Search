@@ -60,7 +60,7 @@ namespace SMS_Search.Settings
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(12, 45);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(59, 13);
+            this.label3.Size = new System.Drawing.Size(60, 15);
             this.label3.TabIndex = 1;
             this.label3.Text = "DB Server:";
             // 
@@ -71,7 +71,7 @@ namespace SMS_Search.Settings
             this.cmbDbServer.FormattingEnabled = true;
             this.cmbDbServer.Location = new System.Drawing.Point(73, 42);
             this.cmbDbServer.Name = "cmbDbServer";
-            this.cmbDbServer.Size = new System.Drawing.Size(284, 21);
+            this.cmbDbServer.Size = new System.Drawing.Size(272, 23);
             this.cmbDbServer.TabIndex = 2;
             this.toolTip1.SetToolTip(this.cmbDbServer, "Select or enter the SQL Server instance name.");
             // 
@@ -81,7 +81,7 @@ namespace SMS_Search.Settings
             this.chkScanNetwork.Enabled = false;
             this.chkScanNetwork.Location = new System.Drawing.Point(15, 193);
             this.chkScanNetwork.Name = "chkScanNetwork";
-            this.chkScanNetwork.Size = new System.Drawing.Size(131, 17);
+            this.chkScanNetwork.Size = new System.Drawing.Size(142, 19);
             this.chkScanNetwork.TabIndex = 6;
             this.chkScanNetwork.Text = "Scan network (slower)";
             this.chkScanNetwork.UseVisualStyleBackColor = true;
@@ -90,9 +90,9 @@ namespace SMS_Search.Settings
             // btnTestConn
             // 
             this.btnTestConn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTestConn.Location = new System.Drawing.Point(363, 42);
+            this.btnTestConn.Location = new System.Drawing.Point(351, 42);
             this.btnTestConn.Name = "btnTestConn";
-            this.btnTestConn.Size = new System.Drawing.Size(71, 51);
+            this.btnTestConn.Size = new System.Drawing.Size(83, 51);
             this.btnTestConn.TabIndex = 5;
             this.btnTestConn.Text = "Test DB connection";
             this.toolTip1.SetToolTip(this.btnTestConn, "Test the connection to the specified database.");
@@ -103,7 +103,7 @@ namespace SMS_Search.Settings
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(12, 75);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(56, 13);
+            this.label4.Size = new System.Drawing.Size(60, 15);
             this.label4.TabIndex = 3;
             this.label4.Text = "DB Name:";
             // 
@@ -116,7 +116,7 @@ namespace SMS_Search.Settings
             this.cmbDbDatabase.FormattingEnabled = true;
             this.cmbDbDatabase.Location = new System.Drawing.Point(73, 72);
             this.cmbDbDatabase.Name = "cmbDbDatabase";
-            this.cmbDbDatabase.Size = new System.Drawing.Size(284, 21);
+            this.cmbDbDatabase.Size = new System.Drawing.Size(272, 23);
             this.cmbDbDatabase.Sorted = true;
             this.cmbDbDatabase.TabIndex = 4;
             this.toolTip1.SetToolTip(this.cmbDbDatabase, "Select or enter the database name.");
@@ -128,7 +128,7 @@ namespace SMS_Search.Settings
             this.chkWindowsAuth.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkWindowsAuth.Location = new System.Drawing.Point(15, 110);
             this.chkWindowsAuth.Name = "chkWindowsAuth";
-            this.chkWindowsAuth.Size = new System.Drawing.Size(141, 17);
+            this.chkWindowsAuth.Size = new System.Drawing.Size(157, 19);
             this.chkWindowsAuth.TabIndex = 7;
             this.chkWindowsAuth.Text = "Windows Authentication";
             this.toolTip1.SetToolTip(this.chkWindowsAuth, "Use current Windows credentials to connect.");
@@ -139,7 +139,7 @@ namespace SMS_Search.Settings
             this.lblDbUser.AutoSize = true;
             this.lblDbUser.Location = new System.Drawing.Point(12, 133);
             this.lblDbUser.Name = "lblDbUser";
-            this.lblDbUser.Size = new System.Drawing.Size(61, 13);
+            this.lblDbUser.Size = new System.Drawing.Size(66, 15);
             this.lblDbUser.TabIndex = 8;
             this.lblDbUser.Text = "User name:";
             // 
@@ -147,7 +147,7 @@ namespace SMS_Search.Settings
             // 
             this.txtDbUser.Location = new System.Drawing.Point(79, 130);
             this.txtDbUser.Name = "txtDbUser";
-            this.txtDbUser.Size = new System.Drawing.Size(150, 20);
+            this.txtDbUser.Size = new System.Drawing.Size(150, 23);
             this.txtDbUser.TabIndex = 9;
             this.toolTip1.SetToolTip(this.txtDbUser, "SQL Server username.");
             // 
@@ -156,7 +156,7 @@ namespace SMS_Search.Settings
             this.lblDbPassword.AutoSize = true;
             this.lblDbPassword.Location = new System.Drawing.Point(12, 159);
             this.lblDbPassword.Name = "lblDbPassword";
-            this.lblDbPassword.Size = new System.Drawing.Size(56, 13);
+            this.lblDbPassword.Size = new System.Drawing.Size(60, 15);
             this.lblDbPassword.TabIndex = 10;
             this.lblDbPassword.Text = "Password:";
             // 
@@ -164,7 +164,7 @@ namespace SMS_Search.Settings
             // 
             this.txtDbPassword.Location = new System.Drawing.Point(79, 156);
             this.txtDbPassword.Name = "txtDbPassword";
-            this.txtDbPassword.Size = new System.Drawing.Size(150, 20);
+            this.txtDbPassword.Size = new System.Drawing.Size(150, 23);
             this.txtDbPassword.TabIndex = 11;
             this.toolTip1.SetToolTip(this.txtDbPassword, "SQL Server password.");
             // 
@@ -179,7 +179,6 @@ namespace SMS_Search.Settings
             // 
             // DatabaseSettings
             // 
-            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.lblDescription);
@@ -195,6 +194,7 @@ namespace SMS_Search.Settings
             this.Controls.Add(this.chkScanNetwork);
             this.Controls.Add(this.cmbDbServer);
             this.Controls.Add(this.label3);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "DatabaseSettings";
             this.Size = new System.Drawing.Size(450, 400);
             this.ResumeLayout(false);

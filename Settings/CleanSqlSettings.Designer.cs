@@ -79,11 +79,11 @@ namespace SMS_Search.Settings
             // btnResetCleanSql
             // 
             this.btnResetCleanSql.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnResetCleanSql.Location = new System.Drawing.Point(355, 370);
+            this.btnResetCleanSql.Location = new System.Drawing.Point(325, 370);
             this.btnResetCleanSql.Name = "btnResetCleanSql";
-            this.btnResetCleanSql.Size = new System.Drawing.Size(85, 23);
+            this.btnResetCleanSql.Size = new System.Drawing.Size(115, 23);
             this.btnResetCleanSql.TabIndex = 3;
-            this.btnResetCleanSql.Text = "Reset Defaults";
+            this.btnResetCleanSql.Text = "Reset to Defaults";
             this.toolTip1.SetToolTip(this.btnResetCleanSql, "Restore the default set of cleaning rules.");
             this.btnResetCleanSql.UseVisualStyleBackColor = true;
             // 
@@ -92,7 +92,7 @@ namespace SMS_Search.Settings
             this.chkCopyCleanSql.AutoSize = true;
             this.chkCopyCleanSql.Location = new System.Drawing.Point(13, 35);
             this.chkCopyCleanSql.Name = "chkCopyCleanSql";
-            this.chkCopyCleanSql.Size = new System.Drawing.Size(202, 17);
+            this.chkCopyCleanSql.Size = new System.Drawing.Size(222, 19);
             this.chkCopyCleanSql.TabIndex = 1;
             this.chkCopyCleanSql.Text = "Copy cleaned SQL query to clipboard";
             this.toolTip1.SetToolTip(this.chkCopyCleanSql, "When cleaning SQL copy the cleaned query to the windows clipboard");
@@ -100,13 +100,13 @@ namespace SMS_Search.Settings
             // 
             // CleanSqlSettings
             // 
-            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.chkCopyCleanSql);
             this.Controls.Add(this.lblDescription);
             this.Controls.Add(this.btnResetCleanSql);
             this.Controls.Add(this.dgvCleanSqlRules);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "CleanSqlSettings";
             this.Size = new System.Drawing.Size(450, 400);
             ((System.ComponentModel.ISupportInitialize)(this.dgvCleanSqlRules)).EndInit();

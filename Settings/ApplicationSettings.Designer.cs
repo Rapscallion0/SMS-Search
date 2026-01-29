@@ -41,52 +41,54 @@ namespace SMS_Search.Settings
             this.chkCheckUpdate = new System.Windows.Forms.CheckBox();
             this.btnChkUpdate = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.grpUpdate = new System.Windows.Forms.GroupBox();
+            this.grpUpdate.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblDescription
-            //
+            // 
             this.lblDescription.AutoSize = true;
             this.lblDescription.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDescription.Location = new System.Drawing.Point(15, 15);
             this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(262, 15);
+            this.lblDescription.Size = new System.Drawing.Size(281, 15);
             this.lblDescription.TabIndex = 0;
             this.lblDescription.Text = "General application settings and startup behavior.";
-            //
+            // 
             // lblStartTab
-            //
+            // 
             this.lblStartTab.AutoSize = true;
-            this.lblStartTab.Location = new System.Drawing.Point(15, 50);
+            this.lblStartTab.Location = new System.Drawing.Point(15, 78);
             this.lblStartTab.Name = "lblStartTab";
-            this.lblStartTab.Size = new System.Drawing.Size(62, 13);
+            this.lblStartTab.Size = new System.Drawing.Size(68, 15);
             this.lblStartTab.TabIndex = 1;
             this.lblStartTab.Text = "Startup tab:";
-            //
+            // 
             // cmbStartTab
-            //
+            // 
             this.cmbStartTab.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStartTab.FormattingEnabled = true;
             this.cmbStartTab.Items.AddRange(new object[] {
             "Function",
             "Totalizer",
             "Fields"});
-            this.cmbStartTab.Location = new System.Drawing.Point(120, 47);
+            this.cmbStartTab.Location = new System.Drawing.Point(120, 75);
             this.cmbStartTab.Name = "cmbStartTab";
-            this.cmbStartTab.Size = new System.Drawing.Size(150, 21);
+            this.cmbStartTab.Size = new System.Drawing.Size(150, 23);
             this.cmbStartTab.TabIndex = 2;
             this.toolTip1.SetToolTip(this.cmbStartTab, "Select which tab is active when the application starts.");
-            //
+            // 
             // lblStartupLocation
-            //
+            // 
             this.lblStartupLocation.AutoSize = true;
-            this.lblStartupLocation.Location = new System.Drawing.Point(15, 80);
+            this.lblStartupLocation.Location = new System.Drawing.Point(15, 48);
             this.lblStartupLocation.Name = "lblStartupLocation";
-            this.lblStartupLocation.Size = new System.Drawing.Size(84, 13);
+            this.lblStartupLocation.Size = new System.Drawing.Size(94, 15);
             this.lblStartupLocation.TabIndex = 3;
             this.lblStartupLocation.Text = "Startup location:";
-            //
+            // 
             // cmbStartupLocation
-            //
+            // 
             this.cmbStartupLocation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStartupLocation.FormattingEnabled = true;
             this.cmbStartupLocation.Items.AddRange(new object[] {
@@ -94,85 +96,94 @@ namespace SMS_Search.Settings
             "Primary display",
             "Active display",
             "Cursor location"});
-            this.cmbStartupLocation.Location = new System.Drawing.Point(120, 77);
+            this.cmbStartupLocation.Location = new System.Drawing.Point(120, 45);
             this.cmbStartupLocation.Name = "cmbStartupLocation";
-            this.cmbStartupLocation.Size = new System.Drawing.Size(150, 21);
+            this.cmbStartupLocation.Size = new System.Drawing.Size(150, 23);
             this.cmbStartupLocation.TabIndex = 4;
             this.toolTip1.SetToolTip(this.cmbStartupLocation, "Select where the window appears when the application starts.");
-            //
+            // 
             // chkAlwaysOnTop
-            //
+            // 
             this.chkAlwaysOnTop.AutoSize = true;
             this.chkAlwaysOnTop.Location = new System.Drawing.Point(18, 115);
             this.chkAlwaysOnTop.Name = "chkAlwaysOnTop";
-            this.chkAlwaysOnTop.Size = new System.Drawing.Size(92, 17);
+            this.chkAlwaysOnTop.Size = new System.Drawing.Size(101, 19);
             this.chkAlwaysOnTop.TabIndex = 5;
             this.chkAlwaysOnTop.Text = "Always on top";
             this.toolTip1.SetToolTip(this.chkAlwaysOnTop, "Keep the application window above all other windows.");
             this.chkAlwaysOnTop.UseVisualStyleBackColor = true;
-            //
+            // 
             // chkShowInTray
-            //
+            // 
             this.chkShowInTray.AutoSize = true;
             this.chkShowInTray.Location = new System.Drawing.Point(18, 140);
             this.chkShowInTray.Name = "chkShowInTray";
-            this.chkShowInTray.Size = new System.Drawing.Size(119, 17);
+            this.chkShowInTray.Size = new System.Drawing.Size(131, 19);
             this.chkShowInTray.TabIndex = 6;
             this.chkShowInTray.Text = "Show in system tray";
             this.toolTip1.SetToolTip(this.chkShowInTray, "Minimize the application to the system tray instead of the taskbar.");
             this.chkShowInTray.UseVisualStyleBackColor = true;
-            //
+            // 
             // chkMultiInstance
-            //
+            // 
             this.chkMultiInstance.AutoSize = true;
             this.chkMultiInstance.Location = new System.Drawing.Point(18, 165);
             this.chkMultiInstance.Name = "chkMultiInstance";
-            this.chkMultiInstance.Size = new System.Drawing.Size(137, 17);
+            this.chkMultiInstance.Size = new System.Drawing.Size(155, 19);
             this.chkMultiInstance.TabIndex = 7;
             this.chkMultiInstance.Text = "Allow multiple instances";
             this.toolTip1.SetToolTip(this.chkMultiInstance, "Allow more than one instance of SMS Search to run simultaneously.");
             this.chkMultiInstance.UseVisualStyleBackColor = true;
-            //
+            // 
             // chkUnarchiveTarget
-            //
+            // 
             this.chkUnarchiveTarget.AutoSize = true;
             this.chkUnarchiveTarget.Location = new System.Drawing.Point(18, 190);
             this.chkUnarchiveTarget.Name = "chkUnarchiveTarget";
-            this.chkUnarchiveTarget.Size = new System.Drawing.Size(183, 17);
+            this.chkUnarchiveTarget.Size = new System.Drawing.Size(201, 19);
             this.chkUnarchiveTarget.TabIndex = 8;
             this.chkUnarchiveTarget.Text = "Show unarchive target on startup";
             this.toolTip1.SetToolTip(this.chkUnarchiveTarget, "Automatically show the unarchive target dialog when the application starts.");
             this.chkUnarchiveTarget.UseVisualStyleBackColor = true;
-            //
+            // 
             // chkCheckUpdate
-            //
+            // 
             this.chkCheckUpdate.AutoSize = true;
-            this.chkCheckUpdate.Location = new System.Drawing.Point(18, 215);
+            this.chkCheckUpdate.Location = new System.Drawing.Point(6, 22);
             this.chkCheckUpdate.Name = "chkCheckUpdate";
-            this.chkCheckUpdate.Size = new System.Drawing.Size(222, 17);
+            this.chkCheckUpdate.Size = new System.Drawing.Size(249, 19);
             this.chkCheckUpdate.TabIndex = 9;
             this.chkCheckUpdate.Text = "Automatically check for update on startup";
             this.toolTip1.SetToolTip(this.chkCheckUpdate, "Check for new versions of SMS Search when the application launches.");
             this.chkCheckUpdate.UseVisualStyleBackColor = true;
-            //
+            // 
             // btnChkUpdate
-            //
-            this.btnChkUpdate.Location = new System.Drawing.Point(18, 240);
+            // 
+            this.btnChkUpdate.Location = new System.Drawing.Point(26, 47);
             this.btnChkUpdate.Name = "btnChkUpdate";
             this.btnChkUpdate.Size = new System.Drawing.Size(140, 30);
             this.btnChkUpdate.TabIndex = 10;
-            this.btnChkUpdate.Text = "Check for update";
+            this.btnChkUpdate.Text = "Check for update now";
             this.toolTip1.SetToolTip(this.btnChkUpdate, "Manually check for updates now.");
             this.btnChkUpdate.UseVisualStyleBackColor = true;
-            //
+            // 
+            // grpUpdate
+            // 
+            this.grpUpdate.Controls.Add(this.btnChkUpdate);
+            this.grpUpdate.Controls.Add(this.chkCheckUpdate);
+            this.grpUpdate.Location = new System.Drawing.Point(18, 249);
+            this.grpUpdate.Name = "grpUpdate";
+            this.grpUpdate.Size = new System.Drawing.Size(411, 91);
+            this.grpUpdate.TabIndex = 11;
+            this.grpUpdate.TabStop = false;
+            this.grpUpdate.Text = "Update";
+            // 
             // ApplicationSettings
             // 
-            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.Controls.Add(this.btnChkUpdate);
-            this.Controls.Add(this.chkCheckUpdate);
+            this.Controls.Add(this.grpUpdate);
             this.Controls.Add(this.chkUnarchiveTarget);
             this.Controls.Add(this.chkMultiInstance);
             this.Controls.Add(this.chkShowInTray);
@@ -182,8 +193,11 @@ namespace SMS_Search.Settings
             this.Controls.Add(this.cmbStartTab);
             this.Controls.Add(this.lblStartTab);
             this.Controls.Add(this.lblDescription);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "ApplicationSettings";
             this.Size = new System.Drawing.Size(450, 400);
+            this.grpUpdate.ResumeLayout(false);
+            this.grpUpdate.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -203,5 +217,6 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.CheckBox chkCheckUpdate;
         private System.Windows.Forms.Button btnChkUpdate;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.GroupBox grpUpdate;
     }
 }
