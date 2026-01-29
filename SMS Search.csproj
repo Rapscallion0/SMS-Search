@@ -16,6 +16,7 @@
   <Target Name="KillLauncher" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
     <Exec Command="taskkill /F /IM &quot;SMS Search Launcher.exe&quot; 2&gt;nul || exit 0" />
     <Exec Command="taskkill /F /IM &quot;SMSSearchLauncher.exe&quot; 2&gt;nul || exit 0" />
+    <Exec Command="taskkill /F /IM &quot;SMSSearch.exe&quot; 2&gt;nul || exit 0" />
   </Target>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -78,6 +79,10 @@
 
   <Target Name="PostBuildRelease" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
      <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\publish_release.ps1&quot; -AssemblyInfoPath &quot;$(MSBuildProjectDirectory)\Properties\AssemblyInfo.cs&quot; -ExePath &quot;$(TargetPath)&quot;" />
+  </Target>
+
+  <Target Name="RestartListener" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -Command &quot;$s = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Startup); $p = Join-Path $s 'SMSSearchLauncher.lnk'; if (Test-Path $p) { Start-Process -FilePath '$(TargetPath)' -ArgumentList '--listener' }&quot;" />
   </Target>
 
 </Project>
