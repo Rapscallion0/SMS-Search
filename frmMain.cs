@@ -71,6 +71,7 @@ namespace SMS_Search
         private Color _matchHighlightColor = Color.Yellow;
         private long _lastTotalMatchCount = 0;
         private bool _showRowNumbers = false;
+        private bool _showDescriptions = false;
 
 		public frmMain(string[] Params)
 		{
@@ -510,11 +511,11 @@ namespace SMS_Search
 
 			if (config.GetValue("GENERAL", "DESCRIPTIONCOLUMNS") == "1")
 			{
-				chkToggleDesc.Checked = true;
+				_showDescriptions = true;
 			}
 			else
 			{
-				chkToggleDesc.Checked = false;
+				_showDescriptions = false;
 			}
 
             string fctFields = config.GetValue("QUERY", "FUNCTION");
@@ -1236,6 +1237,17 @@ namespace SMS_Search
         {
             var menu = new ContextMenuStrip();
 
+            // 0. Toggle Descriptions
+            var itemToggleDesc = menu.Items.Add("Show description in header");
+            itemToggleDesc.Click += async (s, e) =>
+            {
+                _showDescriptions = !_showDescriptions;
+                await setHeadersAsync();
+                setTabTextFocus();
+            };
+
+            menu.Items.Add(new ToolStripSeparator());
+
             // 1. Select all
             var itemSelectAll = menu.Items.Add("Select all");
             itemSelectAll.Click += (s, e) => dGrd.SelectAll();
@@ -1265,6 +1277,14 @@ namespace SMS_Search
             // 8. Export to CSV
             var itemExport = menu.Items.Add("Export results to CSV");
             itemExport.Click += (s, e) => ExportToCsv();
+
+            menu.Opening += (s, e) =>
+            {
+                if (_showDescriptions)
+                    itemToggleDesc.Text = "Show field name in header";
+                else
+                    itemToggleDesc.Text = "Show description in header";
+            };
 
             dGrd.ContextMenuStrip = menu;
             _headerContextMenu = menu; // Reuse for header
@@ -1366,7 +1386,7 @@ namespace SMS_Search
 
 		private async Task setHeadersAsync()
 		{
-            bool showDesc = chkToggleDesc.Checked;
+            bool showDesc = _showDescriptions;
 
             for (int i = 0; i < dGrd.Columns.Count; i++)
             {
@@ -1446,12 +1466,6 @@ namespace SMS_Search
                 col.Width = maxWidth;
             }
         }
-
-		private async void chkToggleDesc_CheckedChanged(object sender, EventArgs e)
-		{
-			await setHeadersAsync();
-			setTabTextFocus();
-		}
 
 		private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
 		{
