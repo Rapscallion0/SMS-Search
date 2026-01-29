@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -23,6 +24,9 @@ namespace SMS_Search
         private readonly Color ColorComment = Color.Green;
         private readonly Color ColorNormal = Color.Black;
 
+        // Regex Patterns
+        private const string IdentifierPattern = @"(?:\[[^\]]+\]|""[^""]+""|[\w]+)";
+
         public SqlRichTextBox()
         {
             // Set Font to Consolas or Courier New
@@ -44,6 +48,26 @@ namespace SMS_Search
 
             base.OnTextChanged(e);
             HighlightSyntax();
+        }
+
+        private string Unquote(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            if (text.StartsWith("[") && text.EndsWith("]"))
+                return text.Substring(1, text.Length - 2);
+            if (text.StartsWith("\"") && text.EndsWith("\""))
+                return text.Substring(1, text.Length - 2);
+            return text;
+        }
+
+        private string GetLastIdentifierPart(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            // Matches [bracketed], "quoted", or word.
+            var matches = Regex.Matches(text, IdentifierPattern);
+            if (matches.Count > 0)
+                return Unquote(matches[matches.Count - 1].Value);
+            return Unquote(text);
         }
 
         public void HighlightSyntax()
@@ -85,28 +109,55 @@ namespace SMS_Search
                 string aliasExclusions = keywordsList.Replace("ORDER BY", "ORDER").Replace("GROUP BY", "GROUP");
 
                 // Robust Identifier Patterns
-                // Part: [Bracketed] OR "Quoted" OR SimpleWord
-                string idPart = @"(?:\[[^\]]+\]|""[^""]+""|[\w]+)";
                 // Table: Part (. Part)*
-                string tablePattern = idPart + @"(?:\." + idPart + @")*";
+                string tablePattern = IdentifierPattern + @"(?:\." + IdentifierPattern + @")*";
                 // Alias: Part
-                string aliasPattern = idPart;
+                string aliasPattern = IdentifierPattern;
 
                 // Combined Regex for efficiency and correct precedence
                 // Group 1: Comment (--... or /*...*/)
                 // Group 2: String ('...')
                 // Group 3: TableDefinition (Trigger + Table + Optional Alias)
                 // Group 4: Keyword
+                // Group 5: Identifier (Generic, low priority)
 
                 string pattern =
                     @"(?<Comment>--.*$|/\*[\s\S]*?\*/)|" +
                     @"(?<String>'([^']|'')*')|" +
                     @"(?<TableDef>\b(?<Trigger>" + tableTriggers + @")\s+(?<Table>" + tablePattern + @")(?:\s+(?:(?<As>AS)\s+)?(?<Alias>(?!\b(" + aliasExclusions + @")\b)" + aliasPattern + @"))?)|" +
-                    @"(?<Keyword>\b(" + keywordsList + @")\b)";
+                    @"(?<Keyword>\b(" + keywordsList + @")\b)|" +
+                    @"(?<Identifier>" + IdentifierPattern + @")";
 
                 Regex regex = new Regex(pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
+                MatchCollection matches = regex.Matches(text);
 
-                foreach (Match m in regex.Matches(text))
+                // Pass 1: Collect Aliases (Case-Insensitive)
+                HashSet<string> aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (Match m in matches)
+                {
+                    if (m.Groups["TableDef"].Success)
+                    {
+                        Group gAlias = m.Groups["Alias"];
+                        if (gAlias.Success)
+                        {
+                            // Explicit alias: FROM Table A -> 'A'
+                            aliases.Add(Unquote(gAlias.Value));
+                        }
+                        else
+                        {
+                            // Implicit alias: FROM Table -> 'Table'
+                            Group gTable = m.Groups["Table"];
+                            if (gTable.Success)
+                            {
+                                aliases.Add(GetLastIdentifierPart(gTable.Value));
+                            }
+                        }
+                    }
+                }
+
+                // Pass 2: Apply Formatting
+                foreach (Match m in matches)
                 {
                     if (m.Groups["Comment"].Success)
                     {
@@ -122,28 +173,32 @@ namespace SMS_Search
                     {
                         // 1. Trigger (FROM, JOIN, etc) - Blue
                         Group gTrigger = m.Groups["Trigger"];
-                        if(gTrigger.Success) {
+                        if (gTrigger.Success)
+                        {
                             this.Select(gTrigger.Index, gTrigger.Length);
                             this.SelectionColor = ColorKeyword;
                         }
 
                         // 2. Table Name - Bold
                         Group gTable = m.Groups["Table"];
-                        if(gTable.Success) {
+                        if (gTable.Success)
+                        {
                             this.Select(gTable.Index, gTable.Length);
                             this.SelectionFont = boldFont;
                         }
 
                         // 3. AS - Blue
                         Group gAs = m.Groups["As"];
-                        if(gAs.Success) {
+                        if (gAs.Success)
+                        {
                             this.Select(gAs.Index, gAs.Length);
                             this.SelectionColor = ColorKeyword;
                         }
 
                         // 4. Alias - Bold
                         Group gAlias = m.Groups["Alias"];
-                        if(gAlias.Success) {
+                        if (gAlias.Success)
+                        {
                             this.Select(gAlias.Index, gAlias.Length);
                             this.SelectionFont = boldFont;
                         }
@@ -152,6 +207,16 @@ namespace SMS_Search
                     {
                         this.Select(m.Index, m.Length);
                         this.SelectionColor = ColorKeyword;
+                    }
+                    else if (m.Groups["Identifier"].Success)
+                    {
+                        // Check if this identifier is in our list of aliases
+                        string id = Unquote(m.Groups["Identifier"].Value);
+                        if (aliases.Contains(id))
+                        {
+                            this.Select(m.Index, m.Length);
+                            this.SelectionFont = boldFont;
+                        }
                     }
                 }
             }
