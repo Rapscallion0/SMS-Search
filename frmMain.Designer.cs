@@ -46,11 +46,11 @@ namespace SMS_Search
         private RadioButton rdbDescFct;
         private TextBox txtDescFct;
         private TextBox txtNumFct;
-        private TextBox txtCustSqlFct;
+        private SMS_Search.SqlRichTextBox txtCustSqlFct;
         private RadioButton rdbCustSqlTlz;
         private RadioButton rdbNumTlz;
         private Button btnBuildQryTlz;
-        private TextBox txtCustSqlTlz;
+        private SMS_Search.SqlRichTextBox txtCustSqlTlz;
         private Button btnClearTlz;
         private TextBox txtNumTlz;
         private TextBox txtDescTlz;
@@ -70,7 +70,7 @@ namespace SMS_Search
         private TextBox txtNumFld;
         private Button btnBuildQryFld;
         private Button btnClearFld;
-        private TextBox txtCustSqlFld;
+        private SMS_Search.SqlRichTextBox txtCustSqlFld;
         private Label label6;
         private RadioButton rdbTableFld;
         private ComboBox cmbTableFld;
@@ -139,14 +139,14 @@ namespace SMS_Search
             this.label1 = new System.Windows.Forms.Label();
             this.rdbCustSqlFct = new System.Windows.Forms.RadioButton();
             this.rdbNumFct = new System.Windows.Forms.RadioButton();
-            this.txtCustSqlFct = new System.Windows.Forms.TextBox();
+            this.txtCustSqlFct = new SMS_Search.SqlRichTextBox();
             this.btnClearFct = new System.Windows.Forms.Button();
             this.txtNumFct = new System.Windows.Forms.TextBox();
             this.txtDescFct = new System.Windows.Forms.TextBox();
             this.rdbDescFct = new System.Windows.Forms.RadioButton();
             this.rdbCustSqlTlz = new System.Windows.Forms.RadioButton();
             this.rdbNumTlz = new System.Windows.Forms.RadioButton();
-            this.txtCustSqlTlz = new System.Windows.Forms.TextBox();
+            this.txtCustSqlTlz = new SMS_Search.SqlRichTextBox();
             this.btnClearTlz = new System.Windows.Forms.Button();
             this.txtNumTlz = new System.Windows.Forms.TextBox();
             this.txtDescTlz = new System.Windows.Forms.TextBox();
@@ -175,7 +175,7 @@ namespace SMS_Search
             this.txtDescFld = new System.Windows.Forms.TextBox();
             this.txtNumFld = new System.Windows.Forms.TextBox();
             this.btnClearFld = new System.Windows.Forms.Button();
-            this.txtCustSqlFld = new System.Windows.Forms.TextBox();
+            this.txtCustSqlFld = new SMS_Search.SqlRichTextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStripNotify = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -451,7 +451,7 @@ namespace SMS_Search
             this.txtCustSqlFct.Location = new System.Drawing.Point(97, 59);
             this.txtCustSqlFct.Multiline = true;
             this.txtCustSqlFct.Name = "txtCustSqlFct";
-            this.txtCustSqlFct.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtCustSqlFct.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.txtCustSqlFct.Size = new System.Drawing.Size(483, 77);
             this.txtCustSqlFct.TabIndex = 4;
             this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
@@ -529,7 +529,7 @@ namespace SMS_Search
             this.txtCustSqlTlz.Location = new System.Drawing.Point(97, 59);
             this.txtCustSqlTlz.Multiline = true;
             this.txtCustSqlTlz.Name = "txtCustSqlTlz";
-            this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.txtCustSqlTlz.Size = new System.Drawing.Size(483, 49);
             this.txtCustSqlTlz.TabIndex = 4;
             this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
@@ -886,7 +886,7 @@ namespace SMS_Search
             this.txtCustSqlFld.Location = new System.Drawing.Point(97, 84);
             this.txtCustSqlFld.Multiline = true;
             this.txtCustSqlFld.Name = "txtCustSqlFld";
-            this.txtCustSqlFld.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtCustSqlFld.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.txtCustSqlFld.Size = new System.Drawing.Size(484, 24);
             this.txtCustSqlFld.TabIndex = 6;
             this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
