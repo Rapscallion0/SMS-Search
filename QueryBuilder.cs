@@ -122,18 +122,24 @@ GROUP BY
                 sql = $"Select {_tlzFields} FROM TLZ_TAB";
                 if (criteria.Type == SearchType.Number)
                 {
-                    string val = criteria.Value;
-                    HandleWildcards(ref val, out string op);
-                    sql += $" WHERE F1034 {op} @Val";
-                    p.Add("Val", val);
+                    if (!string.IsNullOrEmpty(criteria.Value))
+                    {
+                        string val = criteria.Value;
+                        HandleWildcards(ref val, out string op);
+                        sql += $" WHERE F1034 {op} @Val";
+                        p.Add("Val", val);
+                    }
                 }
                 else if (criteria.Type == SearchType.Description)
                 {
-                     string val = criteria.Value;
-                     if (criteria.AnyMatch) val = $"*{val}*";
-                     HandleWildcards(ref val, out string op);
-                     sql += $" WHERE F1039 {op} @Val";
-                     p.Add("Val", val);
+                    if (!string.IsNullOrEmpty(criteria.Value))
+                    {
+                        string val = criteria.Value;
+                        if (criteria.AnyMatch) val = $"*{val}*";
+                        HandleWildcards(ref val, out string op);
+                        sql += $" WHERE F1039 {op} @Val";
+                        p.Add("Val", val);
+                    }
                 }
                 else if (criteria.Type == SearchType.CustomSql)
                 {
@@ -145,18 +151,24 @@ GROUP BY
                 sql = $"Select {_fctFields} FROM FCT_TAB";
                 if (criteria.Type == SearchType.Number)
                 {
-                    string val = criteria.Value;
-                    HandleWildcards(ref val, out string op);
-                    sql += $" WHERE F1063 {op} @Val";
-                    p.Add("Val", val);
+                    if (!string.IsNullOrEmpty(criteria.Value))
+                    {
+                        string val = criteria.Value;
+                        HandleWildcards(ref val, out string op);
+                        sql += $" WHERE F1063 {op} @Val";
+                        p.Add("Val", val);
+                    }
                 }
                 else if (criteria.Type == SearchType.Description)
                 {
-                     string val = criteria.Value;
-                     if (criteria.AnyMatch) val = $"*{val}*";
-                     HandleWildcards(ref val, out string op);
-                     sql += $" WHERE F1064 {op} @Val";
-                     p.Add("Val", val);
+                    if (!string.IsNullOrEmpty(criteria.Value))
+                    {
+                        string val = criteria.Value;
+                        if (criteria.AnyMatch) val = $"*{val}*";
+                        HandleWildcards(ref val, out string op);
+                        sql += $" WHERE F1064 {op} @Val";
+                        p.Add("Val", val);
+                    }
                 }
                 else if (criteria.Type == SearchType.CustomSql)
                 {
