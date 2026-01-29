@@ -1774,11 +1774,6 @@ namespace SMS_Search
             _filterDebounceTimer.Start();
         }
 
-        private void btnClearFilter_Click(object sender, EventArgs e)
-        {
-            txtGridFilter.Text = "";
-        }
-
         private async void _filterDebounceTimer_Tick(object sender, EventArgs e)
         {
             _filterDebounceTimer.Stop();
