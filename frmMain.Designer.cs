@@ -118,8 +118,8 @@ namespace SMS_Search
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.btnPopGrid = new System.Windows.Forms.Button();
             this.dGrd = new SMS_Search.ExDataGridView();
@@ -223,7 +223,7 @@ namespace SMS_Search
             // btnPopGrid
             // 
             this.btnPopGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnPopGrid.Location = new System.Drawing.Point(3, 145);
+            this.btnPopGrid.Location = new System.Drawing.Point(3, 178);
             this.btnPopGrid.Name = "btnPopGrid";
             this.btnPopGrid.Size = new System.Drawing.Size(78, 23);
             this.btnPopGrid.TabIndex = 10;
@@ -237,30 +237,30 @@ namespace SMS_Search
             this.dGrd.AllowUserToDeleteRows = false;
             this.dGrd.AllowUserToOrderColumns = true;
             this.dGrd.AllowUserToResizeRows = false;
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.WhiteSmoke;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            this.dGrd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.WhiteSmoke;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            this.dGrd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dGrd.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dGrd.BackgroundColor = System.Drawing.SystemColors.ControlLight;
             this.dGrd.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dGrd.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dGrd.DefaultCellStyle = dataGridViewCellStyle2;
             this.dGrd.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dGrd.Location = new System.Drawing.Point(2, 35);
             this.dGrd.Name = "dGrd";
             this.dGrd.ReadOnly = true;
             this.dGrd.RowHeadersVisible = false;
             this.dGrd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dGrd.Size = new System.Drawing.Size(594, 334);
+            this.dGrd.Size = new System.Drawing.Size(594, 301);
             this.dGrd.TabIndex = 4;
             this.dGrd.TabStop = false;
             this.dGrd.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dGrd_CellDoubleClick);
@@ -401,7 +401,7 @@ namespace SMS_Search
             this.groupBox1.Controls.Add(this.dateGregorian);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtJulian);
-            this.groupBox1.Location = new System.Drawing.Point(318, 135);
+            this.groupBox1.Location = new System.Drawing.Point(318, 168);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(0);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(0);
@@ -445,15 +445,17 @@ namespace SMS_Search
             // 
             // txtCustSqlFct
             // 
+            this.txtCustSqlFct.AcceptsTab = true;
             this.txtCustSqlFct.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlFct.Font = new System.Drawing.Font("Consolas", 9.75F);
             this.txtCustSqlFct.Location = new System.Drawing.Point(97, 59);
-            this.txtCustSqlFct.Multiline = true;
             this.txtCustSqlFct.Name = "txtCustSqlFct";
             this.txtCustSqlFct.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 77);
+            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 79);
             this.txtCustSqlFct.TabIndex = 4;
+            this.txtCustSqlFct.Text = "";
             this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
             // 
             // btnClearFct
@@ -523,15 +525,17 @@ namespace SMS_Search
             // 
             // txtCustSqlTlz
             // 
+            this.txtCustSqlTlz.AcceptsTab = true;
             this.txtCustSqlTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlTlz.Font = new System.Drawing.Font("Consolas", 9.75F);
             this.txtCustSqlTlz.Location = new System.Drawing.Point(97, 59);
-            this.txtCustSqlTlz.Multiline = true;
             this.txtCustSqlTlz.Name = "txtCustSqlTlz";
             this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlTlz.Size = new System.Drawing.Size(483, 49);
+            this.txtCustSqlTlz.Size = new System.Drawing.Size(483, 79);
             this.txtCustSqlTlz.TabIndex = 4;
+            this.txtCustSqlTlz.Text = "";
             this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
             // 
             // btnClearTlz
@@ -606,7 +610,7 @@ namespace SMS_Search
             this.tabCtl.Location = new System.Drawing.Point(3, 4);
             this.tabCtl.Name = "tabCtl";
             this.tabCtl.SelectedIndex = 0;
-            this.tabCtl.Size = new System.Drawing.Size(596, 136);
+            this.tabCtl.Size = new System.Drawing.Size(596, 169);
             this.tabCtl.TabIndex = 0;
             this.tabCtl.SelectedIndexChanged += new System.EventHandler(this.tabCtl_SelectedIndexChanged);
             // 
@@ -627,7 +631,7 @@ namespace SMS_Search
             this.tabFct.Location = new System.Drawing.Point(4, 24);
             this.tabFct.Name = "tabFct";
             this.tabFct.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFct.Size = new System.Drawing.Size(588, 108);
+            this.tabFct.Size = new System.Drawing.Size(588, 141);
             this.tabFct.TabIndex = 0;
             this.tabFct.Text = "Function";
             this.tabFct.ToolTipText = "<CRTL> + 1";
@@ -671,7 +675,7 @@ namespace SMS_Search
             this.tabTlz.Location = new System.Drawing.Point(4, 24);
             this.tabTlz.Name = "tabTlz";
             this.tabTlz.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTlz.Size = new System.Drawing.Size(588, 108);
+            this.tabTlz.Size = new System.Drawing.Size(588, 141);
             this.tabTlz.TabIndex = 1;
             this.tabTlz.Text = "Totalizer";
             // 
@@ -720,7 +724,7 @@ namespace SMS_Search
             this.tabFields.Location = new System.Drawing.Point(4, 24);
             this.tabFields.Name = "tabFields";
             this.tabFields.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFields.Size = new System.Drawing.Size(588, 108);
+            this.tabFields.Size = new System.Drawing.Size(588, 141);
             this.tabFields.TabIndex = 2;
             this.tabFields.Text = "Fields";
             // 
@@ -880,15 +884,17 @@ namespace SMS_Search
             // 
             // txtCustSqlFld
             // 
+            this.txtCustSqlFld.AcceptsTab = true;
             this.txtCustSqlFld.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlFld.Font = new System.Drawing.Font("Consolas", 9.75F);
             this.txtCustSqlFld.Location = new System.Drawing.Point(97, 84);
-            this.txtCustSqlFld.Multiline = true;
             this.txtCustSqlFld.Name = "txtCustSqlFld";
             this.txtCustSqlFld.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 24);
+            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 54);
             this.txtCustSqlFld.TabIndex = 6;
+            this.txtCustSqlFld.Text = "";
             this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
             // 
             // label6
@@ -965,7 +971,7 @@ namespace SMS_Search
             this.tscmbDbServer.Enabled = false;
             this.tscmbDbServer.Name = "tscmbDbServer";
             this.tscmbDbServer.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.tscmbDbServer.Size = new System.Drawing.Size(130, 23);
+            this.tscmbDbServer.Size = new System.Drawing.Size(110, 23);
             this.tscmbDbServer.ToolTipText = "Server";
             this.tscmbDbServer.Visible = false;
             // 
@@ -1075,7 +1081,7 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.dGrd);
             this.splitContainer.Panel2MinSize = 29;
             this.splitContainer.Size = new System.Drawing.Size(603, 554);
-            this.splitContainer.SplitterDistance = 177;
+            this.splitContainer.SplitterDistance = 210;
             this.splitContainer.TabIndex = 102;
             this.splitContainer.TabStop = false;
             this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
