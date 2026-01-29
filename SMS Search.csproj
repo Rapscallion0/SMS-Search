@@ -72,6 +72,7 @@
     <ILRepack Parallel="true" Internalize="true" Union="true" InputAssemblies="@(InputAssemblies)" TargetKind="SameAsPrimaryAssembly" OutputFile="$(OutputPath)$(AssemblyName).Merged.exe" />
     <Delete Files="@(MergedDlls)" />
     <Delete Files="$(OutputPath)$(AssemblyName).Merged.exe.config" />
+    <Delete Files="$(OutputPath)$(AssemblyName).exe" />
     <Move SourceFiles="$(OutputPath)$(AssemblyName).Merged.exe" DestinationFiles="$(OutputPath)$(AssemblyName).exe" OverwriteReadOnlyFiles="true" />
   </Target>
 
