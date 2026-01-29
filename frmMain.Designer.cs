@@ -103,7 +103,6 @@ namespace SMS_Search
         private ToolStripProgressBar tsProgressBar;
         private SplitContainer splitContainer;
         private CheckBox chkLastTransaction;
-        private CheckBox chkToggleDesc;
         private Label lblFilter;
         private TextBox txtGridFilter;
         private Button btnClearFilter;
@@ -205,7 +204,6 @@ namespace SMS_Search
             this.btnClearFilter = new System.Windows.Forms.Button();
             this.txtGridFilter = new System.Windows.Forms.TextBox();
             this.lblFilter = new System.Windows.Forms.Label();
-            this.chkToggleDesc = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -1074,7 +1072,6 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.btnClearFilter);
             this.splitContainer.Panel2.Controls.Add(this.txtGridFilter);
             this.splitContainer.Panel2.Controls.Add(this.lblFilter);
-            this.splitContainer.Panel2.Controls.Add(this.chkToggleDesc);
             this.splitContainer.Panel2.Controls.Add(this.groupBox1);
             this.splitContainer.Panel2.Controls.Add(this.dGrd);
             this.splitContainer.Panel2MinSize = 29;
@@ -1141,17 +1138,6 @@ namespace SMS_Search
             this.lblFilter.Size = new System.Drawing.Size(36, 15);
             this.lblFilter.TabIndex = 10;
             this.lblFilter.Text = "Filter:";
-            // 
-            // chkToggleDesc
-            // 
-            this.chkToggleDesc.Appearance = System.Windows.Forms.Appearance.Button;
-            this.chkToggleDesc.Location = new System.Drawing.Point(87, 4);
-            this.chkToggleDesc.Name = "chkToggleDesc";
-            this.chkToggleDesc.Size = new System.Drawing.Size(77, 23);
-            this.chkToggleDesc.TabIndex = 2;
-            this.chkToggleDesc.Text = "Show Desc.";
-            this.chkToggleDesc.UseVisualStyleBackColor = true;
-            this.chkToggleDesc.CheckedChanged += new System.EventHandler(this.chkToggleDesc_CheckedChanged);
             // 
             // frmMain
             // 

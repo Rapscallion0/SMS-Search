@@ -55,7 +55,7 @@ namespace SMS_Search.Settings
             this.chkDescriptionColumns.Name = "chkDescriptionColumns";
             this.chkDescriptionColumns.Size = new System.Drawing.Size(143, 17);
             this.chkDescriptionColumns.TabIndex = 1;
-            this.chkDescriptionColumns.Text = "Show header description";
+            this.chkDescriptionColumns.Text = "Show description in header";
             this.toolTip1.SetToolTip(this.chkDescriptionColumns, "Show descriptive names in column headers instead of field codes.");
             this.chkDescriptionColumns.UseVisualStyleBackColor = true;
             //

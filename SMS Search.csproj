@@ -69,14 +69,7 @@
         <InputAssemblies Include="$(OutputPath)$(AssemblyName).exe" />
         <InputAssemblies Include="@(MergedDlls)" />
     </ItemGroup>
-    <ILRepack
-        Parallel="true"
-        Internalize="true"
-        Union="true"
-        InputAssemblies="@(InputAssemblies)"
-        TargetKind="SameAsPrimaryAssembly"
-        OutputFile="$(OutputPath)$(AssemblyName).Merged.exe"
-    />
+    <ILRepack Parallel="true" Internalize="true" Union="true" InputAssemblies="@(InputAssemblies)" TargetKind="SameAsPrimaryAssembly" OutputFile="$(OutputPath)$(AssemblyName).Merged.exe" />
     <Delete Files="@(MergedDlls)" />
     <Delete Files="$(OutputPath)$(AssemblyName).Merged.exe.config" />
     <Move SourceFiles="$(OutputPath)$(AssemblyName).Merged.exe" DestinationFiles="$(OutputPath)$(AssemblyName).exe" OverwriteReadOnlyFiles="true" />
