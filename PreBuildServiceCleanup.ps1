@@ -10,7 +10,7 @@ if (Test-Path $lnk) {
     Remove-Item $lnk -Force -ErrorAction SilentlyContinue
 }
 
-$processNames = 'SMSSearch','SMSSearchLauncher','SMS Search Launcher'
+$processNames = 'SMSSearch','SMSSearchLauncher','SMS Search Launcher','SMS Search'
 $processes = Get-Process -Name $processNames -ErrorAction SilentlyContinue
 
 if ($processes) {
