@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="PreBuildServiceCleanup">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -13,7 +13,7 @@
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
 
-  <Target Name="PreBuildServiceCleanup" BeforeTargets="Clean;Build" Condition="'$(OS)' == 'Windows_NT'">
+  <Target Name="PreBuildServiceCleanup" Condition="'$(OS)' == 'Windows_NT'">
     <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\PreBuildServiceCleanup.ps1&quot; -MarkerPath &quot;$(ProjectDir)service_was_registered.tmp&quot;" />
   </Target>
 
