@@ -13,8 +13,8 @@
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
 
-  <Target Name="PreBuildServiceCleanup" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
-    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\PreBuildServiceCleanup.ps1&quot; -MarkerPath &quot;$(ProjectDir)$(IntermediateOutputPath)service_was_registered.marker&quot;" />
+  <Target Name="PreBuildServiceCleanup" BeforeTargets="Clean;Build" Condition="'$(OS)' == 'Windows_NT'">
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\PreBuildServiceCleanup.ps1&quot; -MarkerPath &quot;$(ProjectDir)service_was_registered.tmp&quot;" />
   </Target>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -80,7 +80,7 @@
   </Target>
 
   <Target Name="PostBuildServiceRestore" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
-    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\PostBuildServiceRestore.ps1&quot; -MarkerPath &quot;$(ProjectDir)$(IntermediateOutputPath)service_was_registered.marker&quot; -TargetPath &quot;$(TargetPath)&quot; -TargetDir &quot;$([System.IO.Path]::GetDirectoryName('$(TargetPath)'))&quot;" />
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\PostBuildServiceRestore.ps1&quot; -MarkerPath &quot;$(ProjectDir)service_was_registered.tmp&quot; -TargetPath &quot;$(TargetPath)&quot; -TargetDir &quot;$([System.IO.Path]::GetDirectoryName('$(TargetPath)'))&quot;" />
   </Target>
 
 </Project>
