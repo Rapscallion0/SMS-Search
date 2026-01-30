@@ -10,4 +10,11 @@ if (Test-Path $lnk) {
     Remove-Item $lnk -Force -ErrorAction SilentlyContinue
 }
 
-Stop-Process -Name 'SMSSearch','SMSSearchLauncher','SMS Search Launcher' -Force -ErrorAction SilentlyContinue
+$processNames = 'SMSSearch','SMSSearchLauncher','SMS Search Launcher'
+$processes = Get-Process -Name $processNames -ErrorAction SilentlyContinue
+
+if ($processes) {
+    $processes | Stop-Process -Force -ErrorAction SilentlyContinue
+    # Wait for the processes to actually exit to avoid file locks during build
+    $processes | Wait-Process -Timeout 10 -ErrorAction SilentlyContinue
+}
