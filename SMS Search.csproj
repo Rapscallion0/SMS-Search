@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <Target Name="PreBuildServiceCleanup" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
-    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -Command &quot;$startup = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Startup); $lnk = Join-Path $startup 'SMSSearchLauncher.lnk'; $marker = '$(ProjectDir)$(IntermediateOutputPath)service_was_registered.marker'; if (Test-Path $lnk) { New-Item -ItemType File -Path $marker -Force | Out-Null; Remove-Item $lnk -Force -ErrorAction SilentlyContinue; } Stop-Process -Name 'SMSSearch','SMSSearchLauncher','SMS Search Launcher' -Force -ErrorAction SilentlyContinue&quot;" />
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -Command '$startup = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Startup); $lnk = Join-Path $startup ''SMSSearchLauncher.lnk''; $marker = ''$(ProjectDir)$(IntermediateOutputPath)service_was_registered.marker''; if (Test-Path $lnk) { New-Item -ItemType File -Path $marker -Force | Out-Null; Remove-Item $lnk -Force -ErrorAction SilentlyContinue; } Stop-Process -Name ''SMSSearch'',''SMSSearchLauncher'',''SMS Search Launcher'' -Force -ErrorAction SilentlyContinue'" />
   </Target>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -80,7 +80,7 @@
   </Target>
 
   <Target Name="PostBuildServiceRestore" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
-    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -Command &quot;$marker = '$(ProjectDir)$(IntermediateOutputPath)service_was_registered.marker'; if (Test-Path $marker) { $startup = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Startup); $lnk = Join-Path $startup 'SMSSearchLauncher.lnk'; $WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut($lnk); $Shortcut.TargetPath = '$(TargetPath)'; $Shortcut.Arguments = '--listener'; $Shortcut.WorkingDirectory = '$(TargetDir)'; $Shortcut.Save(); Start-Process -FilePath '$(TargetPath)' -ArgumentList '--listener'; Remove-Item $marker -Force -ErrorAction SilentlyContinue; }&quot;" />
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -Command '$marker = ''$(ProjectDir)$(IntermediateOutputPath)service_was_registered.marker''; if (Test-Path $marker) { $startup = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Startup); $lnk = Join-Path $startup ''SMSSearchLauncher.lnk''; $WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut($lnk); $Shortcut.TargetPath = ''$(TargetPath)''; $Shortcut.Arguments = ''--listener''; $Shortcut.WorkingDirectory = ''$(TargetDir)''; $Shortcut.Save(); Start-Process -FilePath ''$(TargetPath)'' -ArgumentList ''--listener''; Remove-Item $marker -Force -ErrorAction SilentlyContinue; }'" />
   </Target>
 
 </Project>
