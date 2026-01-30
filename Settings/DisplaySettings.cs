@@ -70,6 +70,8 @@ namespace SMS_Search.Settings
             if (!_isLoaded || _config == null) return;
             _config.SetValue(section, key, value);
             _config.Save();
+
+            (this.ParentForm as frmConfig)?.FlashSaved();
         }
     }
 }
