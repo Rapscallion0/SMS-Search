@@ -1447,6 +1447,10 @@ namespace SMS_Search
             }
 
             int rowsToCheck = Math.Min(dGrd.RowCount, rowLimit);
+            const int padding = 14; // Approximate padding for cell content
+
+            // Cache font to avoid property access overhead in loop
+            Font font = dGrd.DefaultCellStyle.Font ?? Font;
 
             foreach (DataGridViewColumn col in dGrd.Columns)
             {
@@ -1458,9 +1462,24 @@ namespace SMS_Search
                 // Measure Cells
                 for (int i = 0; i < rowsToCheck; i++)
                 {
-                    var cell = dGrd.Rows[i].Cells[col.Index];
-                    int cellWidth = cell.PreferredSize.Width;
-                    if (cellWidth > maxWidth) maxWidth = cellWidth;
+                    string valueStr = "";
+                    if (dGrd.VirtualMode)
+                    {
+                        var value = _gridContext.GetValue(i, col.Index);
+                        valueStr = value?.ToString() ?? "";
+                    }
+                    else
+                    {
+                        // Fallback for non-virtual mode
+                        var value = dGrd.Rows[i].Cells[col.Index].Value;
+                        valueStr = value?.ToString() ?? "";
+                    }
+
+                    if (!string.IsNullOrEmpty(valueStr))
+                    {
+                        int cellWidth = TextRenderer.MeasureText(valueStr, font).Width + padding;
+                        if (cellWidth > maxWidth) maxWidth = cellWidth;
+                    }
                 }
 
                 col.Width = maxWidth;
