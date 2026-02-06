@@ -1414,8 +1414,6 @@ namespace SMS_Search
                 int limit = 5000;
                 if (string.IsNullOrEmpty(limitStr) || !int.TryParse(limitStr, out limit)) limit = 5000;
 
-                int firstDisplayedScrollingColumnIndex = dGrd.FirstDisplayedScrollingColumnIndex;
-
                 if (dGrd.RowCount <= limit)
                 {
                     if (dGrd.VirtualMode)
@@ -1428,11 +1426,6 @@ namespace SMS_Search
                 {
                     await ResizeColumnsBasedOnFirstRowsAsync(100);
                 }
-
-			    if (firstDisplayedScrollingColumnIndex >= 0)
-			    {
-				    dGrd.FirstDisplayedScrollingColumnIndex = firstDisplayedScrollingColumnIndex;
-			    }
 			}
 		}
 
