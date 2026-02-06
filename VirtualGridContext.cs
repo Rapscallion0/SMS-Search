@@ -368,5 +368,19 @@ namespace SMS_Search
                  }
              }
         }
+
+        public async Task<int> FindMatchRowAsync(string searchText, IEnumerable<string> searchColumns, int startRowIndex, bool forward)
+        {
+            if (string.IsNullOrWhiteSpace(searchText) || searchColumns == null) return -1;
+
+            var colTypes = new Dictionary<string, string>();
+            foreach (var col in searchColumns)
+            {
+                if (_columnSqlTypes.TryGetValue(col, out string type)) colTypes[col] = type;
+                else colTypes[col] = null;
+            }
+
+            return await _repo.GetMatchRowIndexAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, searchText, colTypes, startRowIndex, SortColumn, SortDirection, forward);
+        }
     }
 }

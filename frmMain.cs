@@ -2006,82 +2006,48 @@ namespace SMS_Search
             int startCol = dGrd.CurrentCell != null ? dGrd.CurrentCell.ColumnIndex : 0;
 
             int currentRow = startRow;
-            int currentCol = startCol;
-
             bool found = false;
 
-            // Simple client-side search because grid is filtered to only show matching rows.
-            // We just need to find the next cell that matches.
-            // Warning: If rows are many, we might need to fetch data.
-            // But since grid is virtual, accessing dGrd[col, row].Value triggers LoadPage.
-            // This might be slow if we traverse many rows.
-            // However, every row has a match (since filtered). So we will find one very quickly (in current row or next row).
+            // Ensure current row is loaded for local check
+            await _gridContext.WaitForRowAsync(currentRow);
 
-            // Search limit to avoid infinite loops or massive fetches (though every row should have a match)
-            int rowsChecked = 0;
-            int maxRowsToCheck = dGrd.RowCount;
-
-            while (rowsChecked < maxRowsToCheck)
+            // Step 1: Check current row
+            if (FindMatchInRow(currentRow, filterText, forward, forward ? startCol + 1 : startCol - 1, out int foundCol))
             {
-                // Advance col
-                if (forward)
-                {
-                    currentCol++;
-                    if (currentCol >= dGrd.ColumnCount)
-                    {
-                        currentCol = 0;
-                        currentRow++;
-                        if (currentRow >= dGrd.RowCount) currentRow = 0; // Wrap around? Or stop? User didn't specify. Wrap is good.
-                    }
-                }
-                else
-                {
-                    currentCol--;
-                    if (currentCol < 0)
-                    {
-                        currentCol = dGrd.ColumnCount - 1;
-                        currentRow--;
-                        if (currentRow < 0) currentRow = dGrd.RowCount - 1;
-                    }
-                }
+                dGrd.CurrentCell = dGrd[foundCol, currentRow];
+                found = true;
+            }
+            else
+            {
+                 // Step 2: DB Search
+                 var visibleCols = dGrd.Columns.Cast<DataGridViewColumn>()
+                                      .Where(c => c.Visible)
+                                      .Select(c => c.Name)
+                                      .ToList();
 
-                // Check match
-                // Only check visible columns
-                if (dGrd.Columns[currentCol].Visible)
-                {
-                    var val = dGrd[currentCol, currentRow].Value;
-                    // Accessing .Value triggers VirtualGridContext.GetValue -> RequestPage -> Async?
-                    // VirtualGridContext.GetValue returns null if not in cache and triggers RequestPage.
-                    // If it returns null, we can't check it immediately.
-                    // We need to wait for data?
-                    // This implementation of VirtualGridContext is async-void for RequestPage.
-                    // We can't await it easily.
-                    // BUT: RequestPage fetches a page (100 rows).
-                    // If we hit a null value, we should probably wait.
-                    // Since we can't await GetValue, this loop will fail if data isn't loaded.
+                 int nextRow = await _gridContext.FindMatchRowAsync(filterText, visibleCols, currentRow, forward);
 
-                    if (val == null)
-                    {
-                        await _gridContext.WaitForRowAsync(currentRow);
-                        val = dGrd[currentCol, currentRow].Value;
-                    }
+                 if (nextRow == -1)
+                 {
+                     // Wrap around
+                     int wrapStart = forward ? -1 : _gridContext.TotalCount;
+                     nextRow = await _gridContext.FindMatchRowAsync(filterText, visibleCols, wrapStart, forward);
+                 }
 
-                    if (val != null && val.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        dGrd.CurrentCell = dGrd[currentCol, currentRow];
-                        found = true;
-                        break;
-                    }
-                }
+                 if (nextRow != -1)
+                 {
+                     currentRow = nextRow;
+                     await _gridContext.WaitForRowAsync(currentRow);
 
-                // If we wrapped around to start, stop
-                if (currentRow == startRow && currentCol == startCol) break;
+                     // Find column in new row (Scan all columns)
+                     int startOffset = forward ? -1 : dGrd.ColumnCount;
 
-                // Optimization: If we moved to a new row, and we know every row has a match, we should find it in this row.
-                // So rowsChecked increment is effectively checking how many cells? No.
-                // Just guard against infinite loop.
-                if (forward && currentCol == 0) rowsChecked++;
-                if (!forward && currentCol == dGrd.ColumnCount - 1) rowsChecked++;
+                     if (FindMatchInRow(currentRow, filterText, forward, startOffset, out foundCol))
+                     {
+                         dGrd.CurrentCell = dGrd[foundCol, currentRow];
+                         found = true;
+                     }
+                 }
             }
 
             if (found)
@@ -2108,6 +2074,43 @@ namespace SMS_Search
                 long matchIndex = preceding + currentMatches;
                 lblMatchCount.Text = $"Match {matchIndex} of {total}";
             }
+        }
+
+        private bool FindMatchInRow(int rowIndex, string filterText, bool forward, int startColIndex, out int foundColIndex)
+        {
+            foundColIndex = -1;
+            int colCount = dGrd.ColumnCount;
+
+            if (forward)
+            {
+                for (int c = Math.Max(0, startColIndex); c < colCount; c++)
+                {
+                     if (CheckCellMatch(c, rowIndex, filterText))
+                     {
+                         foundColIndex = c;
+                         return true;
+                     }
+                }
+            }
+            else
+            {
+                for (int c = Math.Min(colCount - 1, startColIndex); c >= 0; c--)
+                {
+                     if (CheckCellMatch(c, rowIndex, filterText))
+                     {
+                         foundColIndex = c;
+                         return true;
+                     }
+                }
+            }
+            return false;
+        }
+
+        private bool CheckCellMatch(int colIndex, int rowIndex, string filterText)
+        {
+             if (!dGrd.Columns[colIndex].Visible) return false;
+             var val = dGrd[colIndex, rowIndex].Value;
+             return val != null && val.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private async void ExportToCsv()
