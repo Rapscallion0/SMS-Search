@@ -1571,9 +1571,9 @@ namespace SMS_Search
 			Application.Exit();
 		}
 
-		private void picRefresh_Click(object sender, EventArgs e)
+		private async void picRefresh_Click(object sender, EventArgs e)
 		{
-			PopulateTableList();
+			await PopulateTableList();
 		}
 
 		private void picRefresh_MouseEnter(object sender, EventArgs e)
@@ -1602,9 +1602,9 @@ namespace SMS_Search
 			getDbNames();
 		}
 
-		private void tscmbDbDatabase_SelectedIndexChanged(object sender, EventArgs e)
+		private async void tscmbDbDatabase_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			PopulateTableList();
+			await PopulateTableList();
 		}
 
 		private async void getDbNames()
