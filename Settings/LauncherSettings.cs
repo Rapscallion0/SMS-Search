@@ -124,15 +124,15 @@ namespace SMS_Search.Settings
                  btnRegister.Enabled = false;
                  btnUnregister.Enabled = false;
 
-                 await Task.Run(() =>
+                 await Task.Run(async () =>
                  {
                      KillLauncher(); // Kills legacy and new
-                     DeleteLegacyLauncher(); // Deletes legacy exe
+                     await DeleteLegacyLauncherAsync(); // Deletes legacy exe
                      RemoveStartupShortcut(); // Removes all shortcuts
 
                      // Now Register New
                      CreateStartupShortcut();
-                     StartLauncher();
+                     await StartLauncherAsync();
                  });
              }
              catch (Exception ex)
@@ -155,7 +155,7 @@ namespace SMS_Search.Settings
             btnUnregister.Click += btnUnregister_Click;
         }
 
-        private void txtHotkey_KeyDown(object sender, KeyEventArgs e)
+        private async void txtHotkey_KeyDown(object sender, KeyEventArgs e)
         {
             e.SuppressKeyPress = true;
 
@@ -165,7 +165,7 @@ namespace SMS_Search.Settings
                  txtHotkey.Text = HotkeyUtils.ToString(def);
                  _currentValidHotkey = txtHotkey.Text;
                  _isCurrentHotkeyValid = true;
-                 SaveHotkeyIfValid();
+                 await SaveHotkeyIfValidAsync();
                  return;
             }
 
@@ -205,7 +205,7 @@ namespace SMS_Search.Settings
             }
         }
 
-        private void txtHotkey_KeyUp(object sender, KeyEventArgs e)
+        private async void txtHotkey_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.None || (e.KeyData & Keys.Modifiers) == Keys.None)
             {
@@ -219,12 +219,12 @@ namespace SMS_Search.Settings
                 else
                 {
                     _lastValidHotkey = _currentValidHotkey;
-                    SaveHotkeyIfValid();
+                    await SaveHotkeyIfValidAsync();
                 }
             }
         }
 
-        private void txtHotkey_Leave(object sender, EventArgs e)
+        private async void txtHotkey_Leave(object sender, EventArgs e)
         {
              if (!_isCurrentHotkeyValid)
             {
@@ -233,10 +233,10 @@ namespace SMS_Search.Settings
                 _isCurrentHotkeyValid = true;
                 txtHotkey.BackColor = SystemColors.Window;
             }
-            SaveHotkeyIfValid();
+            await SaveHotkeyIfValidAsync();
         }
 
-        private void SaveHotkeyIfValid()
+        private async Task SaveHotkeyIfValidAsync()
         {
             if (_isCurrentHotkeyValid && _isLoaded && _config != null)
             {
@@ -244,7 +244,7 @@ namespace SMS_Search.Settings
                  _config.Save();
 
                  // If running, restart to pick up new hotkey
-                 ReloadLauncherIfRunning();
+                 await ReloadLauncherIfRunningAsync();
                  (this.ParentForm as frmConfig)?.FlashSaved();
             }
         }
@@ -289,11 +289,11 @@ namespace SMS_Search.Settings
                 btnRegister.Enabled = false;
                 btnUnregister.Enabled = false;
 
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
                     KillLauncher();
                     CreateStartupShortcut();
-                    StartLauncher();
+                    await StartLauncherAsync();
                 });
             }
             catch (Exception ex)
@@ -319,11 +319,11 @@ namespace SMS_Search.Settings
                 btnRegister.Enabled = false;
                 btnUnregister.Enabled = false;
 
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
                     RemoveStartupShortcut();
                     KillLauncher();
-                    DeleteLegacyLauncher();
+                    await DeleteLegacyLauncherAsync();
                 });
             }
             catch (Exception ex)
@@ -338,7 +338,7 @@ namespace SMS_Search.Settings
             }
         }
 
-        private void DeleteLegacyLauncher()
+        private async Task DeleteLegacyLauncherAsync()
         {
             _log.Logger(LogLevel.Info, "Checking for legacy Launcher executable");
             string targetPath = Path.Combine(Application.StartupPath, LegacyLauncherExe);
@@ -362,7 +362,7 @@ namespace SMS_Search.Settings
                             return;
                         }
                         retries--;
-                        System.Threading.Thread.Sleep(200);
+                        await Task.Delay(200);
                     }
                 }
             }
@@ -420,7 +420,7 @@ namespace SMS_Search.Settings
             }
         }
 
-        private void StartLauncher()
+        private async Task StartLauncherAsync()
         {
             string targetPath = Application.ExecutablePath;
             if (!IsLauncherRunning())
@@ -433,7 +433,7 @@ namespace SMS_Search.Settings
                 while (retries > 0)
                 {
                     if (IsLauncherRunning()) break;
-                    System.Threading.Thread.Sleep(100);
+                    await Task.Delay(100);
                     retries--;
                 }
             }
@@ -510,12 +510,12 @@ namespace SMS_Search.Settings
             }
         }
 
-        private void ReloadLauncherIfRunning()
+        private async Task ReloadLauncherIfRunningAsync()
         {
             if (IsLauncherRunning())
             {
                 KillLauncher();
-                StartLauncher();
+                await StartLauncherAsync();
             }
         }
 
