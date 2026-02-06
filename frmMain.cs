@@ -1621,10 +1621,7 @@ namespace SMS_Search
                 string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 
                 var dbs = await _repo.GetDatabasesAsync(server, user, pass);
-                foreach(var db in dbs)
-                {
-                    tscmbDbDatabase.Items.Add(db);
-                }
+                tscmbDbDatabase.Items.AddRange(dbs.ToArray());
                 log.Logger(LogLevel.Info, $"getDbNames: Loaded {dbs.Count()} databases");
             }
             catch (Exception ex)
