@@ -34,6 +34,13 @@ namespace SMS_Search
         private string _rawFilterText;
         private List<string> _filterColumns;
 
+        private Dictionary<string, string> _columnSqlTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        private static readonly HashSet<string> SafeStringTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "char", "nchar", "varchar", "nvarchar", "text", "ntext", "sysname"
+        };
+
         public event EventHandler DataReady;
         public event EventHandler<string> LoadError;
 
@@ -87,7 +94,14 @@ namespace SMS_Search
                 string safeFilter = filterText.Replace("'", "''");
                 foreach (var col in columns)
                 {
-                    clauses.Add($"CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%'");
+                    if (_columnSqlTypes.TryGetValue(col, out string type) && SafeStringTypes.Contains(type))
+                    {
+                        clauses.Add($"[{col}] LIKE '%{safeFilter}%'");
+                    }
+                    else
+                    {
+                        clauses.Add($"CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%'");
+                    }
                 }
                 FilterText = string.Join(" OR ", clauses);
             }
@@ -100,7 +114,14 @@ namespace SMS_Search
             if (string.IsNullOrWhiteSpace(_rawFilterText) || _filterColumns == null || _filterColumns.Count == 0)
                 return 0;
 
-            return await _repo.GetTotalMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, _filterColumns);
+            var colTypes = new Dictionary<string, string>();
+            foreach(var col in _filterColumns)
+            {
+                if(_columnSqlTypes.TryGetValue(col, out string type)) colTypes[col] = type;
+                else colTypes[col] = null;
+            }
+
+            return await _repo.GetTotalMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, colTypes);
         }
 
         public async Task<long> GetPrecedingMatchCountAsync(int limitRowIndex)
@@ -108,7 +129,14 @@ namespace SMS_Search
             if (string.IsNullOrWhiteSpace(_rawFilterText) || _filterColumns == null || _filterColumns.Count == 0 || limitRowIndex <= 0)
                 return 0;
 
-            return await _repo.GetPrecedingMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, _filterColumns, limitRowIndex, SortColumn, SortDirection);
+            var colTypes = new Dictionary<string, string>();
+            foreach (var col in _filterColumns)
+            {
+                if (_columnSqlTypes.TryGetValue(col, out string type)) colTypes[col] = type;
+                else colTypes[col] = null;
+            }
+
+            return await _repo.GetPrecedingMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, colTypes, limitRowIndex, SortColumn, SortDirection);
         }
 
         public async Task WaitForRowAsync(int rowIndex)
@@ -252,7 +280,16 @@ namespace SMS_Search
 
         public async Task<DataTable> GetSchemaAsync(string sql, object parameters)
         {
-             return await _repo.GetQuerySchemaAsync(_server, _database, _user, _pass, sql, parameters);
+             var dt = await _repo.GetQuerySchemaAsync(_server, _database, _user, _pass, sql, parameters);
+             _columnSqlTypes.Clear();
+             foreach(DataColumn col in dt.Columns)
+             {
+                 if(col.ExtendedProperties.ContainsKey("SqlType"))
+                 {
+                     _columnSqlTypes[col.ColumnName] = col.ExtendedProperties["SqlType"] as string;
+                 }
+             }
+             return dt;
         }
 
         public async Task ExportToCsvAsync(string filename, Dictionary<string, string> headerMap = null, bool includeHeaders = true)

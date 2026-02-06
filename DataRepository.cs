@@ -12,6 +12,11 @@ namespace SMS_Search
     {
         private Logfile log = new Logfile("DataRepo");
 
+        private static readonly HashSet<string> SafeStringTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "char", "nchar", "varchar", "nvarchar", "text", "ntext", "sysname"
+        };
+
         public string GetConnectionString(string server, string database, string user, string pass)
         {
             if (string.IsNullOrEmpty(user))
@@ -139,8 +144,25 @@ namespace SMS_Search
                 await conn.OpenAsync();
                 using (var reader = await conn.ExecuteReaderAsync(schemaSql, parameters))
                 {
+                    // Capture SQL Types before consuming reader with Load
+                    var typeMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        typeMap[reader.GetName(i)] = reader.GetDataTypeName(i);
+                    }
+
                     var dt = new DataTable();
                     dt.Load(reader);
+
+                    // Attach SQL types to columns
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        if (typeMap.TryGetValue(col.ColumnName, out string sqlType))
+                        {
+                            col.ExtendedProperties["SqlType"] = sqlType;
+                        }
+                    }
+
                     log.Logger(LogLevel.Debug, $"GetQuerySchemaAsync: Returned {dt.Columns.Count} columns");
                     return dt;
                 }
@@ -239,15 +261,24 @@ namespace SMS_Search
              }
         }
 
-        public async Task<long> GetTotalMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, IEnumerable<string> columns)
+        public async Task<long> GetTotalMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes)
         {
             if (string.IsNullOrWhiteSpace(filterText)) return 0;
             string safeFilter = filterText.Replace("'", "''");
 
             List<string> sumParts = new List<string>();
-            foreach (var col in columns)
+            foreach (var kvp in columnTypes)
             {
-                sumParts.Add($"(CASE WHEN CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
+                string col = kvp.Key;
+                string type = kvp.Value;
+                if (type != null && SafeStringTypes.Contains(type))
+                {
+                    sumParts.Add($"(CASE WHEN [{col}] LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
+                }
+                else
+                {
+                    sumParts.Add($"(CASE WHEN CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
+                }
             }
             string sumExpression = string.Join(" + ", sumParts);
 
@@ -263,16 +294,25 @@ namespace SMS_Search
             }
         }
 
-        public async Task<long> GetPrecedingMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, IEnumerable<string> columns, int limitRowIndex, string sortCol, string sortDir)
+        public async Task<long> GetPrecedingMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes, int limitRowIndex, string sortCol, string sortDir)
         {
             if (limitRowIndex <= 0) return 0;
             if (string.IsNullOrWhiteSpace(filterText)) return 0;
             string safeFilter = filterText.Replace("'", "''");
 
             List<string> sumParts = new List<string>();
-            foreach (var col in columns)
+            foreach (var kvp in columnTypes)
             {
-                sumParts.Add($"(CASE WHEN CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
+                string col = kvp.Key;
+                string type = kvp.Value;
+                if (type != null && SafeStringTypes.Contains(type))
+                {
+                    sumParts.Add($"(CASE WHEN [{col}] LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
+                }
+                else
+                {
+                    sumParts.Add($"(CASE WHEN CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
+                }
             }
             string sumExpression = string.Join(" + ", sumParts);
 
