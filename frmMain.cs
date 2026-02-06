@@ -65,7 +65,9 @@ namespace SMS_Search
 		private ArrayList arrayGrdFld = new ArrayList();
 		private ArrayList arrayGrdDesc = new ArrayList();
         private System.Windows.Forms.Timer _filterDebounceTimer;
-        private ContextMenuStrip _headerContextMenu;
+        private ContextMenuStrip _cellContextMenu;
+        private ContextMenuStrip _columnHeaderMenu;
+        private ContextMenuStrip _rowHeaderMenu;
 
         private bool _highlightMatches = false;
         private Color _matchHighlightColor = Color.Yellow;
@@ -86,12 +88,13 @@ namespace SMS_Search
             dGrd.RowPostPaint += dGrd_RowPostPaint;
             dGrd.CellPainting += dGrd_CellPainting;
             dGrd.CurrentCellChanged += dGrd_CurrentCellChanged;
+            dGrd.RowHeaderMouseClick += dGrd_RowHeaderMouseClick;
 
             _filterDebounceTimer = new System.Windows.Forms.Timer();
             _filterDebounceTimer.Interval = 500;
             _filterDebounceTimer.Tick += _filterDebounceTimer_Tick;
 
-            SetupGridContextMenu();
+            SetupContextMenus();
 
 			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " initialized");
 
@@ -770,7 +773,7 @@ namespace SMS_Search
         {
             if (e.Button == MouseButtons.Right)
             {
-                _headerContextMenu.Show(Cursor.Position);
+                _columnHeaderMenu.Show(Cursor.Position);
                 return;
             }
 
@@ -1246,12 +1249,63 @@ namespace SMS_Search
             Height = FormHeightMin;
         }
 
-        private void SetupGridContextMenu()
+        private void SetupContextMenus()
         {
-            var menu = new ContextMenuStrip();
+            // 1. Cell Context Menu
+            _cellContextMenu = new ContextMenuStrip();
 
-            // 0. Toggle Descriptions
-            var itemToggleDesc = menu.Items.Add("Show description in header");
+            // Filter by selection
+            var itemFilter = _cellContextMenu.Items.Add("Filter by selection");
+            itemFilter.Click += FilterBySelection_Click;
+
+            _cellContextMenu.Items.Add(new ToolStripSeparator());
+
+            // Select all
+            var itemSelectAll = _cellContextMenu.Items.Add("Select all");
+            itemSelectAll.Click += (s, e) => dGrd.SelectAll();
+
+            // Copy
+            var itemCopy = _cellContextMenu.Items.Add("Copy selected");
+            itemCopy.Click += (s, e) => CopyToClipboard(false);
+
+            // Copy with headers
+            var itemCopyWithHeaders = _cellContextMenu.Items.Add("Copy selected with headers");
+            itemCopyWithHeaders.Click += (s, e) => CopyToClipboard(true);
+
+            // Copy as INSERT
+            var itemCopyInsert = _cellContextMenu.Items.Add("Copy as INSERT");
+            itemCopyInsert.Click += (s, e) => CopyAsInsert();
+
+            _cellContextMenu.Items.Add(new ToolStripSeparator());
+
+            // Resize
+            var itemResize = _cellContextMenu.Items.Add("Resize to fit content");
+            itemResize.Click += (s, e) => dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+
+            // Clear result
+            var itemClear = _cellContextMenu.Items.Add("Clear result");
+            itemClear.Click += (s, e) => ClearResults();
+
+            _cellContextMenu.Items.Add(new ToolStripSeparator());
+
+            // Export to CSV
+            var itemExport = _cellContextMenu.Items.Add("Export results to CSV");
+            itemExport.Click += (s, e) => ExportToCsv();
+
+            _cellContextMenu.Opening += (s, e) =>
+            {
+                // Only enable "Filter by selection" if a single cell is active and has a value
+                bool canFilter = dGrd.CurrentCell != null && dGrd.CurrentCell.Value != null && !string.IsNullOrEmpty(dGrd.CurrentCell.Value.ToString());
+                itemFilter.Enabled = canFilter;
+            };
+
+            dGrd.ContextMenuStrip = _cellContextMenu;
+
+
+            // 2. Column Header Context Menu
+            _columnHeaderMenu = new ContextMenuStrip();
+
+            var itemToggleDesc = _columnHeaderMenu.Items.Add("Show description in header");
             itemToggleDesc.Click += async (s, e) =>
             {
                 _showDescriptions = !_showDescriptions;
@@ -1259,39 +1313,7 @@ namespace SMS_Search
                 setTabTextFocus();
             };
 
-            menu.Items.Add(new ToolStripSeparator());
-
-            // 1. Select all
-            var itemSelectAll = menu.Items.Add("Select all");
-            itemSelectAll.Click += (s, e) => dGrd.SelectAll();
-
-            // 2. Copy
-            var itemCopy = menu.Items.Add("Copy selected");
-            itemCopy.Click += (s, e) => CopyToClipboard(false);
-
-            // 3. Copy with headers
-            var itemCopyWithHeaders = menu.Items.Add("Copy selected with headers");
-            itemCopyWithHeaders.Click += (s, e) => CopyToClipboard(true);
-
-            // 4. Separator
-            menu.Items.Add(new ToolStripSeparator());
-
-            // 5. Resize content to fit
-            var itemResize = menu.Items.Add("Resize to fit content");
-            itemResize.Click += (s, e) => dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-
-            // 6. Clear result
-            var itemClear = menu.Items.Add("Clear result");
-            itemClear.Click += (s, e) => ClearResults();
-
-            // 7. Separator
-            menu.Items.Add(new ToolStripSeparator());
-
-            // 8. Export to CSV
-            var itemExport = menu.Items.Add("Export results to CSV");
-            itemExport.Click += (s, e) => ExportToCsv();
-
-            menu.Opening += (s, e) =>
+            _columnHeaderMenu.Opening += (s, e) =>
             {
                 if (_showDescriptions)
                     itemToggleDesc.Text = "Show field name in header";
@@ -1299,8 +1321,124 @@ namespace SMS_Search
                     itemToggleDesc.Text = "Show description in header";
             };
 
-            dGrd.ContextMenuStrip = menu;
-            _headerContextMenu = menu; // Reuse for header
+
+            // 3. Row Header Context Menu
+            _rowHeaderMenu = new ContextMenuStrip();
+
+            var itemCopyRow = _rowHeaderMenu.Items.Add("Copy row(s)");
+            itemCopyRow.Click += (s, e) => CopyToClipboard(false);
+
+            var itemCopyRowHeaders = _rowHeaderMenu.Items.Add("Copy row(s) with headers");
+            itemCopyRowHeaders.Click += (s, e) => CopyToClipboard(true);
+
+            var itemRowCopyInsert = _rowHeaderMenu.Items.Add("Copy as INSERT");
+            itemRowCopyInsert.Click += (s, e) => CopyAsInsert();
+        }
+
+        private void dGrd_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                // If the clicked row is NOT part of the current selection, select it exclusively.
+                // Otherwise (if it IS selected), keep the selection (allows right-clicking a multi-selection).
+                if (!dGrd.Rows[e.RowIndex].Selected)
+                {
+                    dGrd.ClearSelection();
+                    dGrd.Rows[e.RowIndex].Selected = true;
+                }
+
+                _rowHeaderMenu.Show(Cursor.Position);
+            }
+        }
+
+        private void FilterBySelection_Click(object sender, EventArgs e)
+        {
+            if (dGrd.CurrentCell != null && dGrd.CurrentCell.Value != null)
+            {
+                txtGridFilter.Text = dGrd.CurrentCell.Value.ToString();
+            }
+        }
+
+        private void CopyAsInsert()
+        {
+            if (dGrd.SelectedCells.Count == 0) return;
+
+            // Get unique rows from selected cells
+            var rows = new HashSet<int>();
+            foreach (DataGridViewCell cell in dGrd.SelectedCells)
+            {
+                rows.Add(cell.RowIndex);
+            }
+
+            var sortedRows = rows.OrderBy(r => r).ToList();
+
+            // Determine Table Name
+            string tableName = "[TableName]";
+            if (tabCtl.SelectedTab == tabFields && rdbTableFld.Checked && !string.IsNullOrWhiteSpace(cmbTableFld.Text))
+            {
+                tableName = cmbTableFld.Text;
+                if (!tableName.StartsWith("[") && !tableName.Contains(" ")) tableName = "[" + tableName + "]";
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (int rowIndex in sortedRows)
+            {
+                if (rowIndex >= dGrd.RowCount) continue;
+
+                // Ensure data is loaded (Virtual Mode check) - dGrd.SelectedCells implies it is loaded visually,
+                // but checking Value directly calls CellValueNeeded which handles it.
+
+                sb.Append($"INSERT INTO {tableName} (");
+
+                var cols = new List<DataGridViewColumn>();
+                for (int i = 0; i < dGrd.Columns.Count; i++)
+                {
+                    if (dGrd.Columns[i].Visible) cols.Add(dGrd.Columns[i]);
+                }
+
+                for (int i = 0; i < cols.Count; i++)
+                {
+                    sb.Append($"[{cols[i].Name}]");
+                    if (i < cols.Count - 1) sb.Append(", ");
+                }
+
+                sb.Append(") VALUES (");
+
+                for (int i = 0; i < cols.Count; i++)
+                {
+                    var val = dGrd[cols[i].Index, rowIndex].Value;
+                    sb.Append(FormatSqlValue(val));
+                    if (i < cols.Count - 1) sb.Append(", ");
+                }
+
+                sb.AppendLine(");");
+            }
+
+            if (sb.Length > 0)
+            {
+                Clipboard.SetText(sb.ToString());
+                Utils.showToast(0, "INSERT statements copied", "Copy", Screen.FromControl(this));
+            }
+        }
+
+        private string FormatSqlValue(object value)
+        {
+            if (value == null || value == DBNull.Value) return "NULL";
+
+            if (value is bool b) return b ? "1" : "0";
+            if (IsNumeric(value)) return value.ToString();
+            if (value is DateTime dt) return $"'{dt.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+
+            // Default: Quote string and escape
+            return $"'{value.ToString().Replace("'", "''")}'";
+        }
+
+        private bool IsNumeric(object value)
+        {
+            return value is sbyte || value is byte || value is short || value is ushort ||
+                   value is int || value is uint || value is long || value is ulong ||
+                   value is float || value is double || value is decimal;
         }
 
         private void CopyToClipboard(bool includeHeaders)
