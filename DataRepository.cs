@@ -343,5 +343,57 @@ namespace SMS_Search
                 return Convert.ToInt64(result);
             }
         }
+
+        public virtual async Task<int> GetMatchRowIndexAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string searchText, Dictionary<string, string> columnTypes, int startRowIndex, string sortCol, string sortDir, bool forward)
+        {
+            if (string.IsNullOrWhiteSpace(searchText)) return -1;
+            string safeFilter = searchText.Replace("'", "''");
+
+            List<string> searchParts = new List<string>();
+            foreach (var kvp in columnTypes)
+            {
+                string col = kvp.Key;
+                string type = kvp.Value;
+                if (type != null && SafeStringTypes.Contains(type))
+                {
+                    searchParts.Add($"[{col}] LIKE '%{safeFilter}%'");
+                }
+                else
+                {
+                    searchParts.Add($"CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%'");
+                }
+            }
+            string searchExpression = string.Join(" OR ", searchParts);
+
+            string finalSql = ApplyFilter(sql, filterClause);
+
+            string orderBy = "(SELECT NULL)";
+            if (!string.IsNullOrEmpty(sortCol))
+            {
+                string safeCol = sortCol.Replace("[", "").Replace("]", "");
+                orderBy = $"[{safeCol}] {sortDir}";
+            }
+
+            string comparison = forward ? ">" : "<";
+            string orderDirection = forward ? "ASC" : "DESC";
+
+            string query = $@"
+                SELECT TOP 1 RowNum
+                FROM (
+                    SELECT ROW_NUMBER() OVER (ORDER BY {orderBy}) - 1 as RowNum, *
+                    FROM ({finalSql}) AS _Base
+                ) AS _Ordered
+                WHERE RowNum {comparison} {startRowIndex}
+                AND ({searchExpression})
+                ORDER BY RowNum {orderDirection}";
+
+            using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
+            {
+                await conn.OpenAsync();
+                var result = await conn.ExecuteScalarAsync<object>(query, parameters);
+                if (result == null || result == DBNull.Value) return -1;
+                return Convert.ToInt32(result);
+            }
+        }
     }
 }
