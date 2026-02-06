@@ -1253,11 +1253,11 @@ namespace SMS_Search
             itemSelectAll.Click += (s, e) => dGrd.SelectAll();
 
             // 2. Copy
-            var itemCopy = menu.Items.Add("Copy");
+            var itemCopy = menu.Items.Add("Copy selected");
             itemCopy.Click += (s, e) => CopyToClipboard(false);
 
             // 3. Copy with headers
-            var itemCopyWithHeaders = menu.Items.Add("Copy with headers");
+            var itemCopyWithHeaders = menu.Items.Add("Copy selected with headers");
             itemCopyWithHeaders.Click += (s, e) => CopyToClipboard(true);
 
             // 4. Separator
@@ -1292,24 +1292,70 @@ namespace SMS_Search
 
         private void CopyToClipboard(bool includeHeaders)
         {
-            if (dGrd.GetCellCount(DataGridViewElementStates.Selected) > 0)
-            {
-                var oldMode = dGrd.ClipboardCopyMode;
-                try
-                {
-                    dGrd.ClipboardCopyMode = includeHeaders
-                        ? DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText
-                        : DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            string delimiterSetting = config.GetValue("GENERAL", "COPY_DELIMITER");
+            if (string.IsNullOrEmpty(delimiterSetting)) delimiterSetting = "TAB";
 
-                    DataObject dataObj = dGrd.GetClipboardContent();
-                    if (dataObj != null)
-                        Clipboard.SetDataObject(dataObj);
-                }
-                finally
+            if (delimiterSetting == "TAB")
+            {
+                if (dGrd.GetCellCount(DataGridViewElementStates.Selected) > 0)
                 {
-                    dGrd.ClipboardCopyMode = oldMode;
+                    var oldMode = dGrd.ClipboardCopyMode;
+                    try
+                    {
+                        dGrd.ClipboardCopyMode = includeHeaders
+                            ? DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText
+                            : DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+
+                        DataObject dataObj = dGrd.GetClipboardContent();
+                        if (dataObj != null)
+                            Clipboard.SetDataObject(dataObj);
+                    }
+                    finally
+                    {
+                        dGrd.ClipboardCopyMode = oldMode;
+                    }
                 }
+                return;
             }
+
+            // Custom delimiter logic
+            string delimiter = "";
+            switch (delimiterSetting)
+            {
+                case "Comma (,)": delimiter = ","; break;
+                case "Pipe (|)": delimiter = "|"; break;
+                case "Semicolon (;)": delimiter = ";"; break;
+                case "Custom...":
+                    delimiter = config.GetValue("GENERAL", "COPY_DELIMITER_CUSTOM");
+                    break;
+                default: delimiter = "\t"; break;
+            }
+
+            if (dGrd.SelectedCells.Count == 0) return;
+
+            var sb = new StringBuilder();
+            var cells = dGrd.SelectedCells.Cast<DataGridViewCell>().ToList();
+            var rows = cells.GroupBy(c => c.RowIndex).OrderBy(g => g.Key);
+
+            if (includeHeaders)
+            {
+                var uniqueCols = cells.Select(c => c.ColumnIndex).Distinct().OrderBy(c => c).ToList();
+                var headers = new List<string>();
+                foreach (var colIdx in uniqueCols)
+                {
+                    headers.Add(dGrd.Columns[colIdx].HeaderText);
+                }
+                sb.AppendLine(string.Join(delimiter, headers));
+            }
+
+            foreach (var rowGroup in rows)
+            {
+                var rowCells = rowGroup.OrderBy(c => c.ColumnIndex).Select(c => c.FormattedValue?.ToString() ?? "").ToList();
+                sb.AppendLine(string.Join(delimiter, rowCells));
+            }
+
+            if (sb.Length > 0)
+                Clipboard.SetText(sb.ToString());
         }
 
         private void btnSetup_Click(object sender, EventArgs e)

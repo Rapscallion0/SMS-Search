@@ -76,7 +76,7 @@ namespace SMS_Search.Settings
             treeNode2.ImageKey = "Display";
             treeNode2.Name = "Display";
             treeNode2.SelectedImageKey = "Display";
-            treeNode2.Text = "Display";
+            treeNode2.Text = "Result Grid";
             treeNode3.ImageKey = "Logging";
             treeNode3.Name = "Logging";
             treeNode3.SelectedImageKey = "Logging";
