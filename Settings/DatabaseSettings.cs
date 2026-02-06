@@ -334,21 +334,28 @@ namespace SMS_Search.Settings
 
             try
             {
-                await _dbConn.TestDbConnAsync(
+                bool success = await _dbConn.TestDbConnAsync(
                     cmbDbServer.Text,
                     cmbDbDatabase.Text,
+                    true,
                     chkWindowsAuth.Checked ? null : txtDbUser.Text,
                     chkWindowsAuth.Checked ? null : txtDbPassword.Text);
 
-                lblConnStatus.Text = "Connection Successful";
-                lblConnStatus.ForeColor = Color.Green;
-                //MessageBox.Show($"Connection successful to {cmbDbDatabase.Text}", "Connection Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (success)
+                {
+                    lblConnStatus.Text = "Connection Successful";
+                    lblConnStatus.ForeColor = Color.Green;
+                }
+                else
+                {
+                    lblConnStatus.Text = "Connection Failed";
+                    lblConnStatus.ForeColor = Color.Red;
+                }
             }
             catch (Exception)
             {
                 lblConnStatus.Text = "Connection Failed";
                 lblConnStatus.ForeColor = Color.Red;
-                //MessageBox.Show(ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             finally
             {
