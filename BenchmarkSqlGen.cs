@@ -10,7 +10,7 @@ public class BenchmarkSqlGen
         "char", "nchar", "varchar", "nvarchar", "text", "ntext"
     };
 
-    public static void Main(string[] args)
+    public static void Run(string[] args)
     {
         Console.WriteLine("Starting BenchmarkSqlGen...");
 
