@@ -53,7 +53,7 @@ namespace DbConn
 			}
 		}
 
-        public async Task<bool> TestDbConnAsync(string DbServer, string DbDatabase, string dbUser = null, string dbPassword = null)
+        public async Task<bool> TestDbConnAsync(string DbServer, string DbDatabase, bool DispError, string dbUser = null, string dbPassword = null)
         {
             log.Logger(LogLevel.Info, $"TestDbConnAsync: Testing connection to Server='{DbServer}' Database='{DbDatabase}'");
 
@@ -61,7 +61,12 @@ namespace DbConn
             {
                 if (string.IsNullOrEmpty(DbServer) || string.IsNullOrEmpty(DbDatabase))
                 {
-                    throw new ArgumentException("Cannot connect to Database when a blank 'Server Name' or 'Database Name' is specified.");
+                    log.Logger(LogLevel.Warning, "TestDbConnAsync: Blank Server or Database");
+                    if (DispError)
+                    {
+                         MessageBox.Show("Cannot connect: blank Server or Database.", "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                    }
+                    return false;
                 }
 
                 string connectionString = _repo.GetConnectionString(DbServer, DbDatabase, dbUser, dbPassword);
@@ -78,7 +83,11 @@ namespace DbConn
             catch (Exception ex)
             {
                 log.Logger(LogLevel.Error, "TestDbConnAsync: Connection failed - " + ex.Message);
-                throw;
+                if (DispError)
+                {
+                     MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                }
+                return false;
             }
         }
 	}

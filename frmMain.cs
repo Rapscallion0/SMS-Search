@@ -234,26 +234,8 @@ namespace SMS_Search
                 CheckUpdateAsync();
             }
 
-            bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
-            string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-            string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
-
-            if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), false, user, pass) || !File.Exists(frmMain.ConfigFilePath))
-            {
-                using (frmConfig frmConfig = new frmConfig())
-                {
-                    frmConfig.ForceDatabaseSetup = true;
-                    if (frmConfig.ShowDialog(this) != DialogResult.OK)
-                    {
-                        Application.Exit();
-                        return;
-                    }
-                }
-                config.Load();
-                log.ReloadConfig();
-            }
-
-			ValidateConfigFile();
+            // Apply UI settings immediately
+            ApplyConfigSettings();
 
 			splitContainer.Paint += new PaintEventHandler(SplitContainer_Paint);
 			tslblInfo.Text = "";
@@ -306,10 +288,6 @@ namespace SMS_Search
             typeof(DataGridView).InvokeMember("DoubleBuffered",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty,
                 null, dGrd, new object[] { true });
-
-			//Show();
-			//Focus();
-			//BringToFront();
 		}
 
 		private static async void CheckUpdateAsync()
@@ -331,7 +309,7 @@ namespace SMS_Search
             }
 		}
 
-        protected override void OnShown(EventArgs e)
+        protected override async void OnShown(EventArgs e)
 		{
             base.OnShown(e);
             log.Logger(LogLevel.Info, "frmMain_OnShown: Executing");
@@ -349,6 +327,7 @@ namespace SMS_Search
                 config.Save();
             }
 
+            await InitializeDatabaseAsync(true);
 			setTabTextFocus();
 		}
 
@@ -384,7 +363,7 @@ namespace SMS_Search
         /// <summary>
         /// 
         /// </summary>
-        private async void PopulateTableList()
+        private async Task PopulateTableList()
 		{
 			string text = cmbTableFld.Text.ToString();
             string server = tscmbDbServer.Text;
@@ -433,90 +412,64 @@ namespace SMS_Search
             }
 		}
 
-        /// <summary>
-        /// Validate Configuration file for SQL connection and set runtime configurations
-        /// </summary>
-        private void ValidateConfigFile()
-		{
-			SetBusy(true);
+        private void ApplyConfigSettings()
+        {
+            // Read connection values and update UI
+            string server = config.GetValue("CONNECTION", "SERVER");
+            string database = config.GetValue("CONNECTION", "DATABASE");
 
-			// Read connection values once
-			string server = config.GetValue("CONNECTION", "SERVER");
-			string database = config.GetValue("CONNECTION", "DATABASE");
+            // Defensive UI updates: only touch controls if form and controls are valid
+            if (!this.IsDisposed && !this.Disposing)
+            {
+                if (tscmbDbServer != null) tscmbDbServer.Text = server ?? string.Empty;
+                if (tscmbDbDatabase != null) tscmbDbDatabase.Text = database ?? string.Empty;
+            }
 
-            bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
-            string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-            string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+            if (config.GetValue("GENERAL", "SHOWINTRAY") == "1")
+            {
+                notifyIcon.Visible = true;
+                ShowInTaskbar = false;
+                MinimizeBox = false;
+            }
+            else
+            {
+                notifyIcon.Visible = false;
+                ShowInTaskbar = true;
+                MinimizeBox = true;
+            }
 
-			// If connection test fails or config file missing, show config dialog
-			if (!dbConn.TestDbConn(server, database, true, user, pass) || !File.Exists(frmMain.ConfigFilePath))
-			{
-				using (var cfg = new frmConfig())
-				{
-					cfg.ShowDialog(this);
-				}
-                config.Load(); // Re-load config in case it was changed
-                log.ReloadConfig();
+            if (config.GetValue("GENERAL", "ALWAYSONTOP") == "1")
+            {
+                TopMost = true;
+                onTop.Checked = true;
+            }
+            else
+            {
+                TopMost = false;
+                onTop.Checked = false;
+            }
 
-				// Re-read values in case the user updated configuration
-				server = config.GetValue("CONNECTION", "SERVER");
-				database = config.GetValue("CONNECTION", "DATABASE");
-			}
+            if (config.GetValue("GENERAL", "SEARCHANY") == "1")
+            {
+                chkSearchAnyFct.Checked = true;
+                chkSearchAnyTlz.Checked = true;
+                chkSearchAnyFld.Checked = true;
+            }
+            else
+            {
+                chkSearchAnyFct.Checked = false;
+                chkSearchAnyTlz.Checked = false;
+                chkSearchAnyFld.Checked = false;
+            }
 
-			// Defensive UI updates: only touch controls if form and controls are valid
-			if (!this.IsDisposed && !this.Disposing)
-			{
-				if (tscmbDbServer != null) tscmbDbServer.Text = server ?? string.Empty;
-				if (tscmbDbDatabase != null) tscmbDbDatabase.Text = database ?? string.Empty;
-			}
-
-			PopulateTableList();
-
-			if (config.GetValue("GENERAL", "SHOWINTRAY") == "1")
-			{
-				notifyIcon.Visible = true;
-				ShowInTaskbar = false;
-				MinimizeBox = false;
-			}
-			else
-			{
-				notifyIcon.Visible = false;
-				ShowInTaskbar = true;
-				MinimizeBox = true;
-			}
-
-			if (config.GetValue("GENERAL", "ALWAYSONTOP") == "1")
-			{
-				TopMost = true;
-				onTop.Checked = true;
-			}
-			else
-			{
-				TopMost = false;
-				onTop.Checked = false;
-			}
-
-			if (config.GetValue("GENERAL", "SEARCHANY") == "1")
-			{
-				chkSearchAnyFct.Checked = true;
-				chkSearchAnyTlz.Checked = true;
-				chkSearchAnyFld.Checked = true;
-			}
-			else
-			{
-				chkSearchAnyFct.Checked = false;
-				chkSearchAnyTlz.Checked = false;
-				chkSearchAnyFld.Checked = false;
-			}
-
-			if (config.GetValue("GENERAL", "DESCRIPTIONCOLUMNS") == "1")
-			{
-				_showDescriptions = true;
-			}
-			else
-			{
-				_showDescriptions = false;
-			}
+            if (config.GetValue("GENERAL", "DESCRIPTIONCOLUMNS") == "1")
+            {
+                _showDescriptions = true;
+            }
+            else
+            {
+                _showDescriptions = false;
+            }
 
             string fctFields = config.GetValue("QUERY", "FUNCTION");
             string tlzFields = config.GetValue("QUERY", "TOTALIZER");
@@ -537,9 +490,62 @@ namespace SMS_Search
 
             _showRowNumbers = config.GetValue("GENERAL", "SHOW_ROW_NUMBERS") == "1";
             UpdateRowHeaderWidth();
+        }
 
-			SetBusy(false);
-		}
+        private async Task InitializeDatabaseAsync(bool isStartup)
+        {
+            SetBusy(true);
+
+            bool connected = false;
+
+            while (!connected)
+            {
+                string server = config.GetValue("CONNECTION", "SERVER");
+                string database = config.GetValue("CONNECTION", "DATABASE");
+                bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
+                string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
+                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+
+                // Attempt to connect
+                connected = await dbConn.TestDbConnAsync(server, database, false, user, pass);
+
+                if (!connected || !File.Exists(frmMain.ConfigFilePath))
+                {
+                    // Show config dialog
+                    using (var cfg = new frmConfig())
+                    {
+                        if (isStartup) cfg.ForceDatabaseSetup = true;
+
+                        var result = cfg.ShowDialog(this);
+
+                        if (isStartup && result != DialogResult.OK)
+                        {
+                            // User cancelled initial setup
+                            Application.Exit();
+                            return;
+                        }
+
+                        if (!isStartup && result != DialogResult.OK)
+                        {
+                            // User cancelled re-configuration, stop trying to connect
+                            SetBusy(false);
+                            return;
+                        }
+                    }
+
+                    // Reload config
+                    config.Load();
+                    log.ReloadConfig();
+
+                    // Re-apply settings (e.g. server name in UI)
+                    ApplyConfigSettings();
+                }
+            }
+
+            // Connection successful
+            await PopulateTableList();
+            SetBusy(false);
+        }
 
         private void LoadCleanSqlRules()
         {
@@ -1358,7 +1364,7 @@ namespace SMS_Search
                 Clipboard.SetText(sb.ToString());
         }
 
-        private void btnSetup_Click(object sender, EventArgs e)
+        private async void btnSetup_Click(object sender, EventArgs e)
 		{
 			// Check if both Ctrl and Shift are pressed
 			if ((Control.ModifierKeys & Keys.Control) == Keys.Control && (Control.ModifierKeys & Keys.Shift) == Keys.Shift)
@@ -1373,19 +1379,14 @@ namespace SMS_Search
 				frmConfig.StartPosition = FormStartPosition.CenterParent;
 				frmConfig.ShowDialog(this);
 
-                bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
-                string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+                // Note: The original code re-checked DB connection manually here too.
+                // We'll rely on InitializeDatabaseAsync to handle re-validation and table refresh.
 
-				if (!dbConn.TestDbConn(config.GetValue("CONNECTION", "SERVER"), config.GetValue("CONNECTION", "DATABASE"), true, user, pass) || !File.Exists(frmMain.ConfigFilePath))
-				{
-					//frmConfig frmConfig = new frmConfig();
-					frmConfig.ShowDialog();
-				}
                 config.Load(); // Re-load config in case it was changed
                 log.ReloadConfig();
 
-				ValidateConfigFile();
+				ApplyConfigSettings();
+                await InitializeDatabaseAsync(false);
 			}
 		}
 
