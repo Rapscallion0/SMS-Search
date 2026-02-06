@@ -7,7 +7,7 @@ namespace SMS_Search
 {
     public class VirtualGridContext
     {
-        private readonly DataRepository _repo;
+        private readonly IDataRepository _repo;
 
         // Connection info
         private string _server;
@@ -24,6 +24,7 @@ namespace SMS_Search
         public int UnfilteredCount { get; private set; }
         private Dictionary<int, DataRow> _cache;
         private HashSet<int> _pagesBeingFetched;
+        private Dictionary<int, TaskCompletionSource<bool>> _pageCompletionSources;
         private const int PageSize = 100;
         private int _version = 0;
 
@@ -44,11 +45,12 @@ namespace SMS_Search
         public event EventHandler DataReady;
         public event EventHandler<string> LoadError;
 
-        public VirtualGridContext(DataRepository repo)
+        public VirtualGridContext(IDataRepository repo)
         {
             _repo = repo;
             _cache = new Dictionary<int, DataRow>();
             _pagesBeingFetched = new HashSet<int>();
+            _pageCompletionSources = new Dictionary<int, TaskCompletionSource<bool>>();
         }
 
         public void SetConnection(string server, string database, string user, string pass)
@@ -146,15 +148,20 @@ namespace SMS_Search
             // Trigger fetch by accessing (ignoring return)
             GetValue(rowIndex, 0);
 
-            // Poll for data arrival
-            int timeout = 5000; // 5 seconds max wait
-            int interval = 50;
-            while (timeout > 0)
+            if (_cache.ContainsKey(rowIndex)) return;
+
+            int pageIndex = rowIndex / PageSize;
+            TaskCompletionSource<bool> tcs;
+
+            if (!_pageCompletionSources.TryGetValue(pageIndex, out tcs))
             {
-                if (_cache.ContainsKey(rowIndex)) return;
-                await Task.Delay(interval);
-                timeout -= interval;
+                tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                _pageCompletionSources[pageIndex] = tcs;
             }
+
+            // Wait with timeout
+            var timeoutTask = Task.Delay(5000);
+            await Task.WhenAny(tcs.Task, timeoutTask);
         }
 
         public async Task EnsureRangeLoadedAsync(int startIndex, int count)
@@ -202,6 +209,12 @@ namespace SMS_Search
             {
                 _cache.Clear();
                 _pagesBeingFetched.Clear();
+
+                foreach (var tcs in _pageCompletionSources.Values)
+                {
+                    tcs.TrySetResult(false);
+                }
+                _pageCompletionSources.Clear();
 
                 // If filter/sort makes query invalid, this throws
                 TotalCount = await _repo.GetQueryCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText);
@@ -274,6 +287,12 @@ namespace SMS_Search
                 if (_version == currentVersion)
                 {
                     _pagesBeingFetched.Remove(pageIndex);
+
+                    if (_pageCompletionSources.TryGetValue(pageIndex, out var tcs))
+                    {
+                        tcs.TrySetResult(true);
+                        _pageCompletionSources.Remove(pageIndex);
+                    }
                 }
             }
         }

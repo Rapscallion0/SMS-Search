@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.Common;
 using System.Threading.Tasks;
 using Dapper;
 using Log;
 
 namespace SMS_Search
 {
-    public class DataRepository
+    public class DataRepository : IDataRepository
     {
         private Logfile log = new Logfile("DataRepo");
 
@@ -29,7 +30,7 @@ namespace SMS_Search
             }
         }
 
-        public async Task<bool> TestConnectionAsync(string server, string database, string user, string pass)
+        public virtual async Task<bool> TestConnectionAsync(string server, string database, string user, string pass)
         {
             try
             {
@@ -61,7 +62,7 @@ namespace SMS_Search
             }
         }
 
-        public async Task<DataTable> ExecuteQueryAsync(string server, string database, string user, string pass, string sql, object parameters = null)
+        public virtual async Task<DataTable> ExecuteQueryAsync(string server, string database, string user, string pass, string sql, object parameters = null)
         {
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
@@ -75,7 +76,7 @@ namespace SMS_Search
             }
         }
 
-        public async Task<int> GetQueryCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filter = null)
+        public virtual async Task<int> GetQueryCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filter = null)
         {
             string finalSql = ApplyFilter(sql, filter);
             // Inject TOP 100 PERCENT to handle potential inner ORDER BYs if the user provided one in Custom SQL
@@ -102,7 +103,7 @@ namespace SMS_Search
             }
         }
 
-        public async Task<DataTable> GetQueryPageAsync(string server, string database, string user, string pass, string sql, object parameters, int offset, int limit, string sortCol, string sortDir, string filter = null)
+        public virtual async Task<DataTable> GetQueryPageAsync(string server, string database, string user, string pass, string sql, object parameters, int offset, int limit, string sortCol, string sortDir, string filter = null)
         {
             string finalSql = ApplyFilter(sql, filter);
 
@@ -132,7 +133,7 @@ namespace SMS_Search
             }
         }
 
-        public async Task<DataTable> GetQuerySchemaAsync(string server, string database, string user, string pass, string sql, object parameters)
+        public virtual async Task<DataTable> GetQuerySchemaAsync(string server, string database, string user, string pass, string sql, object parameters)
         {
             // Get schema (0 rows)
             string schemaSql = $"SELECT TOP 0 * FROM ({sql}) AS _SchemaQ";
@@ -185,7 +186,7 @@ namespace SMS_Search
             log.Logger(LogLevel.Debug, $"{method}: Executing SQL: {sql} | Params: {paramLog}");
         }
 
-        public async Task<SqlDataReader> GetQueryDataReaderAsync(string server, string database, string user, string pass, string sql, object parameters)
+        public virtual async Task<DbDataReader> GetQueryDataReaderAsync(string server, string database, string user, string pass, string sql, object parameters)
         {
             var conn = new SqlConnection(GetConnectionString(server, database, user, pass));
             await conn.OpenAsync();
@@ -261,7 +262,7 @@ namespace SMS_Search
              }
         }
 
-        public async Task<long> GetTotalMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes)
+        public virtual async Task<long> GetTotalMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes)
         {
             if (string.IsNullOrWhiteSpace(filterText)) return 0;
             string safeFilter = filterText.Replace("'", "''");
@@ -294,7 +295,7 @@ namespace SMS_Search
             }
         }
 
-        public async Task<long> GetPrecedingMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes, int limitRowIndex, string sortCol, string sortDir)
+        public virtual async Task<long> GetPrecedingMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes, int limitRowIndex, string sortCol, string sortDir)
         {
             if (limitRowIndex <= 0) return 0;
             if (string.IsNullOrWhiteSpace(filterText)) return 0;
