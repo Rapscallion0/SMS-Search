@@ -490,6 +490,13 @@ namespace SMS_Search
 
             _showRowNumbers = config.GetValue("GENERAL", "SHOW_ROW_NUMBERS") == "1";
             UpdateRowHeaderWidth();
+
+            // Refresh filter UI state (visibility of buttons/count) if a filter is active
+            if (!string.IsNullOrWhiteSpace(txtGridFilter.Text))
+            {
+                _filterDebounceTimer.Stop();
+                _filterDebounceTimer.Start();
+            }
         }
 
         private async Task InitializeDatabaseAsync(bool isStartup)
@@ -2052,9 +2059,21 @@ namespace SMS_Search
 
             if (found)
             {
+                // Force UI update to show the move immediately
+                dGrd.Update();
+
                 // Calculate X of Y
                 lblMatchCount.Text = "Calculating...";
-                long total = await _gridContext.GetTotalMatchCountAsync();
+
+                // Use cached total count to avoid DB trip
+                long total = _lastTotalMatchCount;
+                if (total == 0)
+                {
+                    total = await _gridContext.GetTotalMatchCountAsync();
+                    _lastTotalMatchCount = total;
+                }
+
+                // Only await the preceding count
                 long preceding = await _gridContext.GetPrecedingMatchCountAsync(dGrd.CurrentCell.RowIndex);
 
                 // Add matches in current row up to current col
