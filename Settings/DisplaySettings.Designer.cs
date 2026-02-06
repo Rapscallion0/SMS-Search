@@ -36,6 +36,10 @@ namespace SMS_Search.Settings
             this.lblAutoResizeLimit = new System.Windows.Forms.Label();
             this.txtAutoResizeLimit = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.lblCopyDelimiter = new System.Windows.Forms.Label();
+            this.cmbCopyDelimiter = new System.Windows.Forms.ComboBox();
+            this.txtCustomDelimiter = new System.Windows.Forms.TextBox();
+            this.lblCopyWarning = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblDescription
@@ -99,12 +103,55 @@ namespace SMS_Search.Settings
             this.txtAutoResizeLimit.TabIndex = 5;
             this.toolTip1.SetToolTip(this.txtAutoResizeLimit, "Maximum number of rows to process when auto-resizing columns (improves performanc" +
         "e).");
+            //
+            // lblCopyDelimiter
+            //
+            this.lblCopyDelimiter.AutoSize = true;
+            this.lblCopyDelimiter.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCopyDelimiter.Location = new System.Drawing.Point(15, 160);
+            this.lblCopyDelimiter.Name = "lblCopyDelimiter";
+            this.lblCopyDelimiter.Size = new System.Drawing.Size(91, 15);
+            this.lblCopyDelimiter.TabIndex = 6;
+            this.lblCopyDelimiter.Text = "Copy delimiter:";
+            //
+            // cmbCopyDelimiter
+            //
+            this.cmbCopyDelimiter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCopyDelimiter.FormattingEnabled = true;
+            this.cmbCopyDelimiter.Location = new System.Drawing.Point(18, 180);
+            this.cmbCopyDelimiter.Name = "cmbCopyDelimiter";
+            this.cmbCopyDelimiter.Size = new System.Drawing.Size(150, 23);
+            this.cmbCopyDelimiter.TabIndex = 7;
+            this.toolTip1.SetToolTip(this.cmbCopyDelimiter, "Select delimiter for copy operations.");
+            //
+            // txtCustomDelimiter
+            //
+            this.txtCustomDelimiter.Location = new System.Drawing.Point(175, 180);
+            this.txtCustomDelimiter.Name = "txtCustomDelimiter";
+            this.txtCustomDelimiter.Size = new System.Drawing.Size(100, 23);
+            this.txtCustomDelimiter.TabIndex = 8;
+            this.toolTip1.SetToolTip(this.txtCustomDelimiter, "Enter custom delimiter characters.");
+            this.txtCustomDelimiter.Visible = false;
+            //
+            // lblCopyWarning
+            //
+            this.lblCopyWarning.AutoSize = true;
+            this.lblCopyWarning.ForeColor = System.Drawing.Color.DimGray;
+            this.lblCopyWarning.Location = new System.Drawing.Point(15, 210);
+            this.lblCopyWarning.Name = "lblCopyWarning";
+            this.lblCopyWarning.Size = new System.Drawing.Size(383, 15);
+            this.lblCopyWarning.TabIndex = 9;
+            this.lblCopyWarning.Text = "Note: Custom delimiters perform a text-only copy (Excel formatting may be lost).";
             // 
             // DisplaySettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
+            this.Controls.Add(this.lblCopyWarning);
+            this.Controls.Add(this.txtCustomDelimiter);
+            this.Controls.Add(this.cmbCopyDelimiter);
+            this.Controls.Add(this.lblCopyDelimiter);
             this.Controls.Add(this.txtAutoResizeLimit);
             this.Controls.Add(this.lblAutoResizeLimit);
             this.Controls.Add(this.chkShowRowNumbers);
@@ -128,5 +175,9 @@ namespace SMS_Search.Settings
         private System.Windows.Forms.Label lblAutoResizeLimit;
         private System.Windows.Forms.TextBox txtAutoResizeLimit;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label lblCopyDelimiter;
+        private System.Windows.Forms.ComboBox cmbCopyDelimiter;
+        private System.Windows.Forms.TextBox txtCustomDelimiter;
+        private System.Windows.Forms.Label lblCopyWarning;
     }
 }

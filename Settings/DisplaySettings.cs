@@ -40,7 +40,37 @@ namespace SMS_Search.Settings
             if (string.IsNullOrEmpty(resizeLimit)) resizeLimit = "5000";
             txtAutoResizeLimit.Text = resizeLimit;
 
+            InitializeComboBox();
+            string delimiter = _config.GetValue("GENERAL", "COPY_DELIMITER");
+            if (string.IsNullOrEmpty(delimiter)) delimiter = "TAB";
+
+            if (cmbCopyDelimiter.Items.Contains(delimiter))
+                cmbCopyDelimiter.SelectedItem = delimiter;
+            else
+                cmbCopyDelimiter.SelectedIndex = 0;
+
+            txtCustomDelimiter.Text = _config.GetValue("GENERAL", "COPY_DELIMITER_CUSTOM");
+
+            UpdateDelimiterUI();
+
             _isLoaded = true;
+        }
+
+        private void InitializeComboBox()
+        {
+            cmbCopyDelimiter.Items.Clear();
+            cmbCopyDelimiter.Items.Add("TAB");
+            cmbCopyDelimiter.Items.Add("Comma (,)");
+            cmbCopyDelimiter.Items.Add("Pipe (|)");
+            cmbCopyDelimiter.Items.Add("Semicolon (;)");
+            cmbCopyDelimiter.Items.Add("Custom...");
+        }
+
+        private void UpdateDelimiterUI()
+        {
+            bool isCustom = cmbCopyDelimiter.Text == "Custom...";
+            txtCustomDelimiter.Visible = isCustom;
+            lblCopyWarning.Visible = cmbCopyDelimiter.Text != "TAB";
         }
 
         private void WireUpEvents()
@@ -63,6 +93,14 @@ namespace SMS_Search.Settings
                     txtAutoResizeLimit.Text = saved;
                 }
             };
+
+            cmbCopyDelimiter.SelectedIndexChanged += (s, e) =>
+            {
+                UpdateDelimiterUI();
+                SaveSetting("GENERAL", "COPY_DELIMITER", cmbCopyDelimiter.Text);
+            };
+
+            txtCustomDelimiter.TextChanged += (s, e) => SaveSetting("GENERAL", "COPY_DELIMITER_CUSTOM", txtCustomDelimiter.Text);
         }
 
         private void SaveSetting(string section, string key, string value)
