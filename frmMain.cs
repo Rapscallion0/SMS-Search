@@ -89,6 +89,8 @@ namespace SMS_Search
             dGrd.CellPainting += dGrd_CellPainting;
             dGrd.CurrentCellChanged += dGrd_CurrentCellChanged;
             dGrd.RowHeaderMouseClick += dGrd_RowHeaderMouseClick;
+            dGrd.ShowEditingIcon = false;
+            dGrd.CellMouseClick += dGrd_CellMouseClick;
 
             _filterDebounceTimer = new System.Windows.Forms.Timer();
             _filterDebounceTimer.Interval = 500;
@@ -1299,8 +1301,6 @@ namespace SMS_Search
                 itemFilter.Enabled = canFilter;
             };
 
-            dGrd.ContextMenuStrip = _cellContextMenu;
-
 
             // 2. Column Header Context Menu
             _columnHeaderMenu = new ContextMenuStrip();
@@ -1372,6 +1372,14 @@ namespace SMS_Search
                 }
 
                 _rowHeaderMenu.Show(Cursor.Position);
+            }
+        }
+
+        private void dGrd_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                _cellContextMenu.Show(Cursor.Position);
             }
         }
 
