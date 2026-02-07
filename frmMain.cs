@@ -1375,26 +1375,6 @@ namespace SMS_Search
             var itemRowCopyInsert = _rowHeaderMenu.Items.Add("Copy as SQL INSERT");
             itemRowCopyInsert.Click += (s, e) => CopyAsSqlInsert();
 
-            // Advance copy submenu (Row Header)
-            var itemRowAdvCopy = _rowHeaderMenu.Items.Add("Advance copy");
-            var itemRowAdvCopyContent = (itemRowAdvCopy as ToolStripMenuItem).DropDownItems.Add("Copy Content Only");
-            itemRowAdvCopyContent.Click += async (s, e) => {
-                 string del = config.GetValue("GENERAL", "COPY_DELIMITER");
-                 if (string.IsNullOrEmpty(del)) del = "TAB";
-                 await CopyContentOnlyAsync(false, del);
-            };
-            var itemRowAdvCopyLayout = (itemRowAdvCopy as ToolStripMenuItem).DropDownItems.Add("Preserve Layout");
-            itemRowAdvCopyLayout.Click += async (s, e) => {
-                 string del = config.GetValue("GENERAL", "COPY_DELIMITER");
-                 if (string.IsNullOrEmpty(del)) del = "TAB";
-                 await CopyPreserveLayoutAsync(false, del);
-            };
-
-            _rowHeaderMenu.Opening += (s, e) =>
-            {
-                itemRowAdvCopy.Visible = IsSelectionDisjointed();
-            };
-
             _rowHeaderMenu.Items.Add(new ToolStripSeparator());
 
             // Export selected rows to CSV
