@@ -259,7 +259,7 @@ namespace SMS_Search
             this.dGrd.Name = "dGrd";
             this.dGrd.ReadOnly = true;
             this.dGrd.RowHeadersVisible = false;
-            this.dGrd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dGrd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.RowHeaderSelect;
             this.dGrd.Size = new System.Drawing.Size(594, 301);
             this.dGrd.TabIndex = 4;
             this.dGrd.TabStop = false;
