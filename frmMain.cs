@@ -1272,10 +1272,6 @@ namespace SMS_Search
             var itemCopyWithHeaders = _cellContextMenu.Items.Add("Copy selected with headers");
             itemCopyWithHeaders.Click += (s, e) => CopyToClipboard(true);
 
-            // Copy as INSERT
-            var itemCopyInsert = _cellContextMenu.Items.Add("Copy as INSERT");
-            itemCopyInsert.Click += (s, e) => CopyAsInsert();
-
             _cellContextMenu.Items.Add(new ToolStripSeparator());
 
             // Resize
@@ -1288,9 +1284,13 @@ namespace SMS_Search
 
             _cellContextMenu.Items.Add(new ToolStripSeparator());
 
-            // Export to CSV
-            var itemExport = _cellContextMenu.Items.Add("Export results to CSV");
-            itemExport.Click += (s, e) => ExportToCsv();
+            // Export selected cells to CSV
+            var itemExportSelected = _cellContextMenu.Items.Add("Export selected cells to CSV");
+            itemExportSelected.Click += (s, e) => ExportSelectedCellsToCsv();
+
+            // Export all results to CSV
+            var itemExportAll = _cellContextMenu.Items.Add("Export all results to CSV");
+            itemExportAll.Click += (s, e) => ExportAllResultsToCsv();
 
             _cellContextMenu.Opening += (s, e) =>
             {
@@ -1313,6 +1313,16 @@ namespace SMS_Search
                 setTabTextFocus();
             };
 
+            _columnHeaderMenu.Items.Add(new ToolStripSeparator());
+
+            // Export all results to CSV
+            var itemColExportAll = _columnHeaderMenu.Items.Add("Export all results to CSV");
+            itemColExportAll.Click += (s, e) => ExportAllResultsToCsv();
+
+            // Clear result
+            var itemColClear = _columnHeaderMenu.Items.Add("Clear result");
+            itemColClear.Click += (s, e) => ClearResults();
+
             _columnHeaderMenu.Opening += (s, e) =>
             {
                 if (_showDescriptions)
@@ -1331,8 +1341,22 @@ namespace SMS_Search
             var itemCopyRowHeaders = _rowHeaderMenu.Items.Add("Copy row(s) with headers");
             itemCopyRowHeaders.Click += (s, e) => CopyToClipboard(true);
 
-            var itemRowCopyInsert = _rowHeaderMenu.Items.Add("Copy as INSERT");
-            itemRowCopyInsert.Click += (s, e) => CopyAsInsert();
+            var itemRowCopyInsert = _rowHeaderMenu.Items.Add("Copy as SQL INSERT");
+            itemRowCopyInsert.Click += (s, e) => CopyAsSqlInsert();
+
+            _rowHeaderMenu.Items.Add(new ToolStripSeparator());
+
+            // Export selected rows to CSV
+            var itemRowExportSelected = _rowHeaderMenu.Items.Add("Export selected rows to CSV");
+            itemRowExportSelected.Click += (s, e) => ExportSelectedRowsToCsv();
+
+            // Export all results to CSV
+            var itemRowExportAll = _rowHeaderMenu.Items.Add("Export all results to CSV");
+            itemRowExportAll.Click += (s, e) => ExportAllResultsToCsv();
+
+            // Clear result
+            var itemRowClear = _rowHeaderMenu.Items.Add("Clear result");
+            itemRowClear.Click += (s, e) => ClearResults();
         }
 
         private void dGrd_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -1349,6 +1373,10 @@ namespace SMS_Search
 
                 _rowHeaderMenu.Show(Cursor.Position);
             }
+            else if (e.Button == MouseButtons.Left)
+            {
+                dGrd.Rows[e.RowIndex].Selected = true;
+            }
         }
 
         private void FilterBySelection_Click(object sender, EventArgs e)
@@ -1359,18 +1387,16 @@ namespace SMS_Search
             }
         }
 
-        private void CopyAsInsert()
+        private void CopyAsSqlInsert()
         {
             if (dGrd.SelectedCells.Count == 0) return;
 
-            // Get unique rows from selected cells
-            var rows = new HashSet<int>();
-            foreach (DataGridViewCell cell in dGrd.SelectedCells)
-            {
-                rows.Add(cell.RowIndex);
-            }
-
-            var sortedRows = rows.OrderBy(r => r).ToList();
+            // Get unique rows
+            var rowIndices = dGrd.SelectedCells.Cast<DataGridViewCell>()
+                                .Select(c => c.RowIndex)
+                                .Distinct()
+                                .OrderBy(r => r)
+                                .ToList();
 
             // Determine Table Name
             string tableName = "[TableName]";
@@ -1380,39 +1406,38 @@ namespace SMS_Search
                 if (!tableName.StartsWith("[") && !tableName.Contains(" ")) tableName = "[" + tableName + "]";
             }
 
-            StringBuilder sb = new StringBuilder();
+            // Get Visible Columns
+            var cols = dGrd.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).ToList();
+            if (cols.Count == 0) return;
 
-            foreach (int rowIndex in sortedRows)
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"INSERT INTO {tableName} (");
+            sb.Append(string.Join(", ", cols.Select(c => $"[{c.Name}]")));
+            sb.AppendLine(") VALUES");
+
+            for (int i = 0; i < rowIndices.Count; i++)
             {
+                int rowIndex = rowIndices[i];
                 if (rowIndex >= dGrd.RowCount) continue;
 
-                // Ensure data is loaded (Virtual Mode check) - dGrd.SelectedCells implies it is loaded visually,
-                // but checking Value directly calls CellValueNeeded which handles it.
-
-                sb.Append($"INSERT INTO {tableName} (");
-
-                var cols = new List<DataGridViewColumn>();
-                for (int i = 0; i < dGrd.Columns.Count; i++)
+                sb.Append("(");
+                var cellValues = new List<string>();
+                foreach (var col in cols)
                 {
-                    if (dGrd.Columns[i].Visible) cols.Add(dGrd.Columns[i]);
+                    var val = dGrd[col.Index, rowIndex].Value;
+                    cellValues.Add(FormatSqlValue(val));
                 }
+                sb.Append(string.Join(", ", cellValues));
+                sb.Append(")");
 
-                for (int i = 0; i < cols.Count; i++)
+                if (i < rowIndices.Count - 1)
                 {
-                    sb.Append($"[{cols[i].Name}]");
-                    if (i < cols.Count - 1) sb.Append(", ");
+                    sb.AppendLine(",");
                 }
-
-                sb.Append(") VALUES (");
-
-                for (int i = 0; i < cols.Count; i++)
+                else
                 {
-                    var val = dGrd[cols[i].Index, rowIndex].Value;
-                    sb.Append(FormatSqlValue(val));
-                    if (i < cols.Count - 1) sb.Append(", ");
+                    sb.AppendLine(";");
                 }
-
-                sb.AppendLine(");");
             }
 
             if (sb.Length > 0)
@@ -2270,14 +2295,14 @@ namespace SMS_Search
              return val != null && val.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        private async void ExportToCsv()
+        private async void ExportAllResultsToCsv()
         {
             if (dGrd.RowCount == 0) return;
 
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
                 sfd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
-                sfd.FileName = "SMS_Search_Export_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+                sfd.FileName = "SMS_Search_Export_All_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
                     bool includeHeaders = MessageBox.Show("Include headers in export?", "Export CSV", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
@@ -2292,6 +2317,137 @@ namespace SMS_Search
                         }
 
                         await _gridContext.ExportToCsvAsync(sfd.FileName, headerMap, includeHeaders);
+                        Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error exporting: " + ex.Message, "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        SetBusy(false);
+                    }
+                }
+            }
+        }
+
+        private void ExportSelectedRowsToCsv()
+        {
+            if (dGrd.SelectedCells.Count == 0) return;
+
+            // Get unique rows
+            var rowIndices = dGrd.SelectedCells.Cast<DataGridViewCell>()
+                                .Select(c => c.RowIndex)
+                                .Distinct()
+                                .OrderBy(r => r)
+                                .ToList();
+
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                sfd.FileName = "SMS_Search_Export_SelectedRows_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    bool includeHeaders = MessageBox.Show("Include headers in export?", "Export CSV", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+
+                    SetBusy(true);
+                    try
+                    {
+                        using (var writer = new StreamWriter(sfd.FileName))
+                        {
+                            // Headers (All visible columns)
+                            var cols = dGrd.Columns.Cast<DataGridViewColumn>()
+                                           .Where(c => c.Visible)
+                                           .OrderBy(c => c.DisplayIndex) // Visual order
+                                           .ToList();
+
+                            if (includeHeaders)
+                            {
+                                writer.WriteLine(string.Join(",", cols.Select(c => "\"" + c.HeaderText.Replace("\"", "\"\"") + "\"")));
+                            }
+
+                            foreach (int r in rowIndices)
+                            {
+                                var values = new List<string>();
+                                foreach (var col in cols)
+                                {
+                                    var val = dGrd[col.Index, r].Value; // Use indexer to trigger CellValueNeeded
+                                    string sVal = val == null ? "" : val.ToString();
+                                    values.Add("\"" + sVal.Replace("\"", "\"\"") + "\"");
+                                }
+                                writer.WriteLine(string.Join(",", values));
+                            }
+                        }
+                        Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error exporting: " + ex.Message, "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        SetBusy(false);
+                    }
+                }
+            }
+        }
+
+        private void ExportSelectedCellsToCsv()
+        {
+             if (dGrd.SelectedCells.Count == 0) return;
+
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                sfd.FileName = "SMS_Search_Export_SelectedCells_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    bool includeHeaders = MessageBox.Show("Include headers in export?", "Export CSV", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+
+                    SetBusy(true);
+                    try
+                    {
+                        using (var writer = new StreamWriter(sfd.FileName))
+                        {
+                            // Determine bounds
+                            var selectedCells = dGrd.SelectedCells.Cast<DataGridViewCell>().ToList();
+                            // Sort columns by visual order
+                            var uniqueColIndices = selectedCells.Select(c => c.ColumnIndex)
+                                                                .Distinct()
+                                                                .OrderBy(i => dGrd.Columns[i].DisplayIndex)
+                                                                .ToList();
+                            var uniqueRowIndices = selectedCells.Select(c => c.RowIndex)
+                                                                .Distinct()
+                                                                .OrderBy(r => r)
+                                                                .ToList();
+
+                            // Map column index to header text
+                            if (includeHeaders)
+                            {
+                                var headers = uniqueColIndices.Select(i => "\"" + dGrd.Columns[i].HeaderText.Replace("\"", "\"\"") + "\"");
+                                writer.WriteLine(string.Join(",", headers));
+                            }
+
+                            foreach (int r in uniqueRowIndices)
+                            {
+                                var rowValues = new List<string>();
+                                foreach (int c in uniqueColIndices)
+                                {
+                                    // Check if this specific cell is selected
+                                    if (dGrd[c, r].Selected)
+                                    {
+                                        var val = dGrd[c, r].Value;
+                                        string sVal = val == null ? "" : val.ToString();
+                                        rowValues.Add("\"" + sVal.Replace("\"", "\"\"") + "\"");
+                                    }
+                                    else
+                                    {
+                                        rowValues.Add("\"\""); // Empty for unselected cell in the bounding box
+                                    }
+                                }
+                                writer.WriteLine(string.Join(",", rowValues));
+                            }
+                        }
                         Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
                     }
                     catch (Exception ex)
