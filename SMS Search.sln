@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34330.188
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMS Search", "SMS Search.csproj", "{80E48E33-0CB9-4F8B-8431-2606C71A5DF0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4E5830C7-3714-40AE-BCE3-86DD8615D0DF}"
+	ProjectSection(SolutionItems) = preProject
+		AGENTS.md = AGENTS.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,16 +37,16 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {04A8DF77-6EFE-41A4-8764-05D5C6DC1CA8}
-		BuildVersion_BuildAction = Both
-		BuildVersion_AssemblyInfoFilename = Properties\AssemblyInfo.cs
-		BuildVersion_StartDate = 2000/1/1
-		BuildVersion_ConfigurationName = Release
-		BuildVersion_UseGlobalSettings = False
-		BuildVersion_BuildVersioningStyle = None.None.Increment.YearDayOfYearStamp
-		BuildVersion_DetectChanges = True
-		BuildVersion_UpdateAssemblyVersion = True
-		BuildVersion_UpdateFileVersion = True
 		BuildVersion_UseUniversalClock = True
+		BuildVersion_UpdateFileVersion = True
+		BuildVersion_UpdateAssemblyVersion = True
+		BuildVersion_DetectChanges = True
+		BuildVersion_BuildVersioningStyle = None.None.Increment.YearDayOfYearStamp
+		BuildVersion_UseGlobalSettings = False
+		BuildVersion_ConfigurationName = Release
+		BuildVersion_StartDate = 2000/1/1
+		BuildVersion_AssemblyInfoFilename = Properties\AssemblyInfo.cs
+		BuildVersion_BuildAction = Both
+		SolutionGuid = {04A8DF77-6EFE-41A4-8764-05D5C6DC1CA8}
 	EndGlobalSection
 EndGlobal

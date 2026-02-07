@@ -118,8 +118,8 @@ namespace SMS_Search
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.btnPopGrid = new System.Windows.Forms.Button();
             this.dGrd = new SMS_Search.ExDataGridView();
@@ -237,23 +237,23 @@ namespace SMS_Search
             this.dGrd.AllowUserToDeleteRows = false;
             this.dGrd.AllowUserToOrderColumns = true;
             this.dGrd.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.WhiteSmoke;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            this.dGrd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.WhiteSmoke;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            this.dGrd.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dGrd.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dGrd.BackgroundColor = System.Drawing.SystemColors.ControlLight;
             this.dGrd.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dGrd.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dGrd.DefaultCellStyle = dataGridViewCellStyle4;
             this.dGrd.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dGrd.Location = new System.Drawing.Point(2, 35);
             this.dGrd.Name = "dGrd";
@@ -453,7 +453,7 @@ namespace SMS_Search
             this.txtCustSqlFct.Location = new System.Drawing.Point(97, 59);
             this.txtCustSqlFct.Name = "txtCustSqlFct";
             this.txtCustSqlFct.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 79);
+            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 78);
             this.txtCustSqlFct.TabIndex = 4;
             this.txtCustSqlFct.Text = "";
             this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
@@ -533,7 +533,7 @@ namespace SMS_Search
             this.txtCustSqlTlz.Location = new System.Drawing.Point(97, 59);
             this.txtCustSqlTlz.Name = "txtCustSqlTlz";
             this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlTlz.Size = new System.Drawing.Size(483, 79);
+            this.txtCustSqlTlz.Size = new System.Drawing.Size(483, 78);
             this.txtCustSqlTlz.TabIndex = 4;
             this.txtCustSqlTlz.Text = "";
             this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
@@ -672,10 +672,10 @@ namespace SMS_Search
             this.tabTlz.Controls.Add(this.btnBuildQryTlz);
             this.tabTlz.Controls.Add(this.btnClearTlz);
             this.tabTlz.Controls.Add(this.txtCustSqlTlz);
-            this.tabTlz.Location = new System.Drawing.Point(4, 24);
+            this.tabTlz.Location = new System.Drawing.Point(4, 25);
             this.tabTlz.Name = "tabTlz";
             this.tabTlz.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTlz.Size = new System.Drawing.Size(588, 141);
+            this.tabTlz.Size = new System.Drawing.Size(588, 140);
             this.tabTlz.TabIndex = 1;
             this.tabTlz.Text = "Totalizer";
             // 
@@ -721,10 +721,10 @@ namespace SMS_Search
             this.tabFields.Controls.Add(this.txtCustSqlFld);
             this.tabFields.Controls.Add(this.label6);
             this.tabFields.Controls.Add(this.picRefresh);
-            this.tabFields.Location = new System.Drawing.Point(4, 24);
+            this.tabFields.Location = new System.Drawing.Point(4, 25);
             this.tabFields.Name = "tabFields";
             this.tabFields.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFields.Size = new System.Drawing.Size(588, 141);
+            this.tabFields.Size = new System.Drawing.Size(588, 140);
             this.tabFields.TabIndex = 2;
             this.tabFields.Text = "Fields";
             // 
@@ -892,7 +892,7 @@ namespace SMS_Search
             this.txtCustSqlFld.Location = new System.Drawing.Point(97, 84);
             this.txtCustSqlFld.Name = "txtCustSqlFld";
             this.txtCustSqlFld.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 54);
+            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 53);
             this.txtCustSqlFld.TabIndex = 6;
             this.txtCustSqlFld.Text = "";
             this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
@@ -971,7 +971,7 @@ namespace SMS_Search
             this.tscmbDbServer.Enabled = false;
             this.tscmbDbServer.Name = "tscmbDbServer";
             this.tscmbDbServer.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.tscmbDbServer.Size = new System.Drawing.Size(110, 23);
+            this.tscmbDbServer.Size = new System.Drawing.Size(90, 23);
             this.tscmbDbServer.ToolTipText = "Server";
             this.tscmbDbServer.Visible = false;
             // 
@@ -1111,7 +1111,7 @@ namespace SMS_Search
             // lblMatchCount
             // 
             this.lblMatchCount.AutoSize = true;
-            this.lblMatchCount.Location = new System.Drawing.Point(365, 9);
+            this.lblMatchCount.Location = new System.Drawing.Point(358, 9);
             this.lblMatchCount.Name = "lblMatchCount";
             this.lblMatchCount.Size = new System.Drawing.Size(0, 15);
             this.lblMatchCount.TabIndex = 14;
