@@ -225,7 +225,7 @@ namespace SMS_Search
             btnHist.Location = new Point(anchorBtn.Left - 30, anchorBtn.Top);
             btnHist.Anchor = anchorBtn.Anchor;
             btnHist.Text = "H";
-            btnHist.ToolTipText = "Query History";
+            toolTip.SetToolTip(btnHist, "Query History");
             btnHist.Click += (s, e) => ShowHistoryMenu(s as Button, targetInput, type);
             btnHist.UseVisualStyleBackColor = true;
             anchorBtn.Parent.Controls.Add(btnHist);
