@@ -1375,7 +1375,39 @@ namespace SMS_Search
             }
             else if (e.Button == MouseButtons.Left)
             {
-                dGrd.Rows[e.RowIndex].Selected = true;
+                if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+                {
+                    dGrd.Rows[e.RowIndex].Selected = !dGrd.Rows[e.RowIndex].Selected;
+                }
+                else if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
+                {
+                    int startRow = dGrd.CurrentCell != null ? dGrd.CurrentCell.RowIndex : e.RowIndex;
+                    int endRow = e.RowIndex;
+                    int min = Math.Min(startRow, endRow);
+                    int max = Math.Max(startRow, endRow);
+
+                    dGrd.ClearSelection();
+
+                    for (int i = min; i <= max; i++)
+                    {
+                        dGrd.Rows[i].Selected = true;
+                    }
+                }
+                else
+                {
+                    dGrd.ClearSelection();
+                    dGrd.Rows[e.RowIndex].Selected = true;
+
+                    // Set CurrentCell to first visible column in this row
+                    foreach (DataGridViewColumn col in dGrd.Columns)
+                    {
+                        if (col.Visible)
+                        {
+                            dGrd.CurrentCell = dGrd[col.Index, e.RowIndex];
+                            break;
+                        }
+                    }
+                }
             }
         }
 
