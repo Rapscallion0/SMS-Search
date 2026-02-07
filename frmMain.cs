@@ -1886,13 +1886,14 @@ namespace SMS_Search
         {
             if (dGrd.RowCount == 0) return;
 
+            int rowsToCheck = Math.Min(dGrd.RowCount, rowLimit);
+
             // In Virtual Mode, we must ensure data is loaded before measuring
             if (dGrd.VirtualMode)
             {
-                await _gridContext.WaitForRowAsync(0);
+                await _gridContext.EnsureRangeLoadedAsync(0, rowsToCheck);
             }
 
-            int rowsToCheck = Math.Min(dGrd.RowCount, rowLimit);
             const int padding = 14; // Approximate padding for cell content
 
             // Cache font to avoid property access overhead in loop
@@ -2263,6 +2264,7 @@ namespace SMS_Search
             if (dGrd.VirtualMode)
             {
                 // Server-side filtering
+                tslblRecordCnt.Text = "Filtering...";
                 var columns = new List<string>();
                 foreach (DataGridViewColumn col in dGrd.Columns)
                 {
