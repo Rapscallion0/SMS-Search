@@ -1536,9 +1536,13 @@ namespace SMS_Search
 
             if (isDisjointed)
             {
-                // Check Session Preference
-                if (_clipboardSessionPreference.HasValue)
+                if (IsFullRowSelection())
                 {
+                    action = frmClipboardOptions.CopyAction.CopyContent;
+                }
+                else if (_clipboardSessionPreference.HasValue)
+                {
+                    // Check Session Preference
                     action = _clipboardSessionPreference.Value;
                 }
                 else
@@ -1638,6 +1642,27 @@ namespace SMS_Search
 
             long expectedCount = (long)(maxRow - minRow + 1) * (maxCol - minCol + 1);
             return dGrd.SelectedCells.Count != expectedCount;
+        }
+
+        private bool IsFullRowSelection()
+        {
+            if (dGrd.SelectedRows.Count == 0) return false;
+
+            var selectedRowIndices = new HashSet<int>();
+            foreach (DataGridViewRow row in dGrd.SelectedRows)
+            {
+                selectedRowIndices.Add(row.Index);
+            }
+
+            foreach (DataGridViewCell cell in dGrd.SelectedCells)
+            {
+                if (!selectedRowIndices.Contains(cell.RowIndex))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private string GetDelimiter(string delimiterSetting)
