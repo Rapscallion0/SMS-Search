@@ -47,6 +47,7 @@ namespace SMS_Search
 		}
 
 		private List<ReplacementRule> _cleanSqlRules = new List<ReplacementRule>();
+        private frmClipboardOptions.CopyAction? _clipboardSessionPreference = null;
 
 		private int FormHeightMin;
 		private int FormHeightExpanded = 600;
@@ -1067,6 +1068,19 @@ namespace SMS_Search
 
 		private void frmMain_KeyDown(object sender, KeyEventArgs e)
 		{
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                // Only intercept if grid has focus or contains focus, and not in editing mode?
+                // Actually if dGrd is focused, we want to override default behavior.
+                if (dGrd.Focused)
+                {
+                    CopyToClipboard(false);
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+                    return;
+                }
+            }
+
 			if (e.Control && e.KeyCode.ToString() == "A")
 			{
 				if (txtCustSqlFct.Focused)
@@ -1274,6 +1288,21 @@ namespace SMS_Search
             var itemCopyWithHeaders = _cellContextMenu.Items.Add("Copy selected with headers");
             itemCopyWithHeaders.Click += (s, e) => CopyToClipboard(true);
 
+            // Advance copy submenu
+            var itemAdvCopy = _cellContextMenu.Items.Add("Advance copy");
+            var itemAdvCopyContent = (itemAdvCopy as ToolStripMenuItem).DropDownItems.Add("Copy Content Only");
+            itemAdvCopyContent.Click += async (s, e) => {
+                 string del = config.GetValue("GENERAL", "COPY_DELIMITER");
+                 if (string.IsNullOrEmpty(del)) del = "TAB";
+                 await CopyContentOnlyAsync(false, del);
+            };
+            var itemAdvCopyLayout = (itemAdvCopy as ToolStripMenuItem).DropDownItems.Add("Preserve Layout");
+            itemAdvCopyLayout.Click += async (s, e) => {
+                 string del = config.GetValue("GENERAL", "COPY_DELIMITER");
+                 if (string.IsNullOrEmpty(del)) del = "TAB";
+                 await CopyPreserveLayoutAsync(false, del);
+            };
+
             _cellContextMenu.Items.Add(new ToolStripSeparator());
 
             // Resize
@@ -1299,6 +1328,8 @@ namespace SMS_Search
                 // Only enable "Filter by selection" if a single cell is active and has a value
                 bool canFilter = dGrd.CurrentCell != null && dGrd.CurrentCell.Value != null && !string.IsNullOrEmpty(dGrd.CurrentCell.Value.ToString());
                 itemFilter.Enabled = canFilter;
+
+                itemAdvCopy.Visible = IsSelectionDisjointed();
             };
 
 
@@ -1343,6 +1374,26 @@ namespace SMS_Search
 
             var itemRowCopyInsert = _rowHeaderMenu.Items.Add("Copy as SQL INSERT");
             itemRowCopyInsert.Click += (s, e) => CopyAsSqlInsert();
+
+            // Advance copy submenu (Row Header)
+            var itemRowAdvCopy = _rowHeaderMenu.Items.Add("Advance copy");
+            var itemRowAdvCopyContent = (itemRowAdvCopy as ToolStripMenuItem).DropDownItems.Add("Copy Content Only");
+            itemRowAdvCopyContent.Click += async (s, e) => {
+                 string del = config.GetValue("GENERAL", "COPY_DELIMITER");
+                 if (string.IsNullOrEmpty(del)) del = "TAB";
+                 await CopyContentOnlyAsync(false, del);
+            };
+            var itemRowAdvCopyLayout = (itemRowAdvCopy as ToolStripMenuItem).DropDownItems.Add("Preserve Layout");
+            itemRowAdvCopyLayout.Click += async (s, e) => {
+                 string del = config.GetValue("GENERAL", "COPY_DELIMITER");
+                 if (string.IsNullOrEmpty(del)) del = "TAB";
+                 await CopyPreserveLayoutAsync(false, del);
+            };
+
+            _rowHeaderMenu.Opening += (s, e) =>
+            {
+                itemRowAdvCopy.Visible = IsSelectionDisjointed();
+            };
 
             _rowHeaderMenu.Items.Add(new ToolStripSeparator());
 
@@ -1470,72 +1521,248 @@ namespace SMS_Search
                    value is float || value is double || value is decimal;
         }
 
-        private void CopyToClipboard(bool includeHeaders)
+        private async void CopyToClipboard(bool includeHeaders)
         {
+            if (dGrd.SelectedCells.Count == 0) return;
+
             string delimiterSetting = config.GetValue("GENERAL", "COPY_DELIMITER");
             if (string.IsNullOrEmpty(delimiterSetting)) delimiterSetting = "TAB";
 
-            if (delimiterSetting == "TAB")
-            {
-                if (dGrd.GetCellCount(DataGridViewElementStates.Selected) > 0)
-                {
-                    var oldMode = dGrd.ClipboardCopyMode;
-                    try
-                    {
-                        dGrd.ClipboardCopyMode = includeHeaders
-                            ? DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText
-                            : DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            // Determine if disjointed
+            bool isDisjointed = IsSelectionDisjointed();
 
-                        DataObject dataObj = dGrd.GetClipboardContent();
-                        if (dataObj != null)
-                            Clipboard.SetDataObject(dataObj);
-                    }
-                    finally
+            // Check preference
+            var action = frmClipboardOptions.CopyAction.CopyContent; // Default for non-disjointed
+
+            if (isDisjointed)
+            {
+                // Check Session Preference
+                if (_clipboardSessionPreference.HasValue)
+                {
+                    action = _clipboardSessionPreference.Value;
+                }
+                else
+                {
+                    // Check Forever Preference
+                    string foreverPref = config.GetValue("GENERAL", "CLIPBOARD_DISJOINTED_ACTION");
+                    if (!string.IsNullOrEmpty(foreverPref) && Enum.TryParse(foreverPref, out frmClipboardOptions.CopyAction parsedAction))
                     {
-                        dGrd.ClipboardCopyMode = oldMode;
+                        action = parsedAction;
+                    }
+                    else
+                    {
+                        // Ask User
+                        using (var form = new frmClipboardOptions())
+                        {
+                            form.ShowDialog(this);
+                            if (form.SelectedAction == frmClipboardOptions.CopyAction.Cancel) return;
+                            action = form.SelectedAction;
+
+                            if (form.RememberChoice)
+                            {
+                                if (form.RememberScope == frmClipboardOptions.MemoryScope.Session)
+                                {
+                                    _clipboardSessionPreference = action;
+                                }
+                                else
+                                {
+                                    config.SetValue("GENERAL", "CLIPBOARD_DISJOINTED_ACTION", action.ToString());
+                                    config.Save();
+
+                                    // Log
+                                    log.Logger(LogLevel.Info, $"User selected 'Forever' clipboard preference: {action}");
+                                }
+                            }
+                        }
                     }
                 }
-                return;
             }
 
-            // Custom delimiter logic
-            string delimiter = "";
+            // Execute Action
+            try
+            {
+                if (action == frmClipboardOptions.CopyAction.PreserveLayout)
+                {
+                    await CopyPreserveLayoutAsync(includeHeaders, delimiterSetting);
+                }
+                else
+                {
+                    // Copy Content (or Default)
+                    // If TAB delimiter and not disjointed (standard case), use native efficient copy
+                    if (delimiterSetting == "TAB" && !isDisjointed)
+                    {
+                        var oldMode = dGrd.ClipboardCopyMode;
+                        try
+                        {
+                            dGrd.ClipboardCopyMode = includeHeaders
+                                ? DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText
+                                : DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+
+                            DataObject dataObj = dGrd.GetClipboardContent();
+                            if (dataObj != null)
+                                Clipboard.SetDataObject(dataObj);
+                        }
+                        finally
+                        {
+                            dGrd.ClipboardCopyMode = oldMode;
+                        }
+                    }
+                    else
+                    {
+                        // Custom delimiter OR Disjointed Content Only
+                        await CopyContentOnlyAsync(includeHeaders, delimiterSetting);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Logger(LogLevel.Error, "Clipboard Error: " + ex.Message);
+                MessageBox.Show("Error copying to clipboard: " + ex.Message, "Copy Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private bool IsSelectionDisjointed()
+        {
+            if (dGrd.SelectedCells.Count <= 1) return false;
+
+            int minRow = int.MaxValue, maxRow = int.MinValue;
+            int minCol = int.MaxValue, maxCol = int.MinValue;
+
+            foreach (DataGridViewCell cell in dGrd.SelectedCells)
+            {
+                if (cell.RowIndex < minRow) minRow = cell.RowIndex;
+                if (cell.RowIndex > maxRow) maxRow = cell.RowIndex;
+                if (cell.ColumnIndex < minCol) minCol = cell.ColumnIndex;
+                if (cell.ColumnIndex > maxCol) maxCol = cell.ColumnIndex;
+            }
+
+            long expectedCount = (long)(maxRow - minRow + 1) * (maxCol - minCol + 1);
+            return dGrd.SelectedCells.Count != expectedCount;
+        }
+
+        private string GetDelimiter(string delimiterSetting)
+        {
             switch (delimiterSetting)
             {
-                case "Comma (,)": delimiter = ","; break;
-                case "Pipe (|)": delimiter = "|"; break;
-                case "Semicolon (;)": delimiter = ";"; break;
-                case "Custom...":
-                    delimiter = config.GetValue("GENERAL", "COPY_DELIMITER_CUSTOM");
-                    break;
-                default: delimiter = "\t"; break;
+                case "Comma (,)": return ",";
+                case "Pipe (|)": return "|";
+                case "Semicolon (;)": return ";";
+                case "Custom...": return config.GetValue("GENERAL", "COPY_DELIMITER_CUSTOM");
+                default: return "\t";
+            }
+        }
+
+        private async Task CopyPreserveLayoutAsync(bool includeHeaders, string delimiterSetting)
+        {
+            // 1. Capture data on UI thread
+            var cells = dGrd.SelectedCells.Cast<DataGridViewCell>().ToList();
+            if (cells.Count == 0) return;
+
+            int minRow = cells.Min(c => c.RowIndex);
+            int maxRow = cells.Max(c => c.RowIndex);
+            int minCol = cells.Min(c => c.ColumnIndex);
+            int maxCol = cells.Max(c => c.ColumnIndex);
+
+            // Get columns info for the range
+            var colInfo = new List<(int Index, string Header, bool Visible)>();
+            for (int c = minCol; c <= maxCol; c++)
+            {
+                colInfo.Add((c, dGrd.Columns[c].HeaderText, dGrd.Columns[c].Visible));
             }
 
-            if (dGrd.SelectedCells.Count == 0) return;
+            // Capture cell values in a dictionary for fast lookup
+            var cellValues = new Dictionary<(int r, int c), string>();
+            foreach(var cell in cells)
+            {
+                cellValues[(cell.RowIndex, cell.ColumnIndex)] = cell.FormattedValue?.ToString() ?? "";
+            }
 
-            var sb = new StringBuilder();
+            string delimiter = GetDelimiter(delimiterSetting);
+
+            // 2. Build string in background
+            string text = await Task.Run(() =>
+            {
+                var sb = new StringBuilder();
+
+                if (includeHeaders)
+                {
+                    var headers = colInfo.Where(c => c.Visible).Select(c => c.Header);
+                    sb.AppendLine(string.Join(delimiter, headers));
+                }
+
+                for (int r = minRow; r <= maxRow; r++)
+                {
+                    var rowVals = new List<string>();
+                    foreach(var col in colInfo)
+                    {
+                        if (!col.Visible) continue;
+
+                        if (cellValues.TryGetValue((r, col.Index), out string val))
+                        {
+                            rowVals.Add(val);
+                        }
+                        else
+                        {
+                            rowVals.Add(""); // Gap
+                        }
+                    }
+                    sb.AppendLine(string.Join(delimiter, rowVals));
+                }
+                return sb.ToString();
+            });
+
+            if (!string.IsNullOrEmpty(text))
+                Clipboard.SetText(text);
+        }
+
+        private async Task CopyContentOnlyAsync(bool includeHeaders, string delimiterSetting)
+        {
+             // 1. Capture data on UI thread
             var cells = dGrd.SelectedCells.Cast<DataGridViewCell>().ToList();
-            var rows = cells.GroupBy(c => c.RowIndex).OrderBy(g => g.Key);
+            if (cells.Count == 0) return;
 
+            // Group by Row
+            var rows = cells.GroupBy(c => c.RowIndex)
+                            .OrderBy(g => g.Key)
+                            .Select(g => new
+                            {
+                                RowIndex = g.Key,
+                                Cells = g.OrderBy(c => c.ColumnIndex).Select(c => new { Val = c.FormattedValue?.ToString() ?? "", ColIdx = c.ColumnIndex }).ToList()
+                            })
+                            .ToList();
+
+            var uniqueColIndices = cells.Select(c => c.ColumnIndex).Distinct().OrderBy(c => c).ToList();
+            var headerList = new List<string>();
             if (includeHeaders)
             {
-                var uniqueCols = cells.Select(c => c.ColumnIndex).Distinct().OrderBy(c => c).ToList();
-                var headers = new List<string>();
-                foreach (var colIdx in uniqueCols)
-                {
-                    headers.Add(dGrd.Columns[colIdx].HeaderText);
-                }
-                sb.AppendLine(string.Join(delimiter, headers));
+                 foreach(var idx in uniqueColIndices)
+                 {
+                     headerList.Add(dGrd.Columns[idx].HeaderText);
+                 }
             }
 
-            foreach (var rowGroup in rows)
+            string delimiter = GetDelimiter(delimiterSetting);
+
+            // 2. Build string in background
+            string text = await Task.Run(() =>
             {
-                var rowCells = rowGroup.OrderBy(c => c.ColumnIndex).Select(c => c.FormattedValue?.ToString() ?? "").ToList();
-                sb.AppendLine(string.Join(delimiter, rowCells));
-            }
+                var sb = new StringBuilder();
 
-            if (sb.Length > 0)
-                Clipboard.SetText(sb.ToString());
+                if (includeHeaders)
+                {
+                    sb.AppendLine(string.Join(delimiter, headerList));
+                }
+
+                foreach (var row in rows)
+                {
+                    var vals = row.Cells.Select(c => c.Val);
+                    sb.AppendLine(string.Join(delimiter, vals));
+                }
+                return sb.ToString();
+            });
+
+             if (!string.IsNullOrEmpty(text))
+                Clipboard.SetText(text);
         }
 
         private async void btnSetup_Click(object sender, EventArgs e)
