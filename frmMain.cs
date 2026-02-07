@@ -119,7 +119,6 @@ namespace SMS_Search
 
             // Initialize History
             QueryHistoryManager.Instance.Initialize(config);
-            CreateHistoryButtons();
 
 			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " initialized");
 
@@ -211,25 +210,19 @@ namespace SMS_Search
 			txtNumFct.Focus();
 		}
 
-        private void CreateHistoryButtons()
+        private void btnHistFct_Click(object sender, EventArgs e)
         {
-            AddHistoryButton(btnBuildQryFct, txtCustSqlFct, "Function");
-            AddHistoryButton(btnBuildQryTlz, txtCustSqlTlz, "Totalizer");
-            AddHistoryButton(btnBuildQryFld, txtCustSqlFld, "Field");
+            ShowHistoryMenu(sender as Button, txtCustSqlFct, "Function");
         }
 
-        private void AddHistoryButton(Button anchorBtn, Control targetInput, string type)
+        private void btnHistTlz_Click(object sender, EventArgs e)
         {
-            Button btnHist = new Button();
-            btnHist.Size = new Size(25, 23);
-            btnHist.Location = new Point(anchorBtn.Left - 30, anchorBtn.Top);
-            btnHist.Anchor = anchorBtn.Anchor;
-            btnHist.Text = "H";
-            btnHist.ToolTipText = "Query History";
-            btnHist.Click += (s, e) => ShowHistoryMenu(s as Button, targetInput, type);
-            btnHist.UseVisualStyleBackColor = true;
-            anchorBtn.Parent.Controls.Add(btnHist);
-            btnHist.BringToFront();
+            ShowHistoryMenu(sender as Button, txtCustSqlTlz, "Totalizer");
+        }
+
+        private void btnHistFld_Click(object sender, EventArgs e)
+        {
+            ShowHistoryMenu(sender as Button, txtCustSqlFld, "Field");
         }
 
         private void ShowHistoryMenu(Button btn, Control targetInput, string type)

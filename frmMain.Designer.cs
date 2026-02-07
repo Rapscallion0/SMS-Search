@@ -108,6 +108,9 @@ namespace SMS_Search
         private Label lblMatchCount;
         private Button btnPrevMatch;
         private Button btnNextMatch;
+        private Button btnHistFct;
+        private Button btnHistTlz;
+        private Button btnHistFld;
 
         #region Windows Form Designer generated code
 
@@ -130,6 +133,9 @@ namespace SMS_Search
             this.btnBuildQryTlz = new System.Windows.Forms.Button();
             this.btnCleanSqlFct = new System.Windows.Forms.Button();
             this.btnCleanSqlTlz = new System.Windows.Forms.Button();
+            this.btnHistFct = new System.Windows.Forms.Button();
+            this.btnHistTlz = new System.Windows.Forms.Button();
+            this.btnHistFld = new System.Windows.Forms.Button();
             this.btnCleanSqlFld = new System.Windows.Forms.Button();
             this.btnBuildQryFld = new System.Windows.Forms.Button();
             this.btnShowTarget = new System.Windows.Forms.CheckBox();
@@ -223,7 +229,7 @@ namespace SMS_Search
             // btnPopGrid
             // 
             this.btnPopGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnPopGrid.Location = new System.Drawing.Point(3, 178);
+            this.btnPopGrid.Location = new System.Drawing.Point(3, 208);
             this.btnPopGrid.Name = "btnPopGrid";
             this.btnPopGrid.Size = new System.Drawing.Size(78, 23);
             this.btnPopGrid.TabIndex = 10;
@@ -350,6 +356,39 @@ namespace SMS_Search
             this.btnCleanSqlFld.UseVisualStyleBackColor = true;
             this.btnCleanSqlFld.Click += new System.EventHandler(this.btnCleanSqlFld_Click);
             // 
+            // btnHistFct
+            //
+            this.btnHistFct.Location = new System.Drawing.Point(6, 108);
+            this.btnHistFct.Name = "btnHistFct";
+            this.btnHistFct.Size = new System.Drawing.Size(85, 23);
+            this.btnHistFct.TabIndex = 101;
+            this.btnHistFct.Text = "History";
+            this.toolTip.SetToolTip(this.btnHistFct, "Query History");
+            this.btnHistFct.UseVisualStyleBackColor = true;
+            this.btnHistFct.Click += new System.EventHandler(this.btnHistFct_Click);
+            //
+            // btnHistTlz
+            //
+            this.btnHistTlz.Location = new System.Drawing.Point(6, 108);
+            this.btnHistTlz.Name = "btnHistTlz";
+            this.btnHistTlz.Size = new System.Drawing.Size(85, 23);
+            this.btnHistTlz.TabIndex = 102;
+            this.btnHistTlz.Text = "History";
+            this.toolTip.SetToolTip(this.btnHistTlz, "Query History");
+            this.btnHistTlz.UseVisualStyleBackColor = true;
+            this.btnHistTlz.Click += new System.EventHandler(this.btnHistTlz_Click);
+            //
+            // btnHistFld
+            //
+            this.btnHistFld.Location = new System.Drawing.Point(6, 134);
+            this.btnHistFld.Name = "btnHistFld";
+            this.btnHistFld.Size = new System.Drawing.Size(85, 23);
+            this.btnHistFld.TabIndex = 103;
+            this.btnHistFld.Text = "History";
+            this.toolTip.SetToolTip(this.btnHistFld, "Query History");
+            this.btnHistFld.UseVisualStyleBackColor = true;
+            this.btnHistFld.Click += new System.EventHandler(this.btnHistFld_Click);
+            //
             // btnBuildQryFld
             // 
             this.btnBuildQryFld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -401,7 +440,7 @@ namespace SMS_Search
             this.groupBox1.Controls.Add(this.dateGregorian);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtJulian);
-            this.groupBox1.Location = new System.Drawing.Point(318, 168);
+            this.groupBox1.Location = new System.Drawing.Point(318, 198);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(0);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(0);
@@ -610,7 +649,7 @@ namespace SMS_Search
             this.tabCtl.Location = new System.Drawing.Point(3, 4);
             this.tabCtl.Name = "tabCtl";
             this.tabCtl.SelectedIndex = 0;
-            this.tabCtl.Size = new System.Drawing.Size(596, 169);
+            this.tabCtl.Size = new System.Drawing.Size(596, 199);
             this.tabCtl.TabIndex = 0;
             this.tabCtl.SelectedIndexChanged += new System.EventHandler(this.tabCtl_SelectedIndexChanged);
             // 
@@ -618,6 +657,7 @@ namespace SMS_Search
             // 
             this.tabFct.BackColor = System.Drawing.SystemColors.Control;
             this.tabFct.Controls.Add(this.btnCleanSqlFct);
+            this.tabFct.Controls.Add(this.btnHistFct);
             this.tabFct.Controls.Add(this.chkSearchAnyFct);
             this.tabFct.Controls.Add(this.label5);
             this.tabFct.Controls.Add(this.rdbNumFct);
@@ -631,7 +671,7 @@ namespace SMS_Search
             this.tabFct.Location = new System.Drawing.Point(4, 24);
             this.tabFct.Name = "tabFct";
             this.tabFct.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFct.Size = new System.Drawing.Size(588, 141);
+            this.tabFct.Size = new System.Drawing.Size(588, 171);
             this.tabFct.TabIndex = 0;
             this.tabFct.Text = "Function";
             this.tabFct.ToolTipText = "<CRTL> + 1";
@@ -662,6 +702,7 @@ namespace SMS_Search
             // 
             this.tabTlz.BackColor = System.Drawing.SystemColors.Control;
             this.tabTlz.Controls.Add(this.btnCleanSqlTlz);
+            this.tabTlz.Controls.Add(this.btnHistTlz);
             this.tabTlz.Controls.Add(this.chkSearchAnyTlz);
             this.tabTlz.Controls.Add(this.label3);
             this.tabTlz.Controls.Add(this.rdbNumTlz);
@@ -675,7 +716,7 @@ namespace SMS_Search
             this.tabTlz.Location = new System.Drawing.Point(4, 25);
             this.tabTlz.Name = "tabTlz";
             this.tabTlz.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTlz.Size = new System.Drawing.Size(588, 140);
+            this.tabTlz.Size = new System.Drawing.Size(588, 170);
             this.tabTlz.TabIndex = 1;
             this.tabTlz.Text = "Totalizer";
             // 
@@ -706,6 +747,7 @@ namespace SMS_Search
             this.tabFields.BackColor = System.Drawing.SystemColors.Control;
             this.tabFields.Controls.Add(this.chkLastTransaction);
             this.tabFields.Controls.Add(this.btnCleanSqlFld);
+            this.tabFields.Controls.Add(this.btnHistFld);
             this.tabFields.Controls.Add(this.panel1);
             this.tabFields.Controls.Add(this.chkSearchAnyFld);
             this.tabFields.Controls.Add(this.cmbTableFld);
@@ -724,7 +766,7 @@ namespace SMS_Search
             this.tabFields.Location = new System.Drawing.Point(4, 25);
             this.tabFields.Name = "tabFields";
             this.tabFields.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFields.Size = new System.Drawing.Size(588, 140);
+            this.tabFields.Size = new System.Drawing.Size(588, 170);
             this.tabFields.TabIndex = 2;
             this.tabFields.Text = "Fields";
             // 
@@ -1069,7 +1111,7 @@ namespace SMS_Search
             this.splitContainer.Panel1.Controls.Add(this.btnSetup);
             this.splitContainer.Panel1.Controls.Add(this.tabCtl);
             this.splitContainer.Panel1.Controls.Add(this.groupBox1);
-            this.splitContainer.Panel1MinSize = 177;
+            this.splitContainer.Panel1MinSize = 207;
             // 
             // splitContainer.Panel2
             // 
@@ -1081,7 +1123,7 @@ namespace SMS_Search
             this.splitContainer.Panel2.Controls.Add(this.dGrd);
             this.splitContainer.Panel2MinSize = 29;
             this.splitContainer.Size = new System.Drawing.Size(603, 554);
-            this.splitContainer.SplitterDistance = 210;
+            this.splitContainer.SplitterDistance = 240;
             this.splitContainer.TabIndex = 102;
             this.splitContainer.TabStop = false;
             this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
