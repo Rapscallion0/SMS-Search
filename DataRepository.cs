@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Log;
@@ -30,13 +31,13 @@ namespace SMS_Search
             }
         }
 
-        public virtual async Task<bool> TestConnectionAsync(string server, string database, string user, string pass)
+        public virtual async Task<bool> TestConnectionAsync(string server, string database, string user, string pass, CancellationToken cancellationToken = default)
         {
             try
             {
                 using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
                 {
-                    await conn.OpenAsync();
+                    await conn.OpenAsync(cancellationToken);
                     return true;
                 }
             }
@@ -62,12 +63,13 @@ namespace SMS_Search
             }
         }
 
-        public virtual async Task<DataTable> ExecuteQueryAsync(string server, string database, string user, string pass, string sql, object parameters = null)
+        public virtual async Task<DataTable> ExecuteQueryAsync(string server, string database, string user, string pass, string sql, object parameters = null, CancellationToken cancellationToken = default)
         {
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
-                await conn.OpenAsync();
-                using (var reader = await conn.ExecuteReaderAsync(sql, parameters))
+                await conn.OpenAsync(cancellationToken);
+                var cmdDef = new CommandDefinition(sql, parameters, cancellationToken: cancellationToken);
+                using (var reader = await conn.ExecuteReaderAsync(cmdDef))
                 {
                     var dt = new DataTable();
                     dt.Load(reader);
@@ -76,12 +78,9 @@ namespace SMS_Search
             }
         }
 
-        public virtual async Task<int> GetQueryCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filter = null)
+        public virtual async Task<int> GetQueryCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filter = null, CancellationToken cancellationToken = default)
         {
             string finalSql = ApplyFilter(sql, filter);
-            // Inject TOP 100 PERCENT to handle potential inner ORDER BYs if the user provided one in Custom SQL
-            // But this is tricky to do robustly with string manipulation.
-            // We will rely on the caller (QueryBuilder) to provide clean SQL, or fallback if it fails.
             string countSql = $"SELECT COUNT(*) FROM ({finalSql}) AS _CountQ";
 
             LogQuery("GetQueryCountAsync", countSql, parameters);
@@ -90,8 +89,9 @@ namespace SMS_Search
             {
                 using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
                 {
-                    await conn.OpenAsync();
-                    int count = await conn.ExecuteScalarAsync<int>(countSql, parameters);
+                    await conn.OpenAsync(cancellationToken);
+                    var cmdDef = new CommandDefinition(countSql, parameters, cancellationToken: cancellationToken);
+                    int count = await conn.ExecuteScalarAsync<int>(cmdDef);
                     log.Logger(LogLevel.Debug, $"GetQueryCountAsync: Returned {count}");
                     return count;
                 }
@@ -103,15 +103,13 @@ namespace SMS_Search
             }
         }
 
-        public virtual async Task<DataTable> GetQueryPageAsync(string server, string database, string user, string pass, string sql, object parameters, int offset, int limit, string sortCol, string sortDir, string filter = null)
+        public virtual async Task<DataTable> GetQueryPageAsync(string server, string database, string user, string pass, string sql, object parameters, int offset, int limit, string sortCol, string sortDir, string filter = null, CancellationToken cancellationToken = default)
         {
             string finalSql = ApplyFilter(sql, filter);
 
-            // Ensure we have an ORDER BY for OFFSET
             string orderBy = "(SELECT NULL)";
             if (!string.IsNullOrEmpty(sortCol))
             {
-                // Sanitize sortCol (remove brackets to be safe, then re-add)
                 string safeCol = sortCol.Replace("[", "").Replace("]", "");
                 orderBy = $"[{safeCol}] {sortDir}";
             }
@@ -123,8 +121,9 @@ namespace SMS_Search
 
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
-                await conn.OpenAsync();
-                using (var reader = await conn.ExecuteReaderAsync(pageSql, parameters))
+                await conn.OpenAsync(cancellationToken);
+                var cmdDef = new CommandDefinition(pageSql, parameters, cancellationToken: cancellationToken);
+                using (var reader = await conn.ExecuteReaderAsync(cmdDef))
                 {
                     var dt = new DataTable();
                     dt.Load(reader);
@@ -133,19 +132,18 @@ namespace SMS_Search
             }
         }
 
-        public virtual async Task<DataTable> GetQuerySchemaAsync(string server, string database, string user, string pass, string sql, object parameters)
+        public virtual async Task<DataTable> GetQuerySchemaAsync(string server, string database, string user, string pass, string sql, object parameters, CancellationToken cancellationToken = default)
         {
-            // Get schema (0 rows)
             string schemaSql = $"SELECT TOP 0 * FROM ({sql}) AS _SchemaQ";
 
             LogQuery("GetQuerySchemaAsync", schemaSql, parameters);
 
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
-                await conn.OpenAsync();
-                using (var reader = await conn.ExecuteReaderAsync(schemaSql, parameters))
+                await conn.OpenAsync(cancellationToken);
+                var cmdDef = new CommandDefinition(schemaSql, parameters, cancellationToken: cancellationToken);
+                using (var reader = await conn.ExecuteReaderAsync(cmdDef))
                 {
-                    // Capture SQL Types before consuming reader with Load
                     var typeMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
@@ -155,7 +153,6 @@ namespace SMS_Search
                     var dt = new DataTable();
                     dt.Load(reader);
 
-                    // Attach SQL types to columns
                     foreach (DataColumn col in dt.Columns)
                     {
                         if (typeMap.TryGetValue(col.ColumnName, out string sqlType))
@@ -186,15 +183,13 @@ namespace SMS_Search
             log.Logger(LogLevel.Debug, $"{method}: Executing SQL: {sql} | Params: {paramLog}");
         }
 
-        public virtual async Task<DbDataReader> GetQueryDataReaderAsync(string server, string database, string user, string pass, string sql, object parameters)
+        public virtual async Task<DbDataReader> GetQueryDataReaderAsync(string server, string database, string user, string pass, string sql, object parameters, CancellationToken cancellationToken = default)
         {
             var conn = new SqlConnection(GetConnectionString(server, database, user, pass));
-            await conn.OpenAsync();
+            await conn.OpenAsync(cancellationToken);
 
             using (var cmd = new SqlCommand(sql, conn))
             {
-                // We must manually map Dapper parameters because Dapper's ExecuteReaderAsync
-                // does not support CommandBehavior.CloseConnection, which is critical here.
                 if (parameters is DynamicParameters dp)
                 {
                     foreach (var name in dp.ParameterNames)
@@ -204,45 +199,44 @@ namespace SMS_Search
                     }
                 }
 
-                // Caller is responsible for disposing reader which closes connection
-                return await cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection);
+                return await cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, cancellationToken);
             }
         }
 
         private string ApplyFilter(string sql, string filter)
         {
             if (string.IsNullOrWhiteSpace(filter)) return sql;
-            // The filter must be a valid WHERE clause snippet
             return $"SELECT * FROM ({sql}) AS _FilterQ WHERE {filter}";
         }
 
-        public async Task<IEnumerable<string>> GetDatabasesAsync(string server, string user, string pass)
+        public async Task<IEnumerable<string>> GetDatabasesAsync(string server, string user, string pass, CancellationToken cancellationToken = default)
         {
-            // Connect to master
             using (var conn = new SqlConnection(GetConnectionString(server, "master", user, pass)))
             {
-                await conn.OpenAsync();
-                return await conn.QueryAsync<string>("SELECT name FROM sys.databases ORDER BY name");
+                await conn.OpenAsync(cancellationToken);
+                var cmdDef = new CommandDefinition("SELECT name FROM sys.databases ORDER BY name", cancellationToken: cancellationToken);
+                return await conn.QueryAsync<string>(cmdDef);
             }
         }
 
-        public async Task<IEnumerable<string>> GetTablesAsync(string server, string database, string user, string pass)
+        public async Task<IEnumerable<string>> GetTablesAsync(string server, string database, string user, string pass, CancellationToken cancellationToken = default)
         {
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
-                await conn.OpenAsync();
-                return await conn.QueryAsync<string>("SELECT NAME FROM sys.tables ORDER BY NAME");
+                await conn.OpenAsync(cancellationToken);
+                var cmdDef = new CommandDefinition("SELECT NAME FROM sys.tables ORDER BY NAME", cancellationToken: cancellationToken);
+                return await conn.QueryAsync<string>(cmdDef);
             }
         }
 
-        public async Task<List<string>> GetColumnDescriptionsAsync(string server, string database, string user, string pass, IEnumerable<string> columnNames)
+        public async Task<List<string>> GetColumnDescriptionsAsync(string server, string database, string user, string pass, IEnumerable<string> columnNames, CancellationToken cancellationToken = default)
         {
              using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
              {
-                 await conn.OpenAsync();
-                 // Batch query
+                 await conn.OpenAsync(cancellationToken);
                  string sql = "SELECT F1453 as Name, F1454 as Description FROM RB_FIELDS WHERE F1453 IN @Names";
-                 var result = await conn.QueryAsync(sql, new { Names = columnNames });
+                 var cmdDef = new CommandDefinition(sql, new { Names = columnNames }, cancellationToken: cancellationToken);
+                 var result = await conn.QueryAsync(cmdDef);
 
                  var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                  foreach(var r in result)
@@ -262,7 +256,7 @@ namespace SMS_Search
              }
         }
 
-        public virtual async Task<long> GetTotalMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes)
+        public virtual async Task<long> GetTotalMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(filterText)) return 0;
             string safeFilter = filterText.Replace("'", "''");
@@ -288,14 +282,15 @@ namespace SMS_Search
 
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
-                await conn.OpenAsync();
-                var result = await conn.ExecuteScalarAsync<object>(countSql, parameters);
+                await conn.OpenAsync(cancellationToken);
+                var cmdDef = new CommandDefinition(countSql, parameters, cancellationToken: cancellationToken);
+                var result = await conn.ExecuteScalarAsync<object>(cmdDef);
                 if (result == null || result == DBNull.Value) return 0;
                 return Convert.ToInt64(result);
             }
         }
 
-        public virtual async Task<long> GetPrecedingMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes, int limitRowIndex, string sortCol, string sortDir)
+        public virtual async Task<long> GetPrecedingMatchCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string filterText, Dictionary<string, string> columnTypes, int limitRowIndex, string sortCol, string sortDir, CancellationToken cancellationToken = default)
         {
             if (limitRowIndex <= 0) return 0;
             if (string.IsNullOrWhiteSpace(filterText)) return 0;
@@ -326,7 +321,6 @@ namespace SMS_Search
                 orderBy = $"[{safeCol}] {sortDir}";
             }
 
-            // Using OFFSET/FETCH in subquery to limit rows
             string countSql = $@"
                 SELECT SUM((0 + {sumExpression}))
                 FROM (
@@ -337,14 +331,15 @@ namespace SMS_Search
 
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
-                await conn.OpenAsync();
-                var result = await conn.ExecuteScalarAsync<object>(countSql, parameters);
+                await conn.OpenAsync(cancellationToken);
+                var cmdDef = new CommandDefinition(countSql, parameters, cancellationToken: cancellationToken);
+                var result = await conn.ExecuteScalarAsync<object>(cmdDef);
                 if (result == null || result == DBNull.Value) return 0;
                 return Convert.ToInt64(result);
             }
         }
 
-        public virtual async Task<int> GetMatchRowIndexAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string searchText, Dictionary<string, string> columnTypes, int startRowIndex, string sortCol, string sortDir, bool forward)
+        public virtual async Task<int> GetMatchRowIndexAsync(string server, string database, string user, string pass, string sql, object parameters, string filterClause, string searchText, Dictionary<string, string> columnTypes, int startRowIndex, string sortCol, string sortDir, bool forward, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(searchText)) return -1;
             string safeFilter = searchText.Replace("'", "''");
@@ -389,8 +384,9 @@ namespace SMS_Search
 
             using (var conn = new SqlConnection(GetConnectionString(server, database, user, pass)))
             {
-                await conn.OpenAsync();
-                var result = await conn.ExecuteScalarAsync<object>(query, parameters);
+                await conn.OpenAsync(cancellationToken);
+                var cmdDef = new CommandDefinition(query, parameters, cancellationToken: cancellationToken);
+                var result = await conn.ExecuteScalarAsync<object>(cmdDef);
                 if (result == null || result == DBNull.Value) return -1;
                 return Convert.ToInt32(result);
             }

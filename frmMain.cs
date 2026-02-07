@@ -70,11 +70,16 @@ namespace SMS_Search
         private ContextMenuStrip _columnHeaderMenu;
         private ContextMenuStrip _rowHeaderMenu;
 
+        private CancellationTokenSource _cts;
+        private Button btnCancel;
+
         private bool _highlightMatches = false;
         private Color _matchHighlightColor = Color.Yellow;
         private long _lastTotalMatchCount = 0;
         private bool _showRowNumbers = false;
         private bool _showDescriptions = false;
+
+        private enum ExportFormat { Csv, Json, ExcelXml }
 
 		public frmMain(string[] Params)
 		{
@@ -98,6 +103,23 @@ namespace SMS_Search
             _filterDebounceTimer.Tick += _filterDebounceTimer_Tick;
 
             SetupContextMenus();
+
+            // Initialize Cancel Button
+            btnCancel = new Button();
+            btnCancel.Name = "btnCancel";
+            btnCancel.Text = "Cancel";
+            btnCancel.Size = btnPopGrid.Size;
+            btnCancel.Location = btnPopGrid.Location;
+            btnCancel.Anchor = btnPopGrid.Anchor;
+            btnCancel.Visible = false;
+            btnCancel.Click += btnCancel_Click;
+            btnCancel.UseVisualStyleBackColor = true;
+            btnPopGrid.Parent.Controls.Add(btnCancel);
+            btnCancel.BringToFront();
+
+            // Initialize History
+            QueryHistoryManager.Instance.Initialize(config);
+            CreateHistoryButtons();
 
 			log.Logger(LogLevel.Info, "SMS Search V" + Application.ProductVersion + " initialized");
 
@@ -188,6 +210,67 @@ namespace SMS_Search
 
 			txtNumFct.Focus();
 		}
+
+        private void CreateHistoryButtons()
+        {
+            AddHistoryButton(btnBuildQryFct, txtCustSqlFct, "Function");
+            AddHistoryButton(btnBuildQryTlz, txtCustSqlTlz, "Totalizer");
+            AddHistoryButton(btnBuildQryFld, txtCustSqlFld, "Field");
+        }
+
+        private void AddHistoryButton(Button anchorBtn, Control targetInput, string type)
+        {
+            Button btnHist = new Button();
+            btnHist.Size = new Size(25, 23);
+            btnHist.Location = new Point(anchorBtn.Left - 30, anchorBtn.Top);
+            btnHist.Anchor = anchorBtn.Anchor;
+            btnHist.Text = "H";
+            btnHist.ToolTipText = "Query History";
+            btnHist.Click += (s, e) => ShowHistoryMenu(s as Button, targetInput, type);
+            btnHist.UseVisualStyleBackColor = true;
+            anchorBtn.Parent.Controls.Add(btnHist);
+            btnHist.BringToFront();
+        }
+
+        private void ShowHistoryMenu(Button btn, Control targetInput, string type)
+        {
+            var history = QueryHistoryManager.Instance.GetHistory(type);
+            if (history.Count == 0)
+            {
+                ContextMenuStrip emptyMenu = new ContextMenuStrip();
+                emptyMenu.Items.Add("No history").Enabled = false;
+                emptyMenu.Show(btn, new Point(0, btn.Height));
+                return;
+            }
+
+            ContextMenuStrip menu = new ContextMenuStrip();
+            foreach (var sql in history)
+            {
+                string display = sql.Length > 50 ? sql.Substring(0, 47) + "..." : sql;
+                // Replace newlines for display
+                display = display.Replace("\r", " ").Replace("\n", " ");
+
+                var item = menu.Items.Add(display);
+                item.ToolTipText = sql;
+                item.Tag = sql;
+                item.Click += (s, e) =>
+                {
+                    if (targetInput is TextBox tb) tb.Text = (s as ToolStripItem).Tag.ToString();
+                    else if (targetInput is SqlRichTextBox rtb) rtb.Text = (s as ToolStripItem).Tag.ToString();
+                    targetInput.Focus();
+                };
+            }
+
+            menu.Items.Add(new ToolStripSeparator());
+            var clearItem = menu.Items.Add("Clear History");
+            clearItem.Click += (s, e) =>
+            {
+                QueryHistoryManager.Instance.ClearHistory(type);
+                Utils.showToast(0, "History cleared", "History", Screen.FromControl(this));
+            };
+
+            menu.Show(btn, new Point(0, btn.Height));
+        }
 
         private int GetRequiredSearchPanelHeight()
         {
@@ -347,9 +430,22 @@ namespace SMS_Search
 
             Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
             tsProgressBar.Visible = busy;
+
+            btnPopGrid.Visible = !busy;
             btnPopGrid.Enabled = !busy;
+
+            btnCancel.Visible = busy;
+            btnCancel.Enabled = busy;
+
             picRefresh.Enabled = !busy;
             tscmbDbDatabase.Enabled = !busy;
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            _cts?.Cancel();
+            btnCancel.Enabled = false; // Prevent multiple clicks
+            tslblInfo.Text = "Cancelling...";
         }
 
         public string GetConnString(string DbServer, string DbDatabase)
@@ -615,6 +711,11 @@ namespace SMS_Search
 			SetBusy(true);
 			tslblInfo.Text = "";
 
+            // Initialize Cancellation Token
+            _cts?.Dispose();
+            _cts = new CancellationTokenSource();
+            CancellationToken token = _cts.Token;
+
             string server = tscmbDbServer.Text;
             string database = tscmbDbDatabase.Text;
 
@@ -624,112 +725,142 @@ namespace SMS_Search
 
             _gridContext.SetConnection(server, database, user, pass);
 
-			bool SQLConnected = await _repo.TestConnectionAsync(server, database, user, pass);
-			arrayGrdDesc.Clear();
-			arrayGrdDesc.TrimToSize();
-			arrayGrdFld.Clear();
-			arrayGrdFld.TrimToSize();
-			dGrd.DataSource = null;
-            dGrd.Rows.Clear();
-            dGrd.Columns.Clear();
-			tslblRecordCnt.Text = "0";
+            try
+            {
+			    bool SQLConnected = await _repo.TestConnectionAsync(server, database, user, pass, token);
+			    arrayGrdDesc.Clear();
+			    arrayGrdDesc.TrimToSize();
+			    arrayGrdFld.Clear();
+			    arrayGrdFld.TrimToSize();
+			    dGrd.DataSource = null;
+                dGrd.Rows.Clear();
+                dGrd.Columns.Clear();
+			    tslblRecordCnt.Text = "0";
 
-			if (SQLConnected)
-			{
-                var criteria = GetSearchCriteriaFromUI();
-                var queryResult = _queryBuilder.Build(criteria);
+			    if (SQLConnected)
+			    {
+                    var criteria = GetSearchCriteriaFromUI();
 
-                log.Logger(LogLevel.Info, "Starting search...");
-
-                Stopwatch sw = Stopwatch.StartNew();
-
-				try
-				{
-                    // 1. Get Schema to setup columns
-                    log.Logger(LogLevel.Debug, "Fetching schema...");
-                    var schemaDt = await _gridContext.GetSchemaAsync(queryResult.Sql, queryResult.Parameters);
-                    log.Logger(LogLevel.Debug, $"Schema fetched. Columns: {schemaDt.Columns.Count}");
-
-                    foreach (DataColumn col in schemaDt.Columns)
+                    if (criteria.Type == SearchType.CustomSql && !string.IsNullOrWhiteSpace(criteria.Value))
                     {
-                        dGrd.Columns.Add(new DataGridViewTextBoxColumn { Name = col.ColumnName, HeaderText = col.ColumnName });
+                        QueryHistoryManager.Instance.AddQuery(criteria.Mode.ToString(), criteria.Value);
                     }
 
-                    // 2. Load Data (Count)
-                    dGrd.VirtualMode = true;
-                    tslblRecordCnt.Text = "Loading...";
-                    string defaultSort = dGrd.Columns.Count > 0 ? dGrd.Columns[0].Name : null;
+                    var queryResult = _queryBuilder.Build(criteria);
 
-                    log.Logger(LogLevel.Debug, "Loading data (Count)...");
-                    await _gridContext.LoadAsync(queryResult.Sql, queryResult.Parameters, defaultSort);
-                    log.Logger(LogLevel.Debug, $"LoadAsync complete. TotalCount: {_gridContext.TotalCount}");
+                    log.Logger(LogLevel.Info, "Starting search...");
 
-                    if (dGrd.Columns.Count > 0)
-                    {
-                         dGrd.Columns[0].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
-                    }
+                    Stopwatch sw = Stopwatch.StartNew();
 
-                    sw.Stop();
-                    log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, _gridContext.TotalCount, true);
-				}
-				catch (Exception ex)
-				{
-                    // Fallback to legacy load
-                    log.Logger(LogLevel.Warning, "Virtual Mode Load failed, attempting legacy load: " + ex.ToString());
-                    try
-                    {
-                        dGrd.VirtualMode = false;
-                        dGrd.Rows.Clear();
-                        dGrd.Columns.Clear();
+				    try
+				    {
+                        // 1. Get Schema to setup columns
+                        log.Logger(LogLevel.Debug, "Fetching schema...");
+                        var schemaDt = await _gridContext.GetSchemaAsync(queryResult.Sql, queryResult.Parameters, token);
+                        log.Logger(LogLevel.Debug, $"Schema fetched. Columns: {schemaDt.Columns.Count}");
 
-                        var dataTable = await _repo.ExecuteQueryAsync(server, database, user, pass, queryResult.Sql, queryResult.Parameters);
+                        foreach (DataColumn col in schemaDt.Columns)
+                        {
+                            dGrd.Columns.Add(new DataGridViewTextBoxColumn { Name = col.ColumnName, HeaderText = col.ColumnName });
+                        }
 
-                        bindingSource.DataSource = dataTable;
-                        dGrd.DataSource = bindingSource;
-                        UpdateRowHeaderWidth();
+                        // 2. Load Data (Count)
+                        dGrd.VirtualMode = true;
+                        tslblRecordCnt.Text = "Loading...";
+                        string defaultSort = dGrd.Columns.Count > 0 ? dGrd.Columns[0].Name : null;
+
+                        log.Logger(LogLevel.Debug, "Loading data (Count)...");
+                        await _gridContext.LoadAsync(queryResult.Sql, queryResult.Parameters, defaultSort, token);
+                        log.Logger(LogLevel.Debug, $"LoadAsync complete. TotalCount: {_gridContext.TotalCount}");
+
+                        if (dGrd.Columns.Count > 0)
+                        {
+                             dGrd.Columns[0].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+                        }
 
                         sw.Stop();
-                        tslblRecordCnt.Text = dataTable.Rows.Count.ToString();
-                        log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, dataTable.Rows.Count, true);
-                    }
-                    catch (Exception ex2)
-                    {
-                        sw.Stop();
-                        MessageBox.Show("Virtual Load Error: " + ex.Message + "\n\nLegacy Load Error: " + ex2.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                        log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, 0, false, ex2.Message);
-                    }
-				}
-				finally
-				{
-                    // Resize columns based on headers first
-					dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.ColumnHeader);
-				}
+                        log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, _gridContext.TotalCount, true);
+                        tslblInfo.Text = $"Executed in {sw.ElapsedMilliseconds} ms";
+                        tslblInfo.ForeColor = SystemColors.ControlText;
+				    }
+				    catch (Exception ex)
+				    {
+                        if (ex is OperationCanceledException) throw; // Bubble up
+
+                        // Fallback to legacy load
+                        log.Logger(LogLevel.Warning, "Virtual Mode Load failed, attempting legacy load: " + ex.ToString());
+                        try
+                        {
+                            dGrd.VirtualMode = false;
+                            dGrd.Rows.Clear();
+                            dGrd.Columns.Clear();
+
+                            var dataTable = await _repo.ExecuteQueryAsync(server, database, user, pass, queryResult.Sql, queryResult.Parameters, token);
+
+                            bindingSource.DataSource = dataTable;
+                            dGrd.DataSource = bindingSource;
+                            UpdateRowHeaderWidth();
+
+                            sw.Stop();
+                            tslblRecordCnt.Text = dataTable.Rows.Count.ToString();
+                            log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, dataTable.Rows.Count, true);
+                            tslblInfo.Text = $"Executed in {sw.ElapsedMilliseconds} ms";
+                        }
+                        catch (Exception ex2)
+                        {
+                            if (ex2 is OperationCanceledException) throw; // Bubble up
+
+                            sw.Stop();
+                            MessageBox.Show("Virtual Load Error: " + ex.Message + "\n\nLegacy Load Error: " + ex2.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                            log.LogSql(queryResult.Sql, sw.ElapsedMilliseconds, 0, false, ex2.Message);
+                        }
+				    }
+				    finally
+				    {
+                        if (!token.IsCancellationRequested)
+                        {
+                            // Resize columns based on headers first
+					        dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.ColumnHeader);
+                        }
+				    }
 				
-                if (dGrd.RowCount > 0)
-				{
-                    splitContainer.Panel2Collapsed = false;
-                    if (Height < FormHeightMin + GridMinRowHeight)
-                    {
-					    Height = FormHeightExpanded;
-                    }
-				}
+                    if (dGrd.RowCount > 0)
+				    {
+                        splitContainer.Panel2Collapsed = false;
+                        if (Height < FormHeightMin + GridMinRowHeight)
+                        {
+					        Height = FormHeightExpanded;
+                        }
+				    }
 
-				if (dGrd.RowCount < 1)
-				{
-					tslblInfo.Text = "Query returned no records!";
-					tslblInfo.ForeColor = Color.Red;
-				}
-			}
-			else
-			{
-				tslblInfo.Text = "Connection failed!";
-				tslblInfo.ForeColor = Color.Red;
-				MessageBox.Show("Failed to connect to data source.\nPlease check your connection settings.", "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-			}
-			setTabTextFocus();
-			await setColumnArrayAsync();
-			await setHeadersAsync();
-			SetBusy(false);
+				    if (dGrd.RowCount < 1 && !token.IsCancellationRequested)
+				    {
+					    tslblInfo.Text = "Query returned no records!";
+					    tslblInfo.ForeColor = Color.Red;
+				    }
+			    }
+			    else
+			    {
+				    tslblInfo.Text = "Connection failed!";
+				    tslblInfo.ForeColor = Color.Red;
+				    MessageBox.Show("Failed to connect to data source.\nPlease check your connection settings.", "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+			    }
+			    setTabTextFocus();
+                if (!token.IsCancellationRequested)
+                {
+			        await setColumnArrayAsync();
+			        await setHeadersAsync();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                tslblInfo.Text = "Operation cancelled.";
+                tslblInfo.ForeColor = Color.OrangeRed;
+            }
+            finally
+            {
+			    SetBusy(false);
+            }
 		}
 
         private void dGrd_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
@@ -1319,9 +1450,14 @@ namespace SMS_Search
             var itemExportSelected = _cellContextMenu.Items.Add("Export selected cells to CSV");
             itemExportSelected.Click += (s, e) => ExportSelectedCellsToCsv();
 
-            // Export all results to CSV
-            var itemExportAll = _cellContextMenu.Items.Add("Export all results to CSV");
-            itemExportAll.Click += (s, e) => ExportAllResultsToCsv();
+            // Export all results
+            var itemExportAll = _cellContextMenu.Items.Add("Export all results...");
+            var itemExportCsv = (itemExportAll as ToolStripMenuItem).DropDownItems.Add("To CSV");
+            itemExportCsv.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Csv);
+            var itemExportJson = (itemExportAll as ToolStripMenuItem).DropDownItems.Add("To JSON");
+            itemExportJson.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Json);
+            var itemExportExcel = (itemExportAll as ToolStripMenuItem).DropDownItems.Add("To Excel (XML)");
+            itemExportExcel.Click += (s, e) => ExportAllResultsAsync(ExportFormat.ExcelXml);
 
             _cellContextMenu.Opening += (s, e) =>
             {
@@ -1346,9 +1482,14 @@ namespace SMS_Search
 
             _columnHeaderMenu.Items.Add(new ToolStripSeparator());
 
-            // Export all results to CSV
-            var itemColExportAll = _columnHeaderMenu.Items.Add("Export all results to CSV");
-            itemColExportAll.Click += (s, e) => ExportAllResultsToCsv();
+            // Export all results
+            var itemColExportAll = _columnHeaderMenu.Items.Add("Export all results...");
+            var itemColExportCsv = (itemColExportAll as ToolStripMenuItem).DropDownItems.Add("To CSV");
+            itemColExportCsv.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Csv);
+            var itemColExportJson = (itemColExportAll as ToolStripMenuItem).DropDownItems.Add("To JSON");
+            itemColExportJson.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Json);
+            var itemColExportExcel = (itemColExportAll as ToolStripMenuItem).DropDownItems.Add("To Excel (XML)");
+            itemColExportExcel.Click += (s, e) => ExportAllResultsAsync(ExportFormat.ExcelXml);
 
             // Clear result
             var itemColClear = _columnHeaderMenu.Items.Add("Clear result");
@@ -1381,9 +1522,14 @@ namespace SMS_Search
             var itemRowExportSelected = _rowHeaderMenu.Items.Add("Export selected rows to CSV");
             itemRowExportSelected.Click += (s, e) => ExportSelectedRowsToCsv();
 
-            // Export all results to CSV
-            var itemRowExportAll = _rowHeaderMenu.Items.Add("Export all results to CSV");
-            itemRowExportAll.Click += (s, e) => ExportAllResultsToCsv();
+            // Export all results
+            var itemRowExportAll = _rowHeaderMenu.Items.Add("Export all results...");
+            var itemRowExportCsv = (itemRowExportAll as ToolStripMenuItem).DropDownItems.Add("To CSV");
+            itemRowExportCsv.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Csv);
+            var itemRowExportJson = (itemRowExportAll as ToolStripMenuItem).DropDownItems.Add("To JSON");
+            itemRowExportJson.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Json);
+            var itemRowExportExcel = (itemRowExportAll as ToolStripMenuItem).DropDownItems.Add("To Excel (XML)");
+            itemRowExportExcel.Click += (s, e) => ExportAllResultsAsync(ExportFormat.ExcelXml);
 
             // Clear result
             var itemRowClear = _rowHeaderMenu.Items.Add("Clear result");
@@ -2533,19 +2679,33 @@ namespace SMS_Search
              return val != null && val.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        private async void ExportAllResultsToCsv()
+        private async void ExportAllResultsAsync(ExportFormat format)
         {
             if (dGrd.RowCount == 0) return;
 
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
-                sfd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
-                sfd.FileName = "SMS_Search_Export_All_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+                string ext = format == ExportFormat.Json ? "json" : (format == ExportFormat.ExcelXml ? "xml" : "csv");
+                string filter = format == ExportFormat.Json ? "JSON files (*.json)|*.json" : (format == ExportFormat.ExcelXml ? "Excel XML (*.xml)|*.xml" : "CSV files (*.csv)|*.csv");
+
+                sfd.Filter = $"{filter}|All files (*.*)|*.*";
+                sfd.FileName = $"SMS_Search_Export_All_{DateTime.Now:yyyyMMdd_HHmmss}.{ext}";
+
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    bool includeHeaders = MessageBox.Show("Include headers in export?", "Export CSV", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+                    bool includeHeaders = true;
+                    if (format == ExportFormat.Csv || format == ExportFormat.ExcelXml)
+                    {
+                         includeHeaders = MessageBox.Show("Include headers in export?", "Export", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+                    }
 
                     SetBusy(true);
+
+                    // Initialize Cancellation Token
+                    _cts?.Dispose();
+                    _cts = new CancellationTokenSource();
+                    CancellationToken token = _cts.Token;
+
                     try
                     {
                         var headerMap = new Dictionary<string, string>();
@@ -2554,8 +2714,25 @@ namespace SMS_Search
                             headerMap[col.Name] = col.HeaderText;
                         }
 
-                        await _gridContext.ExportToCsvAsync(sfd.FileName, headerMap, includeHeaders);
+                        Stopwatch sw = Stopwatch.StartNew();
+
+                        if (format == ExportFormat.Json)
+                            await _gridContext.ExportToJsonAsync(sfd.FileName, headerMap, token);
+                        else if (format == ExportFormat.ExcelXml)
+                            await _gridContext.ExportToExcelXmlAsync(sfd.FileName, headerMap, token);
+                        else
+                            await _gridContext.ExportToCsvAsync(sfd.FileName, headerMap, includeHeaders, token);
+
+                        sw.Stop();
+
+                        tslblInfo.Text = $"Exported in {sw.ElapsedMilliseconds} ms";
                         Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        tslblInfo.Text = "Export cancelled.";
+                        // Clean up partial file?
+                        try { if (File.Exists(sfd.FileName)) File.Delete(sfd.FileName); } catch { }
                     }
                     catch (Exception ex)
                     {
