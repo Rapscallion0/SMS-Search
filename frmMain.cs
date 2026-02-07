@@ -1373,6 +1373,44 @@ namespace SMS_Search
 
                 _rowHeaderMenu.Show(Cursor.Position);
             }
+            else if (e.Button == MouseButtons.Left)
+            {
+                if (Control.ModifierKeys == Keys.Control)
+                {
+                    // Toggle selection
+                    dGrd.Rows[e.RowIndex].Selected = !dGrd.Rows[e.RowIndex].Selected;
+                }
+                else if (Control.ModifierKeys == Keys.Shift)
+                {
+                    // Range select
+                    int startRow = dGrd.CurrentCell != null ? dGrd.CurrentCell.RowIndex : e.RowIndex;
+                    int endRow = e.RowIndex;
+                    int min = Math.Min(startRow, endRow);
+                    int max = Math.Max(startRow, endRow);
+
+                    dGrd.ClearSelection();
+                    for (int i = min; i <= max; i++)
+                    {
+                        dGrd.Rows[i].Selected = true;
+                    }
+                }
+                else
+                {
+                    // Single select
+                    dGrd.ClearSelection();
+                    dGrd.Rows[e.RowIndex].Selected = true;
+                }
+
+                // Update current cell to the clicked row (first visible column) to anchor future Shift-clicks
+                if (dGrd.Columns.Count > 0)
+                {
+                    var firstVisCol = dGrd.Columns.GetFirstColumn(DataGridViewElementStates.Visible);
+                    if (firstVisCol != null)
+                    {
+                        dGrd.CurrentCell = dGrd[firstVisCol.Index, e.RowIndex];
+                    }
+                }
+            }
         }
 
         private void FilterBySelection_Click(object sender, EventArgs e)
