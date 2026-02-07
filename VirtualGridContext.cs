@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace SMS_Search
 {
@@ -61,7 +64,7 @@ namespace SMS_Search
             _pass = pass;
         }
 
-        public async Task LoadAsync(string sql, object parameters, string initialSortColumn = null)
+        public async Task LoadAsync(string sql, object parameters, string initialSortColumn = null, CancellationToken cancellationToken = default)
         {
             _baseSql = sql;
             _parameters = parameters;
@@ -70,7 +73,7 @@ namespace SMS_Search
             FilterText = null;
             UnfilteredCount = 0; // Reset before reload
 
-            await ReloadAsync();
+            await ReloadAsync(cancellationToken);
 
             // On initial load, TotalCount is the UnfilteredCount
             if (string.IsNullOrEmpty(FilterText))
@@ -79,13 +82,11 @@ namespace SMS_Search
             }
         }
 
-        public async Task ApplyFilterAsync(string filterText, IEnumerable<string> columns)
+        public async Task ApplyFilterAsync(string filterText, IEnumerable<string> columns, CancellationToken cancellationToken = default)
         {
             _rawFilterText = filterText;
             _filterColumns = new List<string>(columns);
 
-            // Convert simple text filter to SQL WHERE
-            // "val" -> "Col1 LIKE '%val%' OR Col2 LIKE '%val%'"
             if (string.IsNullOrWhiteSpace(filterText))
             {
                 FilterText = null;
@@ -108,10 +109,10 @@ namespace SMS_Search
                 FilterText = string.Join(" OR ", clauses);
             }
 
-            await ReloadAsync();
+            await ReloadAsync(cancellationToken);
         }
 
-        public async Task<long> GetTotalMatchCountAsync()
+        public async Task<long> GetTotalMatchCountAsync(CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(_rawFilterText) || _filterColumns == null || _filterColumns.Count == 0)
                 return 0;
@@ -123,10 +124,10 @@ namespace SMS_Search
                 else colTypes[col] = null;
             }
 
-            return await _repo.GetTotalMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, colTypes);
+            return await _repo.GetTotalMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, colTypes, cancellationToken);
         }
 
-        public async Task<long> GetPrecedingMatchCountAsync(int limitRowIndex)
+        public async Task<long> GetPrecedingMatchCountAsync(int limitRowIndex, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(_rawFilterText) || _filterColumns == null || _filterColumns.Count == 0 || limitRowIndex <= 0)
                 return 0;
@@ -138,7 +139,7 @@ namespace SMS_Search
                 else colTypes[col] = null;
             }
 
-            return await _repo.GetPrecedingMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, colTypes, limitRowIndex, SortColumn, SortDirection);
+            return await _repo.GetPrecedingMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, colTypes, limitRowIndex, SortColumn, SortDirection, cancellationToken);
         }
 
         public async Task WaitForRowAsync(int rowIndex)
@@ -185,7 +186,7 @@ namespace SMS_Search
             await Task.WhenAll(tasks);
         }
 
-        public async Task ApplySortAsync(string column)
+        public async Task ApplySortAsync(string column, CancellationToken cancellationToken = default)
         {
             if (SortColumn == column)
             {
@@ -197,10 +198,10 @@ namespace SMS_Search
                 SortDirection = "ASC";
             }
 
-            await ReloadAsync();
+            await ReloadAsync(cancellationToken);
         }
 
-        private async Task ReloadAsync()
+        private async Task ReloadAsync(CancellationToken cancellationToken = default)
         {
             _version++;
             int currentVersion = _version;
@@ -209,20 +210,19 @@ namespace SMS_Search
             {
                 _cache.Clear();
                 _pagesBeingFetched.Clear();
-
-                foreach (var tcs in _pageCompletionSources.Values)
-                {
-                    tcs.TrySetResult(false);
-                }
                 _pageCompletionSources.Clear();
 
                 // If filter/sort makes query invalid, this throws
-                TotalCount = await _repo.GetQueryCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText);
+                TotalCount = await _repo.GetQueryCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, cancellationToken);
 
                 if (_version == currentVersion)
                 {
                     DataReady?.Invoke(this, EventArgs.Empty);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore cancellation
             }
             catch (Exception ex)
             {
@@ -241,7 +241,7 @@ namespace SMS_Search
 
             // Not in cache, trigger fetch
             RequestPage(rowIndex);
-            return null; // Return null so grid displays empty/default. "..." might break typed columns if we used them.
+            return null; // Return null so grid displays empty/default.
         }
 
         private async void RequestPage(int rowIndex)
@@ -257,25 +257,20 @@ namespace SMS_Search
             {
                 int offset = pageIndex * PageSize;
 
-                // Capture state for this request
                 string sortCol = SortColumn;
                 string sortDir = SortDirection;
                 string filter = FilterText;
 
                 var dt = await _repo.GetQueryPageAsync(_server, _database, _user, _pass, _baseSql, _parameters, offset, PageSize, sortCol, sortDir, filter);
 
-                // Check version before updating cache
                 if (_version != currentVersion) return;
 
-                // Add to cache
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     int absIndex = offset + i;
-                    // We overwrite if exists (unlikely given check)
                     _cache[absIndex] = dt.Rows[i];
                 }
 
-                // Notify UI to repaint
                 DataReady?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
@@ -297,9 +292,9 @@ namespace SMS_Search
             }
         }
 
-        public async Task<DataTable> GetSchemaAsync(string sql, object parameters)
+        public async Task<DataTable> GetSchemaAsync(string sql, object parameters, CancellationToken cancellationToken = default)
         {
-             var dt = await _repo.GetQuerySchemaAsync(_server, _database, _user, _pass, sql, parameters);
+             var dt = await _repo.GetQuerySchemaAsync(_server, _database, _user, _pass, sql, parameters, cancellationToken);
              _columnSqlTypes.Clear();
              foreach(DataColumn col in dt.Columns)
              {
@@ -311,7 +306,7 @@ namespace SMS_Search
              return dt;
         }
 
-        public async Task ExportToCsvAsync(string filename, Dictionary<string, string> headerMap = null, bool includeHeaders = true)
+        private string BuildExportSql()
         {
              string finalSql = _baseSql;
              if (!string.IsNullOrWhiteSpace(FilterText))
@@ -319,29 +314,29 @@ namespace SMS_Search
                  finalSql = $"SELECT * FROM ({_baseSql}) AS _FilterQ WHERE {FilterText}";
              }
 
-             // Ensure sort is applied to export?
-             // Ideally yes, user expects export to match grid order.
              if (!string.IsNullOrEmpty(SortColumn))
              {
                 string safeCol = SortColumn.Replace("[", "").Replace("]", "");
-                // If the query is wrapped for filtering, we can just append ORDER BY
-                // If it wasn't wrapped, we wrap it now for sorting
                 if (string.IsNullOrWhiteSpace(FilterText))
                 {
                     finalSql = $"SELECT * FROM ({finalSql}) AS _SortQ ORDER BY [{safeCol}] {SortDirection}";
                 }
                 else
                 {
-                    // Already wrapped as _FilterQ, just append ORDER BY
                     finalSql += $" ORDER BY [{safeCol}] {SortDirection}";
                 }
              }
+             return finalSql;
+        }
 
-             using (var reader = await _repo.GetQueryDataReaderAsync(_server, _database, _user, _pass, finalSql, _parameters))
+        public async Task ExportToCsvAsync(string filename, Dictionary<string, string> headerMap = null, bool includeHeaders = true, CancellationToken cancellationToken = default)
+        {
+             string finalSql = BuildExportSql();
+
+             using (var reader = await _repo.GetQueryDataReaderAsync(_server, _database, _user, _pass, finalSql, _parameters, cancellationToken))
              {
                  using (var writer = new System.IO.StreamWriter(filename))
                  {
-                     // Write headers
                      if (includeHeaders)
                      {
                          for (int i = 0; i < reader.FieldCount; i++)
@@ -354,7 +349,7 @@ namespace SMS_Search
                          writer.WriteLine();
                      }
 
-                     while (await reader.ReadAsync())
+                     while (await reader.ReadAsync(cancellationToken))
                      {
                          for (int i = 0; i < reader.FieldCount; i++)
                          {
@@ -369,7 +364,106 @@ namespace SMS_Search
              }
         }
 
-        public async Task<int> FindMatchRowAsync(string searchText, IEnumerable<string> searchColumns, int startRowIndex, bool forward)
+        public async Task ExportToJsonAsync(string filename, Dictionary<string, string> headerMap = null, CancellationToken cancellationToken = default)
+        {
+             string finalSql = BuildExportSql();
+
+             using (var reader = await _repo.GetQueryDataReaderAsync(_server, _database, _user, _pass, finalSql, _parameters, cancellationToken))
+             {
+                 using (var fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
+                 using (var writer = new Utf8JsonWriter(fs, new JsonWriterOptions { Indented = true }))
+                 {
+                     writer.WriteStartArray();
+                     while (await reader.ReadAsync(cancellationToken))
+                     {
+                         writer.WriteStartObject();
+                         for (int i = 0; i < reader.FieldCount; i++)
+                         {
+                             string colName = reader.GetName(i);
+                             string header = (headerMap != null && headerMap.ContainsKey(colName)) ? headerMap[colName] : colName;
+                             var val = reader.GetValue(i);
+
+                             writer.WritePropertyName(header);
+
+                             if (val == DBNull.Value) writer.WriteNullValue();
+                             else if (val is bool b) writer.WriteBooleanValue(b);
+                             else if (IsNumeric(val)) writer.WriteNumberValue(Convert.ToDecimal(val));
+                             else writer.WriteStringValue(val.ToString());
+                         }
+                         writer.WriteEndObject();
+                     }
+                     writer.WriteEndArray();
+                 }
+             }
+        }
+
+        public async Task ExportToExcelXmlAsync(string filename, Dictionary<string, string> headerMap = null, CancellationToken cancellationToken = default)
+        {
+             string finalSql = BuildExportSql();
+
+             using (var reader = await _repo.GetQueryDataReaderAsync(_server, _database, _user, _pass, finalSql, _parameters, cancellationToken))
+             {
+                 using (var writer = new StreamWriter(filename))
+                 {
+                     writer.WriteLine("<?xml version=\"1.0\"?>");
+                     writer.WriteLine("<?mso-application progid=\"Excel.Sheet\"?>");
+                     writer.WriteLine("<Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\"");
+                     writer.WriteLine(" xmlns:o=\"urn:schemas-microsoft-com:office:office\"");
+                     writer.WriteLine(" xmlns:x=\"urn:schemas-microsoft-com:office:excel\"");
+                     writer.WriteLine(" xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\"");
+                     writer.WriteLine(" xmlns:html=\"http://www.w3.org/TR/REC-html40\">");
+                     writer.WriteLine(" <Worksheet ss:Name=\"Sheet1\">");
+                     writer.WriteLine("  <Table>");
+
+                     // Header
+                     writer.WriteLine("   <Row>");
+                     for (int i = 0; i < reader.FieldCount; i++)
+                     {
+                         string colName = reader.GetName(i);
+                         string header = (headerMap != null && headerMap.ContainsKey(colName)) ? headerMap[colName] : colName;
+                         writer.WriteLine($"    <Cell><Data ss:Type=\"String\">{EscapeXml(header)}</Data></Cell>");
+                     }
+                     writer.WriteLine("   </Row>");
+
+                     while (await reader.ReadAsync(cancellationToken))
+                     {
+                         writer.WriteLine("   <Row>");
+                         for (int i = 0; i < reader.FieldCount; i++)
+                         {
+                             var val = reader.GetValue(i);
+                             if (val == DBNull.Value)
+                             {
+                                 writer.WriteLine("    <Cell></Cell>");
+                             }
+                             else
+                             {
+                                 writer.WriteLine($"    <Cell><Data ss:Type=\"String\">{EscapeXml(val.ToString())}</Data></Cell>");
+                             }
+                         }
+                         writer.WriteLine("   </Row>");
+                     }
+
+                     writer.WriteLine("  </Table>");
+                     writer.WriteLine(" </Worksheet>");
+                     writer.WriteLine("</Workbook>");
+                 }
+             }
+        }
+
+        private string EscapeXml(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "";
+            return s.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&apos;");
+        }
+
+        private bool IsNumeric(object value)
+        {
+            return value is sbyte || value is byte || value is short || value is ushort ||
+                   value is int || value is uint || value is long || value is ulong ||
+                   value is float || value is double || value is decimal;
+        }
+
+        public async Task<int> FindMatchRowAsync(string searchText, IEnumerable<string> searchColumns, int startRowIndex, bool forward, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(searchText) || searchColumns == null) return -1;
 
@@ -380,7 +474,7 @@ namespace SMS_Search
                 else colTypes[col] = null;
             }
 
-            return await _repo.GetMatchRowIndexAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, searchText, colTypes, startRowIndex, SortColumn, SortDirection, forward);
+            return await _repo.GetMatchRowIndexAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, searchText, colTypes, startRowIndex, SortColumn, SortDirection, forward, cancellationToken);
         }
     }
 }
