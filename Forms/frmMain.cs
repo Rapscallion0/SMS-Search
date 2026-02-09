@@ -821,10 +821,61 @@ namespace SMS_Search.Forms
 				
                     if (dGrd.RowCount > 0)
 				    {
-                        splitContainer.Panel2Collapsed = false;
-                        if (Height < FormHeightMin + GridMinRowHeight)
+                        // Check if we are opening the grid for the first time (or after it was hidden)
+                        if (splitContainer.Panel2Collapsed)
                         {
-					        Height = FormHeightExpanded;
+                            // User wants to preserve the current size of the top panel (Search criteria)
+                            // and add the grid below it.
+                            int currentTopPanelHeight = splitContainer.Height;
+
+                            // Determine how much height to add for the grid
+                            // Use the difference between Expanded and Min, or a safe default (e.g. 300)
+                            int gridHeightToAdd = Math.Max(FormHeightExpanded - FormHeightMin, 300);
+
+                            if (this.WindowState != FormWindowState.Maximized)
+                            {
+                                this.Height += gridHeightToAdd;
+                            }
+
+                            // Recalculate based on actual new height
+                            int maxSplitter = splitContainer.Height - splitContainer.Panel2MinSize;
+                            int safeSplitter;
+
+                            // If we couldn't expand (e.g. Maximized or Screen bounds), ensure Panel2 has space
+                            if (currentTopPanelHeight > maxSplitter - 100) // If panel2 would be tiny (<100px)
+                            {
+                                // Give Panel2 some breathing room (e.g. 300px), shrinking Panel1
+                                safeSplitter = splitContainer.Height - 300;
+                            }
+                            else
+                            {
+                                safeSplitter = currentTopPanelHeight;
+                            }
+
+                            safeSplitter = Math.Min(safeSplitter, maxSplitter);
+
+                            if (safeSplitter < splitContainer.Panel1MinSize)
+                                safeSplitter = splitContainer.Panel1MinSize;
+
+                            try
+                            {
+                                splitContainer.SplitterDistance = safeSplitter;
+                            }
+                            catch (Exception ex)
+                            {
+                                log.Logger(LogLevel.Warning, "Failed to restore splitter distance: " + ex.Message);
+                            }
+
+                            splitContainer.Panel2Collapsed = false;
+                        }
+                        else
+                        {
+                            // Grid is already visible. Ensure minimum height is maintained if user shrunk it too much.
+                            if (Height < FormHeightMin + GridMinRowHeight)
+                            {
+					            Height = FormHeightExpanded;
+                            }
+                            splitContainer.Panel2Collapsed = false;
                         }
 				    }
 
