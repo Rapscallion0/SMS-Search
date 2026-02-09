@@ -291,10 +291,10 @@ namespace SMS_Search.Forms
             return 200; // Fallback
         }
 
-        private void splitContainer_SplitterMoved(object sender, SplitterEventArgs e)
+        /*private void splitContainer_SplitterMoved(object sender, SplitterEventArgs e)
 		{
-			FormHeightMin = splitContainer.SplitterDistance + 95;
-		}
+			//FormHeightMin = splitContainer.SplitterDistance + 95;
+		}*/
 
         private void frmMain_Load(object sender, EventArgs e)
 		{
@@ -1437,9 +1437,9 @@ namespace SMS_Search.Forms
         {
             dGrd.DataSource = null;
             UpdateRowHeaderWidth();
+            Height = FormHeightMin;
             tslblRecordCnt.Text = "0";
             splitContainer.Panel2Collapsed = true;
-            Height = FormHeightMin;
         }
 
         private void SetupContextMenus()

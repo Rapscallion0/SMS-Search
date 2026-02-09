@@ -160,9 +160,11 @@ namespace SMS_Search.Forms
             this.tabFct = new System.Windows.Forms.TabPage();
             this.chkSearchAnyFct = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.txtCustSqlFct = new SMS_Search.Controls.SqlRichTextBox();
             this.tabTlz = new System.Windows.Forms.TabPage();
             this.chkSearchAnyTlz = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.txtCustSqlTlz = new SMS_Search.Controls.SqlRichTextBox();
             this.tabFields = new System.Windows.Forms.TabPage();
             this.chkLastTransaction = new System.Windows.Forms.CheckBox();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -179,6 +181,7 @@ namespace SMS_Search.Forms
             this.txtNumFld = new System.Windows.Forms.TextBox();
             this.btnClearFld = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
+            this.txtCustSqlFld = new SMS_Search.Controls.SqlRichTextBox();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStripNotify = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -202,11 +205,8 @@ namespace SMS_Search.Forms
             this.btnNextMatch = new System.Windows.Forms.Button();
             this.btnPrevMatch = new System.Windows.Forms.Button();
             this.lblMatchCount = new System.Windows.Forms.Label();
-            this.lblFilter = new System.Windows.Forms.Label();
-            this.txtCustSqlFct = new SMS_Search.Controls.SqlRichTextBox();
-            this.txtCustSqlTlz = new SMS_Search.Controls.SqlRichTextBox();
-            this.txtCustSqlFld = new SMS_Search.Controls.SqlRichTextBox();
             this.txtGridFilter = new SMS_Search.Controls.SearchTextBox();
+            this.lblFilter = new System.Windows.Forms.Label();
             this.dGrd = new SMS_Search.Controls.ExDataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -634,6 +634,21 @@ namespace SMS_Search.Forms
             this.label5.TabIndex = 1;
             this.label5.Text = "Wildcards supported ( * and ? )";
             // 
+            // txtCustSqlFct
+            // 
+            this.txtCustSqlFct.AcceptsTab = true;
+            this.txtCustSqlFct.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlFct.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.txtCustSqlFct.Location = new System.Drawing.Point(97, 59);
+            this.txtCustSqlFct.Name = "txtCustSqlFct";
+            this.txtCustSqlFct.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 106);
+            this.txtCustSqlFct.TabIndex = 4;
+            this.txtCustSqlFct.Text = "";
+            this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
+            // 
             // tabTlz
             // 
             this.tabTlz.BackColor = System.Drawing.SystemColors.Control;
@@ -649,10 +664,10 @@ namespace SMS_Search.Forms
             this.tabTlz.Controls.Add(this.btnBuildQryTlz);
             this.tabTlz.Controls.Add(this.btnClearTlz);
             this.tabTlz.Controls.Add(this.txtCustSqlTlz);
-            this.tabTlz.Location = new System.Drawing.Point(4, 24);
+            this.tabTlz.Location = new System.Drawing.Point(4, 22);
             this.tabTlz.Name = "tabTlz";
             this.tabTlz.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTlz.Size = new System.Drawing.Size(588, 171);
+            this.tabTlz.Size = new System.Drawing.Size(588, 173);
             this.tabTlz.TabIndex = 1;
             this.tabTlz.Text = "Totalizer";
             // 
@@ -678,6 +693,21 @@ namespace SMS_Search.Forms
             this.label3.TabIndex = 1;
             this.label3.Text = "Wildcards supported ( * and ? )";
             // 
+            // txtCustSqlTlz
+            // 
+            this.txtCustSqlTlz.AcceptsTab = true;
+            this.txtCustSqlTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlTlz.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.txtCustSqlTlz.Location = new System.Drawing.Point(97, 59);
+            this.txtCustSqlTlz.Name = "txtCustSqlTlz";
+            this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.txtCustSqlTlz.Size = new System.Drawing.Size(484, 108);
+            this.txtCustSqlTlz.TabIndex = 4;
+            this.txtCustSqlTlz.Text = "";
+            this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
+            // 
             // tabFields
             // 
             this.tabFields.BackColor = System.Drawing.SystemColors.Control;
@@ -699,10 +729,10 @@ namespace SMS_Search.Forms
             this.tabFields.Controls.Add(this.label6);
             this.tabFields.Controls.Add(this.picRefresh);
             this.tabFields.Controls.Add(this.txtCustSqlFld);
-            this.tabFields.Location = new System.Drawing.Point(4, 24);
+            this.tabFields.Location = new System.Drawing.Point(4, 22);
             this.tabFields.Name = "tabFields";
             this.tabFields.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFields.Size = new System.Drawing.Size(588, 171);
+            this.tabFields.Size = new System.Drawing.Size(588, 173);
             this.tabFields.TabIndex = 2;
             this.tabFields.Text = "Fields";
             // 
@@ -871,6 +901,21 @@ namespace SMS_Search.Forms
             this.label6.TabIndex = 45;
             this.label6.Text = "F";
             // 
+            // txtCustSqlFld
+            // 
+            this.txtCustSqlFld.AcceptsTab = true;
+            this.txtCustSqlFld.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlFld.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.txtCustSqlFld.Location = new System.Drawing.Point(97, 84);
+            this.txtCustSqlFld.Name = "txtCustSqlFld";
+            this.txtCustSqlFld.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 83);
+            this.txtCustSqlFld.TabIndex = 6;
+            this.txtCustSqlFld.Text = "";
+            this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
+            // 
             // notifyIcon
             // 
             this.notifyIcon.ContextMenuStrip = this.contextMenuStripNotify;
@@ -934,7 +979,7 @@ namespace SMS_Search.Forms
             this.tscmbDbServer.Enabled = false;
             this.tscmbDbServer.Name = "tscmbDbServer";
             this.tscmbDbServer.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.tscmbDbServer.Size = new System.Drawing.Size(70, 23);
+            this.tscmbDbServer.Size = new System.Drawing.Size(50, 23);
             this.tscmbDbServer.ToolTipText = "Server";
             this.tscmbDbServer.Visible = false;
             // 
@@ -1047,7 +1092,7 @@ namespace SMS_Search.Forms
             this.splitContainer.SplitterDistance = 240;
             this.splitContainer.TabIndex = 102;
             this.splitContainer.TabStop = false;
-            this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
+            //this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
             // 
             // btnNextMatch
             // 
@@ -1080,60 +1125,6 @@ namespace SMS_Search.Forms
             this.lblMatchCount.TabIndex = 14;
             this.lblMatchCount.Visible = false;
             // 
-            // lblFilter
-            // 
-            this.lblFilter.AutoSize = true;
-            this.lblFilter.Location = new System.Drawing.Point(5, 8);
-            this.lblFilter.Name = "lblFilter";
-            this.lblFilter.Size = new System.Drawing.Size(36, 15);
-            this.lblFilter.TabIndex = 10;
-            this.lblFilter.Text = "Filter:";
-            // 
-            // txtCustSqlFct
-            // 
-            this.txtCustSqlFct.AcceptsTab = true;
-            this.txtCustSqlFct.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlFct.Font = new System.Drawing.Font("Consolas", 9.75F);
-            this.txtCustSqlFct.Location = new System.Drawing.Point(97, 59);
-            this.txtCustSqlFct.Name = "txtCustSqlFct";
-            this.txtCustSqlFct.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 104);
-            this.txtCustSqlFct.TabIndex = 4;
-            this.txtCustSqlFct.Text = "";
-            this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
-            // 
-            // txtCustSqlTlz
-            // 
-            this.txtCustSqlTlz.AcceptsTab = true;
-            this.txtCustSqlTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlTlz.Font = new System.Drawing.Font("Consolas", 9.75F);
-            this.txtCustSqlTlz.Location = new System.Drawing.Point(97, 59);
-            this.txtCustSqlTlz.Name = "txtCustSqlTlz";
-            this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlTlz.Size = new System.Drawing.Size(484, 106);
-            this.txtCustSqlTlz.TabIndex = 4;
-            this.txtCustSqlTlz.Text = "";
-            this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
-            // 
-            // txtCustSqlFld
-            // 
-            this.txtCustSqlFld.AcceptsTab = true;
-            this.txtCustSqlFld.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlFld.Font = new System.Drawing.Font("Consolas", 9.75F);
-            this.txtCustSqlFld.Location = new System.Drawing.Point(97, 84);
-            this.txtCustSqlFld.Name = "txtCustSqlFld";
-            this.txtCustSqlFld.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 81);
-            this.txtCustSqlFld.TabIndex = 6;
-            this.txtCustSqlFld.Text = "";
-            this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
-            // 
             // txtGridFilter
             // 
             this.txtGridFilter.BackColor = System.Drawing.SystemColors.Window;
@@ -1144,6 +1135,15 @@ namespace SMS_Search.Forms
             this.txtGridFilter.Size = new System.Drawing.Size(229, 23);
             this.txtGridFilter.TabIndex = 11;
             this.txtGridFilter.TextChanged += new System.EventHandler(this.txtGridFilter_TextChanged);
+            // 
+            // lblFilter
+            // 
+            this.lblFilter.AutoSize = true;
+            this.lblFilter.Location = new System.Drawing.Point(5, 8);
+            this.lblFilter.Name = "lblFilter";
+            this.lblFilter.Size = new System.Drawing.Size(36, 15);
+            this.lblFilter.TabIndex = 10;
+            this.lblFilter.Text = "Filter:";
             // 
             // dGrd
             // 
