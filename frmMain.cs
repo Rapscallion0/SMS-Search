@@ -836,7 +836,7 @@ namespace SMS_Search
 			    {
 				    tslblInfo.Text = "Connection failed!";
 				    tslblInfo.ForeColor = Color.Red;
-				    MessageBox.Show("Failed to connect to data source.\nPlease check your connection settings.", "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                    Utils.showToast(2, "Failed to connect to data source.\nPlease check your connection settings.", "SQL connection error", Screen.FromControl(this));
 			    }
 			    setTabTextFocus();
                 if (!token.IsCancellationRequested)
@@ -886,14 +886,14 @@ namespace SMS_Search
             dGrd.Invalidate();
         }
 
-        private void _gridContext_LoadError(object sender, string e)
+        private void _gridContext_LoadError(object sender, string errorMessage)
         {
              if (this.InvokeRequired)
             {
-                this.Invoke(new Action(() => _gridContext_LoadError(sender, e)));
+                this.Invoke(new Action(() => _gridContext_LoadError(sender, errorMessage)));
                 return;
             }
-            MessageBox.Show(e, "Error loading data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Utils.showToast(2, errorMessage, "Error loading data", Screen.FromControl(this));
         }
 
         private async void dGrd_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -1289,7 +1289,7 @@ namespace SMS_Search
 			}
 			catch
 			{
-				MessageBox.Show("You must specify a valid Julian date (YYYYDDD).", "Julian date error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                Utils.showToast(3, "You must specify a valid Julian date (YYYYDDD).", "Julian date error", Screen.FromControl(this));
 			}
 		}
         #endregion
@@ -1740,7 +1740,7 @@ namespace SMS_Search
             catch (Exception ex)
             {
                 log.Logger(LogLevel.Error, "Clipboard Error: " + ex.Message);
-                MessageBox.Show("Error copying to clipboard: " + ex.Message, "Copy Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Utils.showToast(2, "Error copying to clipboard: " + ex.Message, "Copy Error", Screen.FromControl(this));
             }
         }
 
@@ -2173,7 +2173,7 @@ namespace SMS_Search
             catch (Exception ex)
             {
                  log.Logger(LogLevel.Error, "getDbNames error: " + ex.Message);
-                 MessageBox.Show("Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                 Utils.showToast(2, "Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", Screen.FromControl(this));
             }
             finally
             {
@@ -2729,7 +2729,7 @@ namespace SMS_Search
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error exporting: " + ex.Message, "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Utils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
                     }
                     finally
                     {
@@ -2790,7 +2790,7 @@ namespace SMS_Search
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error exporting: " + ex.Message, "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Utils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
                     }
                     finally
                     {
@@ -2860,7 +2860,7 @@ namespace SMS_Search
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error exporting: " + ex.Message, "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Utils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
                     }
                     finally
                     {
