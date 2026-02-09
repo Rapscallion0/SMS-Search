@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Utils
 {
+    /// <summary>
+    /// Helper utilities for parsing, validating, and formatting hotkeys.
+    /// </summary>
     public static class HotkeyUtils
     {
         private static readonly Keys[] RestrictedKeys = new Keys[]
@@ -19,6 +22,9 @@ namespace SMS_Search.Utils
             Keys.Alt | Keys.F4
         };
 
+        /// <summary>
+        /// Converts a Keys enum value to a friendly string representation (e.g., "CTRL + ALT + K").
+        /// </summary>
         public static string ToString(Keys keyData)
         {
             var sb = new StringBuilder();
@@ -47,6 +53,9 @@ namespace SMS_Search.Utils
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Parses a hotkey string (friendly or legacy format) back into a Keys enum.
+        /// </summary>
         public static Keys Parse(string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return Keys.None;
@@ -100,6 +109,9 @@ namespace SMS_Search.Utils
             }
         }
 
+        /// <summary>
+        /// Validates if the key combination is a valid hotkey (must have modifier and key).
+        /// </summary>
         public static bool IsValid(Keys keyData)
         {
             // Must have at least one modifier

@@ -7,6 +7,9 @@ using SMS_Search.Data;
 
 namespace SMS_Search.Settings
 {
+    /// <summary>
+    /// Main configuration dialog. Handles loading/switching between different settings categories.
+    /// </summary>
     public partial class frmConfig : Form
     {
         private ConfigManager config = new ConfigManager(Path.Combine(Application.StartupPath, "SMSSearch_settings.json"));

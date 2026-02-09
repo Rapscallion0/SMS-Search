@@ -6,6 +6,9 @@ using SMS_Search.Utils;
 
 namespace SMS_Search.Settings
 {
+    /// <summary>
+    /// UserControl for managing SQL cleaning rules (Regex search/replace patterns).
+    /// </summary>
     public partial class CleanSqlSettings : UserControl
     {
         private ConfigManager _config;
@@ -86,6 +89,9 @@ namespace SMS_Search.Settings
              };
         }
 
+        /// <summary>
+        /// Persists the current list of regex rules to configuration.
+        /// </summary>
         private void SaveRules()
         {
             if (!_isLoaded || _config == null) return;

@@ -4,6 +4,9 @@ using SMS_Search.Utils;
 
 namespace SMS_Search.Settings
 {
+    /// <summary>
+    /// UserControl for configuring Grid Display settings (columns, resize, delimiters).
+    /// </summary>
     public partial class DisplaySettings : UserControl
     {
         private ConfigManager _config;

@@ -26,6 +26,10 @@ namespace SMS_Search.Utils
         public Dictionary<string, Dictionary<string, string>> LastConfig { get; set; } = new Dictionary<string, Dictionary<string, string>>();
     }
 
+    /// <summary>
+    /// Wrapper for Serilog to provide structured application logging.
+    /// Handles log levels, file rotation, and configuration change tracking.
+    /// </summary>
 	public class Logfile
 	{
         private static ILogger _logger;
@@ -66,6 +70,9 @@ namespace SMS_Search.Utils
             }
         }
 
+        /// <summary>
+        /// Reloads logging configuration (levels, retention) from settings file and reconfigures Serilog.
+        /// </summary>
         public void ReloadConfig()
         {
             lock (_syncRoot)
@@ -142,6 +149,9 @@ namespace SMS_Search.Utils
             }
         }
 
+        /// <summary>
+        /// Logs full configuration once a day, and deltas on subsequent runs.
+        /// </summary>
         private void ProcessConfigLogging(ConfigManager config)
         {
             try

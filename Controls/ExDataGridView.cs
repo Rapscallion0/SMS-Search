@@ -3,12 +3,19 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Controls
 {
+    /// <summary>
+    /// Enhanced DataGridView that supports smooth horizontal scrolling via mouse wheel tilt
+    /// and preserves visual context (anchor column) during column resizing.
+    /// </summary>
     public class ExDataGridView : DataGridView
     {
         private const int WM_MOUSEHWHEEL = 0x020E;
         private int _anchorColumnIndex = -1;
         private int _anchorOffset = 0;
 
+        /// <summary>
+        /// Intercepts window messages to handle horizontal mouse wheel events.
+        /// </summary>
         protected override void WndProc(ref Message m)
         {
             if (m.Msg == WM_MOUSEHWHEEL)
@@ -62,6 +69,10 @@ namespace SMS_Search.Controls
             UpdateAnchor();
         }
 
+        /// <summary>
+        /// Calculates and stores the index and visual offset of the leftmost visible column.
+        /// This "anchor" is used to restore the visual position after column resizing.
+        /// </summary>
         private void UpdateAnchor()
         {
             if (this.Columns.Count == 0)
@@ -95,6 +106,9 @@ namespace SMS_Search.Controls
             }
         }
 
+        /// <summary>
+        /// Adjusts horizontal scroll position after a column resize to keep the "anchor" column stationary.
+        /// </summary>
         protected override void OnColumnWidthChanged(DataGridViewColumnEventArgs e)
         {
             base.OnColumnWidthChanged(e);

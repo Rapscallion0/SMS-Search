@@ -7,11 +7,18 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Data
 {
+    /// <summary>
+    /// Helper class for testing database connections.
+    /// </summary>
 	public class dbConnector
 	{
         private Logfile log = new Logfile();
         private DataRepository _repo = new DataRepository();
 
+        /// <summary>
+        /// Synchronously tests the database connection.
+        /// </summary>
+        /// <param name="DispError">If true, displays a MessageBox on error.</param>
 		public bool TestDbConn(string DbServer, string DbDatabase, bool DispError, string dbUser = null, string dbPassword = null)
 		{
             log.Logger(LogLevel.Info, $"TestDbConn: Testing connection to Server='{DbServer}' Database='{DbDatabase}'");
@@ -52,6 +59,10 @@ namespace SMS_Search.Data
 			}
 		}
 
+        /// <summary>
+        /// Asynchronously tests the database connection.
+        /// </summary>
+        /// <param name="DispError">If true, displays a MessageBox on error.</param>
         public async Task<bool> TestDbConnAsync(string DbServer, string DbDatabase, bool DispError, string dbUser = null, string dbPassword = null)
         {
             log.Logger(LogLevel.Info, $"TestDbConnAsync: Testing connection to Server='{DbServer}' Database='{DbDatabase}'");
