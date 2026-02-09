@@ -9,6 +9,9 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 namespace SMS_Search.Forms
 {
+    /// <summary>
+    /// A floating target form that allows users to drag and drop files to unarchive/reset attributes.
+    /// </summary>
 	public partial class frmUnarchive : Form
 	{
 		private static string ConfigFilePath = Path.Combine(Application.StartupPath, "SMSSearch_settings.json");
@@ -58,6 +61,9 @@ namespace SMS_Search.Forms
 			log.Logger(LogLevel.Info, "Target initialized at X: " + config.GetValue("UNARCHIVE", "LOCATIONX") + "; Y: " + config.GetValue("UNARCHIVE", "LOCATIONY"));
 		}
 		
+        /// <summary>
+        /// Handles dragging the borderless form.
+        /// </summary>
         private void picTarget_MouseDown(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Left)
@@ -80,6 +86,9 @@ namespace SMS_Search.Forms
 			}
 		}
 		
+        /// <summary>
+        /// Processes dropped files/folders, removing ReadOnly and Archive attributes.
+        /// </summary>
         private void frmUnarchive_DragDrop(object sender, DragEventArgs e)
 		{
 			int num = 0;

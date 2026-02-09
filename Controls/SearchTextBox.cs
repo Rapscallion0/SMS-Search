@@ -5,6 +5,9 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Controls
 {
+    /// <summary>
+    /// UserControl that combines a TextBox with a clear (X) button that appears when text is present.
+    /// </summary>
     public class SearchTextBox : UserControl
     {
         private TextBox txtValue;

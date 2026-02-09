@@ -10,10 +10,15 @@ using SMS_Search.Utils;
 
 namespace SMS_Search.Data
 {
+    /// <summary>
+    /// Implementation of IDataRepository using Dapper and SqlClient.
+    /// Handles query construction for paging, filtering, and metadata retrieval.
+    /// </summary>
     public class DataRepository : IDataRepository
     {
         private Logfile log = new Logfile("DataRepo");
 
+        // Types safe for LIKE operations
         private static readonly HashSet<string> SafeStringTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "char", "nchar", "varchar", "nvarchar", "text", "ntext", "sysname"
@@ -80,6 +85,7 @@ namespace SMS_Search.Data
 
         public virtual async Task<int> GetQueryCountAsync(string server, string database, string user, string pass, string sql, object parameters, string filter = null, CancellationToken cancellationToken = default)
         {
+            // Wrap the base query to count rows, applying filter if present
             string finalSql = ApplyFilter(sql, filter);
             string countSql = $"SELECT COUNT(*) FROM ({finalSql}) AS _CountQ";
 
@@ -114,6 +120,7 @@ namespace SMS_Search.Data
                 orderBy = $"[{safeCol}] {sortDir}";
             }
 
+            // SQL Server 2012+ Pagination (OFFSET/FETCH)
             string pageSql = $@"
                 SELECT * FROM ({finalSql}) AS _PageQ
                 ORDER BY {orderBy}
@@ -134,6 +141,7 @@ namespace SMS_Search.Data
 
         public virtual async Task<DataTable> GetQuerySchemaAsync(string server, string database, string user, string pass, string sql, object parameters, CancellationToken cancellationToken = default)
         {
+            // Get empty result set to analyze schema
             string schemaSql = $"SELECT TOP 0 * FROM ({sql}) AS _SchemaQ";
 
             LogQuery("GetQuerySchemaAsync", schemaSql, parameters);
@@ -153,6 +161,7 @@ namespace SMS_Search.Data
                     var dt = new DataTable();
                     dt.Load(reader);
 
+                    // Annotate columns with SQL type for correct filtering later
                     foreach (DataColumn col in dt.Columns)
                     {
                         if (typeMap.TryGetValue(col.ColumnName, out string sqlType))
@@ -261,6 +270,7 @@ namespace SMS_Search.Data
             if (string.IsNullOrWhiteSpace(filterText)) return 0;
             string safeFilter = filterText.Replace("'", "''");
 
+            // Build SUM expression: 1 if row matches any column, 0 otherwise
             List<string> sumParts = new List<string>();
             foreach (var kvp in columnTypes)
             {
@@ -272,6 +282,7 @@ namespace SMS_Search.Data
                 }
                 else
                 {
+                    // Cast non-string types
                     sumParts.Add($"(CASE WHEN CAST([{col}] AS NVARCHAR(MAX)) LIKE '%{safeFilter}%' THEN 1 ELSE 0 END)");
                 }
             }
@@ -321,6 +332,7 @@ namespace SMS_Search.Data
                 orderBy = $"[{safeCol}] {sortDir}";
             }
 
+            // Count matches only within the top N rows (limitRowIndex)
             string countSql = $@"
                 SELECT SUM((0 + {sumExpression}))
                 FROM (
@@ -372,6 +384,7 @@ namespace SMS_Search.Data
             string comparison = forward ? ">" : "<";
             string orderDirection = forward ? "ASC" : "DESC";
 
+            // Use ROW_NUMBER to find the absolute index of the next match
             string query = $@"
                 SELECT TOP 1 RowNum
                 FROM (

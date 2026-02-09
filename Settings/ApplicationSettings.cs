@@ -4,6 +4,9 @@ using SMS_Search.Utils;
 
 namespace SMS_Search.Settings
 {
+    /// <summary>
+    /// UserControl for configuring general application settings (Startup, Tray, Update).
+    /// </summary>
     public partial class ApplicationSettings : UserControl
     {
         private ConfigManager _config;
@@ -23,6 +26,9 @@ namespace SMS_Search.Settings
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Reloads settings from the configuration source.
+        /// </summary>
         public void Reload()
         {
             LoadSettings();

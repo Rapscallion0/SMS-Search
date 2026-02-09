@@ -11,6 +11,10 @@ using System.Management;
 
 namespace SMS_Search.Settings
 {
+    /// <summary>
+    /// UserControl for configuring the Global Hotkey Listener (Launcher) service.
+    /// Handles registration, deregistration, and migration of the background listener process.
+    /// </summary>
     public partial class LauncherSettings : UserControl
     {
         [DllImport("user32.dll", SetLastError = true)]
@@ -88,6 +92,9 @@ namespace SMS_Search.Settings
             _isLoaded = true;
         }
 
+        /// <summary>
+        /// Checks for legacy standalone launcher executables/shortcuts and migrates them to the new integrated listener.
+        /// </summary>
         private void CheckAndMigrateLegacy()
         {
             string legacyPath = Path.Combine(Application.StartupPath, LegacyLauncherExe);
@@ -101,12 +108,8 @@ namespace SMS_Search.Settings
             {
                 _log.Logger(LogLevel.Info, "Legacy launcher detected. Migrating...");
                 // We run unregister (cleans up legacy) then register (sets up new)
-                // We do this async fire-and-forget or just invoke register button logic?
-                // Invoke Register logic but need to be careful about UI thread.
-                // Since this is Constructor/Load, we should probably do it carefully.
-                // Let's defer to a method we can await or run on load.
 
-                // For now, we will just queue it up.
+                // Queue the migration to run on UI thread
                 this.BeginInvoke(new Action(async () => {
                      await PerformMigration();
                 }));
@@ -248,6 +251,9 @@ namespace SMS_Search.Settings
             }
         }
 
+        /// <summary>
+        /// Temporarily registers the hotkey to check if it's available for use.
+        /// </summary>
         private bool CheckHotkeyAvailability(Keys keyData)
         {
             string saved = _config.GetValue("LAUNCHER", "HOTKEY");

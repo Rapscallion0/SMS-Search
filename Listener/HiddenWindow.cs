@@ -5,6 +5,9 @@ using SMS_Search.Utils;
 
 namespace SMS_Search.Listener
 {
+    /// <summary>
+    /// Invisible Window used by the Listener process to receive global hotkey messages (WM_HOTKEY).
+    /// </summary>
     public class HiddenWindow : Form
     {
         private const int WM_HOTKEY = 0x0312;

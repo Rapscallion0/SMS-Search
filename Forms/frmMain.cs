@@ -25,8 +25,14 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Forms
 {
+    /// <summary>
+    /// Main application form handling the primary UI, search logic, grid display, and interaction.
+    /// </summary>
 	public partial class frmMain : Form
 	{
+        /// <summary>
+        /// Custom TextBox that handles Ctrl+A for "Select All".
+        /// </summary>
 		public class MyTextBox : TextBox
 		{
 			protected override void OnKeyDown(KeyEventArgs e)
@@ -83,6 +89,10 @@ namespace SMS_Search.Forms
 
         private enum ExportFormat { Csv, Json, ExcelXml }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="frmMain"/> class.
+        /// </summary>
+        /// <param name="Params">Command line parameters.</param>
 		public frmMain(string[] Params)
 		{
 			InitializeComponent();
@@ -90,6 +100,7 @@ namespace SMS_Search.Forms
             _gridContext.DataReady += _gridContext_DataReady;
             _gridContext.LoadError += _gridContext_LoadError;
 
+            // Wire up DataGridView events
             dGrd.CellValueNeeded += dGrd_CellValueNeeded;
             dGrd.ColumnHeaderMouseClick += dGrd_ColumnHeaderMouseClick;
             dGrd.RowPrePaint += dGrd_RowPrePaint;
@@ -100,6 +111,7 @@ namespace SMS_Search.Forms
             dGrd.ShowEditingIcon = false;
             dGrd.CellMouseClick += dGrd_CellMouseClick;
 
+            // Setup debounce timer for filter text input
             _filterDebounceTimer = new System.Windows.Forms.Timer();
             _filterDebounceTimer.Interval = 500;
             _filterDebounceTimer.Tick += _filterDebounceTimer_Tick;
@@ -149,6 +161,7 @@ namespace SMS_Search.Forms
 			StartPosition = FormStartPosition.Manual;
             toolStrip.Renderer = new ToolStripSystemRenderer();
 
+            // Handle startup location preference
             string startupLoc = config.GetValue("GENERAL", "STARTUP_LOCATION");
 
             if (startupLoc == "PRIMARY")
@@ -212,21 +225,36 @@ namespace SMS_Search.Forms
 			txtNumFct.Focus();
 		}
 
+        /// <summary>
+        /// Handles the Click event of the History button for Function search.
+        /// </summary>
         private void btnHistFct_Click(object sender, EventArgs e)
         {
             ShowHistoryMenu(sender as Button, txtCustSqlFct, "Function");
         }
 
+        /// <summary>
+        /// Handles the Click event of the History button for Totalizer search.
+        /// </summary>
         private void btnHistTlz_Click(object sender, EventArgs e)
         {
             ShowHistoryMenu(sender as Button, txtCustSqlTlz, "Totalizer");
         }
 
+        /// <summary>
+        /// Handles the Click event of the History button for Field search.
+        /// </summary>
         private void btnHistFld_Click(object sender, EventArgs e)
         {
             ShowHistoryMenu(sender as Button, txtCustSqlFld, "Field");
         }
 
+        /// <summary>
+        /// Displays the history context menu for the specified search type.
+        /// </summary>
+        /// <param name="btn">The button that triggered the menu.</param>
+        /// <param name="targetInput">The input control to populate when a history item is selected.</param>
+        /// <param name="type">The type of history to retrieve (Function, Totalizer, Field).</param>
         private void ShowHistoryMenu(Button btn, Control targetInput, string type)
         {
             var history = QueryHistoryManager.Instance.GetHistory(type);
@@ -267,6 +295,10 @@ namespace SMS_Search.Forms
             menu.Show(btn, new Point(0, btn.Height));
         }
 
+        /// <summary>
+        /// Calculates the required height for the search criteria panel based on tab content.
+        /// </summary>
+        /// <returns>The calculated height in pixels.</returns>
         private int GetRequiredSearchPanelHeight()
         {
             int maxBottom = 0;
@@ -296,14 +328,19 @@ namespace SMS_Search.Forms
 			FormHeightMin = splitContainer.SplitterDistance + 95;
 		}
 
+        /// <summary>
+        /// Event handler for Form Load. Initializes settings, updates, and UI state.
+        /// </summary>
         private void frmMain_Load(object sender, EventArgs e)
 		{
+            // Check EULA acceptance
 			if (config.GetValue("GENERAL", "EULA") != "1")
 			{
 				frmEula frmEula = new frmEula();
 				frmEula.ShowDialog();
 			}
 
+            // Cleanup old logs
             try
             {
                 string retentionStr = config.GetValue("GENERAL", "LOG_RETENTION");
@@ -313,6 +350,7 @@ namespace SMS_Search.Forms
             }
             catch { }
 
+            // Check for updates if enabled
             if (config.GetValue("GENERAL", "CHECKUPDATE") == "1")
             {
                 CheckUpdateAsync();
@@ -325,6 +363,8 @@ namespace SMS_Search.Forms
 			tslblInfo.Text = "";
 			setJulianDate();
 			Text = Text + " - v" + Application.ProductVersion;
+
+            // Restore last selected tab/mode
 			string a;
 			if ((a = config.GetValue("GENERAL", "TABLE_LOOKUP")) != null)
 			{
@@ -362,6 +402,7 @@ namespace SMS_Search.Forms
 			}
 			tabCtl.SelectedTab = tabFct;
 			IL_182:
+            // Show Unarchive target window if previously open
 			if (config.GetValue("UNARCHIVE", "SHOWTARGET") == "1")
 			{
 				frmUnarchive frmUnarchive = new frmUnarchive();
@@ -369,11 +410,15 @@ namespace SMS_Search.Forms
 				btnShowTarget.Checked = true;
 			}
 
+            // Enable Double Buffering on DataGridView via reflection to reduce flicker
             typeof(DataGridView).InvokeMember("DoubleBuffered",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty,
                 null, dGrd, new object[] { true });
 		}
 
+        /// <summary>
+        /// Checks for application updates asynchronously.
+        /// </summary>
 		private static async void CheckUpdateAsync()
 		{
             UpdateInfo updateInfo = await Versions.CheckForUpdatesAsync();
@@ -393,6 +438,9 @@ namespace SMS_Search.Forms
             }
 		}
 
+        /// <summary>
+        /// Called when the form is shown. Handles database initialization and version checks.
+        /// </summary>
         protected override async void OnShown(EventArgs e)
 		{
             base.OnShown(e);
@@ -415,6 +463,10 @@ namespace SMS_Search.Forms
 			setTabTextFocus();
 		}
 
+        /// <summary>
+        /// Toggles the UI busy state, showing/hiding progress indicators and enabling/disabling controls.
+        /// </summary>
+        /// <param name="busy">If set to <c>true</c>, the UI enters a busy state.</param>
         private void SetBusy(bool busy)
         {
             if (this.InvokeRequired)
@@ -436,6 +488,9 @@ namespace SMS_Search.Forms
             tscmbDbDatabase.Enabled = !busy;
         }
 
+        /// <summary>
+        /// Handles the Cancel button click to abort the current operation.
+        /// </summary>
         private void btnCancel_Click(object sender, EventArgs e)
         {
             _cts?.Cancel();
@@ -443,6 +498,9 @@ namespace SMS_Search.Forms
             tslblInfo.Text = "Cancelling...";
         }
 
+        /// <summary>
+        /// Constructs a SQL connection string based on current configuration and parameters.
+        /// </summary>
         public string GetConnString(string DbServer, string DbDatabase)
 		{
             if (config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH")))
@@ -458,7 +516,7 @@ namespace SMS_Search.Forms
 		}
 
         /// <summary>
-        /// 
+        /// Populates the table list combobox from the database asynchronously.
         /// </summary>
         private async Task PopulateTableList()
 		{
@@ -499,8 +557,6 @@ namespace SMS_Search.Forms
             catch (Exception ex)
             {
                 log.Logger(LogLevel.Error, "PopulateTableList: error - " + ex.Message);
-                // MessageBox.Show(ex.Message, "SQL error encountered", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                // Suppress error message box during auto-populate? The original code showed it.
             }
             finally
             {
@@ -509,6 +565,9 @@ namespace SMS_Search.Forms
             }
 		}
 
+        /// <summary>
+        /// Applies configuration settings to the UI controls.
+        /// </summary>
         private void ApplyConfigSettings()
         {
             // Read connection values and update UI
@@ -596,6 +655,10 @@ namespace SMS_Search.Forms
             }
         }
 
+        /// <summary>
+        /// Initializes the database connection, prompting for configuration if necessary.
+        /// </summary>
+        /// <param name="isStartup">Indicates if this is the application startup sequence.</param>
         private async Task InitializeDatabaseAsync(bool isStartup)
         {
             SetBusy(true);
@@ -651,6 +714,9 @@ namespace SMS_Search.Forms
             SetBusy(false);
         }
 
+        /// <summary>
+        /// Loads the regex replacement rules for SQL cleaning from configuration.
+        /// </summary>
         private void LoadCleanSqlRules()
         {
             _cleanSqlRules.Clear();
@@ -692,6 +758,9 @@ namespace SMS_Search.Forms
             }
         }
 
+        /// <summary>
+        /// Creates a new configuration file with current settings.
+        /// </summary>
         private void CreateConfigFile()
 		{
 			if (File.Exists(frmMain.ConfigFilePath))
@@ -701,6 +770,9 @@ namespace SMS_Search.Forms
 			WriteConfigConn(tscmbDbServer.Text, tscmbDbDatabase.Text);
 		}
 
+        /// <summary>
+        /// Executes the search query and populates the grid.
+        /// </summary>
         private async void btnPopGrid_Click(object sender, EventArgs e)
 		{
 			SetBusy(true);
@@ -736,6 +808,7 @@ namespace SMS_Search.Forms
 			    {
                     var criteria = GetSearchCriteriaFromUI();
 
+                    // Add to history if it's a custom SQL query
                     if (criteria.Type == SearchType.CustomSql && !string.IsNullOrWhiteSpace(criteria.Value))
                     {
                         QueryHistoryManager.Instance.AddQuery(criteria.Mode.ToString(), criteria.Value);
@@ -782,7 +855,7 @@ namespace SMS_Search.Forms
 				    {
                         if (ex is OperationCanceledException) throw; // Bubble up
 
-                        // Fallback to legacy load
+                        // Fallback to legacy load if virtual mode fails
                         log.Logger(LogLevel.Warning, "Virtual Mode Load failed, attempting legacy load: " + ex.ToString());
                         try
                         {
@@ -909,6 +982,9 @@ namespace SMS_Search.Forms
             }
 		}
 
+        /// <summary>
+        /// Provides cell values for Virtual Mode.
+        /// </summary>
         private void dGrd_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
             if (e.RowIndex < _gridContext.TotalCount)
@@ -917,6 +993,9 @@ namespace SMS_Search.Forms
             }
         }
 
+        /// <summary>
+        /// Callback when new data pages are ready to be displayed.
+        /// </summary>
         private void _gridContext_DataReady(object sender, EventArgs e)
         {
             if (this.InvokeRequired)
@@ -949,6 +1028,9 @@ namespace SMS_Search.Forms
             GeneralUtils.showToast(2, errorMessage, "Error loading data", Screen.FromControl(this));
         }
 
+        /// <summary>
+        /// Handles click on column header to trigger sorting or context menu.
+        /// </summary>
         private async void dGrd_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -971,6 +1053,9 @@ namespace SMS_Search.Forms
                 col.HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Descending;
         }
 
+        /// <summary>
+        /// Builds the search criteria object based on the currently selected tab and inputs.
+        /// </summary>
         private SearchCriteria GetSearchCriteriaFromUI()
         {
             var criteria = new SearchCriteria();
@@ -1008,6 +1093,9 @@ namespace SMS_Search.Forms
             return criteria;
         }
 
+        /// <summary>
+        /// Interpolates parameters into the SQL string for display purposes only.
+        /// </summary>
         private string GetInterpolatedSql(QueryResult query)
         {
             // Simple helper to visualize SQL for the Build buttons
@@ -1216,6 +1304,9 @@ namespace SMS_Search.Forms
 		}
         #endregion
 
+        /// <summary>
+        /// Saves the connection parameters to the configuration file.
+        /// </summary>
         private void WriteConfigConn(string DbServer, string DbDatabase)
 		{
 			config.SetValue("CONNECTION", "SERVER", DbServer);
@@ -1442,6 +1533,9 @@ namespace SMS_Search.Forms
             Height = FormHeightMin;
         }
 
+        /// <summary>
+        /// Initializes context menus for cells, column headers, and row headers.
+        /// </summary>
         private void SetupContextMenus()
         {
             // 1. Cell Context Menu
@@ -1614,6 +1708,9 @@ namespace SMS_Search.Forms
             }
         }
 
+        /// <summary>
+        /// Generates and copies SQL INSERT statements for the selected rows.
+        /// </summary>
         private void CopyAsSqlInsert()
         {
             if (dGrd.SelectedCells.Count == 0) return;
@@ -1693,6 +1790,10 @@ namespace SMS_Search.Forms
                    value is float || value is double || value is decimal;
         }
 
+        /// <summary>
+        /// Handles copying selected grid content to clipboard, with support for advanced formatting (disjoint selection, custom delimiters).
+        /// </summary>
+        /// <param name="includeHeaders">Whether to include column headers in the copy.</param>
         private async void CopyToClipboard(bool includeHeaders)
         {
             if (dGrd.SelectedCells.Count == 0) return;
@@ -1849,6 +1950,9 @@ namespace SMS_Search.Forms
             }
         }
 
+        /// <summary>
+        /// Copies selection while preserving the visual grid layout (filling gaps).
+        /// </summary>
         private async Task CopyPreserveLayoutAsync(bool includeHeaders, string delimiterSetting)
         {
             // 1. Capture data on UI thread
@@ -1912,6 +2016,9 @@ namespace SMS_Search.Forms
                 Clipboard.SetText(text);
         }
 
+        /// <summary>
+        /// Copies only the content of selected cells, collapsing gaps.
+        /// </summary>
         private async Task CopyContentOnlyAsync(bool includeHeaders, string delimiterSetting)
         {
              // 1. Capture data on UI thread
@@ -1962,6 +2069,9 @@ namespace SMS_Search.Forms
                 Clipboard.SetText(text);
         }
 
+        /// <summary>
+        /// Opens the configuration dialog or the secret ROT13 tool (Ctrl+Shift).
+        /// </summary>
         private async void btnSetup_Click(object sender, EventArgs e)
 		{
 			// Check if both Ctrl and Shift are pressed
@@ -2074,6 +2184,9 @@ namespace SMS_Search.Forms
 			}
 		}
 
+        /// <summary>
+        /// Resizes columns based on the content of the first N rows for performance optimization.
+        /// </summary>
         private async Task ResizeColumnsBasedOnFirstRowsAsync(int rowLimit)
         {
             if (dGrd.RowCount == 0) return;
@@ -2234,6 +2347,9 @@ namespace SMS_Search.Forms
             }
 		}
 
+        /// <summary>
+        /// Cleans SQL text using configured regex rules.
+        /// </summary>
 		private string CleanSql(string toClean)
 		{
             /*
@@ -2596,6 +2712,11 @@ namespace SMS_Search.Forms
             await NavigateMatch(true);
         }
 
+        /// <summary>
+        /// Navigates to the next or previous match in the grid.
+        /// Performs a local search first, then falls back to a database search.
+        /// </summary>
+        /// <param name="forward">If true, searches forward (next); otherwise searches backward (previous).</param>
         private async Task NavigateMatch(bool forward)
         {
             if (dGrd.RowCount == 0) return;
@@ -2725,6 +2846,10 @@ namespace SMS_Search.Forms
              return val != null && val.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
+        /// <summary>
+        /// Exports all results from the current query to a file.
+        /// </summary>
+        /// <param name="format">The export format (CSV, JSON, Excel XML).</param>
         private async void ExportAllResultsAsync(ExportFormat format)
         {
             if (dGrd.RowCount == 0) return;

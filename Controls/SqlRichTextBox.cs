@@ -7,6 +7,9 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Controls
 {
+    /// <summary>
+    /// RichTextBox control with lightweight SQL syntax highlighting.
+    /// </summary>
     public class SqlRichTextBox : RichTextBox
     {
         private const int WM_SETREDRAW = 0x000B;
@@ -70,6 +73,10 @@ namespace SMS_Search.Controls
             return Unquote(text);
         }
 
+        /// <summary>
+        /// Applies syntax highlighting to the current text content using Regex.
+        /// Temporarily disables redraw to prevent flickering.
+        /// </summary>
         public void HighlightSyntax()
         {
             if (_isHighlighting) return;

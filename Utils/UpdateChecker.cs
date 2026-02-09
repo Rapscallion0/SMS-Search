@@ -18,6 +18,9 @@ namespace SMS_Search.Utils
         public bool IsNewer { get; set; }
     }
 
+    /// <summary>
+    /// Checks for application updates via the GitHub Releases API.
+    /// </summary>
     public class UpdateChecker
     {
         private const string RepoOwner = "Rapscallion0";
@@ -103,6 +106,9 @@ namespace SMS_Search.Utils
             return new UpdateInfo { IsNewer = false };
         }
 
+        /// <summary>
+        /// Downloads and applies the update by running a temporary batch script.
+        /// </summary>
         public async Task PerformUpdate(UpdateInfo info)
         {
             if (string.IsNullOrEmpty(info.DownloadUrl))

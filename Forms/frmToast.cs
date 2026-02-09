@@ -10,12 +10,22 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Forms
 {
+    /// <summary>
+    /// Custom notification form ("toast") that appears briefly on the screen.
+    /// </summary>
     public partial class frmToast : Form
     {
         int toastX, toastY;
         int toastTimerDuration = 300;
         private Screen _targetScreen;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="frmToast"/> class.
+        /// </summary>
+        /// <param name="type">The type of message (0: Success, 1: Info, 2: Error, 3: Warning).</param>
+        /// <param name="message">The message text.</param>
+        /// <param name="title">The message title.</param>
+        /// <param name="screen">The screen on which to display the toast.</param>
         public frmToast(int type, string message, string title, Screen screen = null)
         {
             InitializeComponent();
@@ -99,6 +109,9 @@ namespace SMS_Search.Forms
             Position();
         }
 
+        /// <summary>
+        /// Positions the toast form at the bottom-right of the target screen.
+        /// </summary>
         private void Position()
         {
             Rectangle workingArea = _targetScreen.WorkingArea;

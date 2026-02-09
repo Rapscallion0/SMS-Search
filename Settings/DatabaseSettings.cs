@@ -11,6 +11,10 @@ using SMS_Search.Utils;
 
 namespace SMS_Search.Settings
 {
+    /// <summary>
+    /// UserControl for configuring Database Connection settings.
+    /// Supports Windows Auth, SQL Auth, Server Enumeration, and Database enumeration.
+    /// </summary>
     public partial class DatabaseSettings : UserControl
     {
         private ConfigManager _config;
@@ -165,6 +169,9 @@ namespace SMS_Search.Settings
             (this.ParentForm as frmConfig)?.FlashSaved();
         }
 
+        /// <summary>
+        /// Populates the list of available SQL Servers using Registry or Network Scan.
+        /// </summary>
         private async Task PopulateDbServersAsync()
         {
             bool scanNetwork = chkScanNetwork.Checked;
@@ -196,6 +203,7 @@ namespace SMS_Search.Settings
             {
                 if (!scanNetwork)
                 {
+                    // Check Registry for local instances
                     using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
                     using (RegistryKey key = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL"))
                     {
@@ -213,6 +221,7 @@ namespace SMS_Search.Settings
                 }
                 else
                 {
+                    // Scan network (Slow)
                     SqlDataSourceEnumerator instance = SqlDataSourceEnumerator.Instance;
                     DataTable dataSources = instance.GetDataSources();
                     foreach (DataRow dataRow in dataSources.Rows)

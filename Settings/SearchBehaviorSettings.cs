@@ -5,6 +5,9 @@ using SMS_Search.Utils;
 
 namespace SMS_Search.Settings
 {
+    /// <summary>
+    /// UserControl for configuring Search Behavior (Field selection, Highlight, Colors).
+    /// </summary>
     public partial class SearchBehaviorSettings : UserControl
     {
         private ConfigManager _config;
