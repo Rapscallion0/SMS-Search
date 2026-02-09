@@ -25,7 +25,7 @@ namespace SMS_Search.Forms
 
             // To be enabled once Encryption is figured out
             /*
-            txtEncrypted.Text = Utils.Encrypt(txtDecrypted.Text);
+            txtEncrypted.Text = GeneralUtils.Encrypt(txtDecrypted.Text);
             
             if (txtEncrypted.Text != "")
             {
@@ -33,14 +33,14 @@ namespace SMS_Search.Forms
                 Clipboard.SetText(txtEncrypted.Text);
 
                 // Show toast message
-                Utils.showToast(1, "Encrypted string copied to clipboard.");
+                GeneralUtils.showToast(1, "Encrypted string copied to clipboard.");
             }*/
             txtDecrypted.Focus();
         }
 
         private void btnDecrypt_Click(object sender, EventArgs e)
         {
-            txtDecrypted.Text = Utils.Decrypt(txtEncrypted.Text);
+            txtDecrypted.Text = GeneralUtils.Decrypt(txtEncrypted.Text);
 
             if (txtDecrypted.Text != "")
             {
@@ -48,7 +48,7 @@ namespace SMS_Search.Forms
                 Clipboard.SetText(txtDecrypted.Text);
 
                 // Show toast message
-                Utils.showToast(1, "Decrypted string copied to clipboard.");
+                GeneralUtils.showToast(1, "Decrypted string copied to clipboard.");
             }
             txtEncrypted.Focus();
         }

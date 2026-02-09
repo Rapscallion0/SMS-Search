@@ -2,10 +2,11 @@ using System;
 using System.Text;
 using System.Security.Cryptography;
 using System.Windows.Forms;
+using SMS_Search.Forms;
 
 namespace SMS_Search.Utils
 {
-    public class Utils
+    public class GeneralUtils
     {
         /// <summary>
         /// Display a toast message
