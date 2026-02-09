@@ -4,6 +4,9 @@ using SMS_Search.Utils;
 
 namespace SMS_Search.Settings
 {
+    /// <summary>
+    /// UserControl for configuring application logging (Level, Retention).
+    /// </summary>
     public partial class LoggingSettings : UserControl
     {
         private ConfigManager _config;

@@ -7,6 +7,9 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Listener
 {
+    /// <summary>
+    /// Utility class to handle focusing an existing application instance or starting a new one.
+    /// </summary>
     public static class AppSwitcher
     {
         [DllImport("user32.dll")]
@@ -21,6 +24,10 @@ namespace SMS_Search.Listener
         private const int SW_RESTORE = 9;
         private static Logfile log = new Logfile("Listener");
 
+        /// <summary>
+        /// Checks if the main GUI application is running. If so, brings it to foreground.
+        /// If not, starts a new instance.
+        /// </summary>
         public static void SwitchToOrStartApp()
         {
             try

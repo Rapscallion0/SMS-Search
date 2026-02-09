@@ -4,8 +4,14 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Forms
 {
+    /// <summary>
+    /// Dialog form for configuring clipboard copy options, specifically for handling disjoint selections.
+    /// </summary>
     public partial class frmClipboardOptions : Form
     {
+        /// <summary>
+        /// Defines the action to take for the copy operation.
+        /// </summary>
         public enum CopyAction
         {
             Cancel,
@@ -13,14 +19,28 @@ namespace SMS_Search.Forms
             PreserveLayout
         }
 
+        /// <summary>
+        /// Defines how long to remember the user's choice.
+        /// </summary>
         public enum MemoryScope
         {
             Session,
             Forever
         }
 
+        /// <summary>
+        /// Gets the action selected by the user.
+        /// </summary>
         public CopyAction SelectedAction { get; private set; } = CopyAction.Cancel;
+
+        /// <summary>
+        /// Gets a value indicating whether the user wants to remember this choice.
+        /// </summary>
         public bool RememberChoice { get; private set; } = false;
+
+        /// <summary>
+        /// Gets the scope for remembering the choice (Session or Permanent).
+        /// </summary>
         public MemoryScope RememberScope { get; private set; } = MemoryScope.Session;
 
         public frmClipboardOptions()

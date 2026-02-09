@@ -8,6 +8,10 @@ using System.Text.Json;
 
 namespace SMS_Search.Data
 {
+    /// <summary>
+    /// Manages virtual mode data loading, caching, filtering, and sorting for the DataGridView.
+    /// Acts as an intermediary between the UI grid and the DataRepository.
+    /// </summary>
     public class VirtualGridContext
     {
         private readonly IDataRepository _repo;
@@ -64,6 +68,9 @@ namespace SMS_Search.Data
             _pass = pass;
         }
 
+        /// <summary>
+        /// Resets state and loads the initial count for the query.
+        /// </summary>
         public async Task LoadAsync(string sql, object parameters, string initialSortColumn = null, CancellationToken cancellationToken = default)
         {
             _baseSql = sql;
@@ -82,6 +89,9 @@ namespace SMS_Search.Data
             }
         }
 
+        /// <summary>
+        /// Builds a filter clause based on text and applies it, refreshing the grid count.
+        /// </summary>
         public async Task ApplyFilterAsync(string filterText, IEnumerable<string> columns, CancellationToken cancellationToken = default)
         {
             _rawFilterText = filterText;
@@ -97,6 +107,7 @@ namespace SMS_Search.Data
                 string safeFilter = filterText.Replace("'", "''");
                 foreach (var col in columns)
                 {
+                    // Check type to determine if casting is needed
                     if (_columnSqlTypes.TryGetValue(col, out string type) && SafeStringTypes.Contains(type))
                     {
                         clauses.Add($"[{col}] LIKE '%{safeFilter}%'");
@@ -112,6 +123,9 @@ namespace SMS_Search.Data
             await ReloadAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Asynchronously calculates the total number of matches for the current filter.
+        /// </summary>
         public async Task<long> GetTotalMatchCountAsync(CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(_rawFilterText) || _filterColumns == null || _filterColumns.Count == 0)
@@ -142,6 +156,9 @@ namespace SMS_Search.Data
             return await _repo.GetPrecedingMatchCountAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, _rawFilterText, colTypes, limitRowIndex, SortColumn, SortDirection, cancellationToken);
         }
 
+        /// <summary>
+        /// Waits until the page containing the specified row is loaded into cache.
+        /// </summary>
         public async Task WaitForRowAsync(int rowIndex)
         {
             if (_cache.ContainsKey(rowIndex)) return;
@@ -165,6 +182,9 @@ namespace SMS_Search.Data
             await Task.WhenAny(tcs.Task, timeoutTask);
         }
 
+        /// <summary>
+        /// Ensures a range of rows is loaded into cache, fetching multiple pages if necessary.
+        /// </summary>
         public async Task EnsureRangeLoadedAsync(int startIndex, int count)
         {
             if (count <= 0) return;
@@ -201,6 +221,9 @@ namespace SMS_Search.Data
             await ReloadAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Reloads the grid count and clears cache (version incremented to invalidate old requests).
+        /// </summary>
         private async Task ReloadAsync(CancellationToken cancellationToken = default)
         {
             _version++;
@@ -230,6 +253,9 @@ namespace SMS_Search.Data
             }
         }
 
+        /// <summary>
+        /// Retrieves a value from the cache. If missing, triggers a background fetch.
+        /// </summary>
         public object GetValue(int rowIndex, int colIndex)
         {
             if (_cache.TryGetValue(rowIndex, out DataRow row))
@@ -244,6 +270,9 @@ namespace SMS_Search.Data
             return null; // Return null so grid displays empty/default.
         }
 
+        /// <summary>
+        /// Fetches a page of data from the database.
+        /// </summary>
         private async void RequestPage(int rowIndex)
         {
             int pageIndex = rowIndex / PageSize;
@@ -292,6 +321,9 @@ namespace SMS_Search.Data
             }
         }
 
+        /// <summary>
+        /// Fetches the schema of the query result to determine column types.
+        /// </summary>
         public async Task<DataTable> GetSchemaAsync(string sql, object parameters, CancellationToken cancellationToken = default)
         {
              var dt = await _repo.GetQuerySchemaAsync(_server, _database, _user, _pass, sql, parameters, cancellationToken);
@@ -463,6 +495,9 @@ namespace SMS_Search.Data
                    value is float || value is double || value is decimal;
         }
 
+        /// <summary>
+        /// Finds the row index of a matching value using database-side searching.
+        /// </summary>
         public async Task<int> FindMatchRowAsync(string searchText, IEnumerable<string> searchColumns, int startRowIndex, bool forward, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(searchText) || searchColumns == null) return -1;

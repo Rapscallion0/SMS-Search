@@ -7,6 +7,9 @@ namespace SMS_Search.Data
     public enum SearchMode { Function, Totalizer, Field }
     public enum SearchType { Number, Description, CustomSql, Table }
 
+    /// <summary>
+    /// Represents the user's search criteria gathered from the UI.
+    /// </summary>
     public class SearchCriteria
     {
         public SearchMode Mode { get; set; }
@@ -19,17 +22,24 @@ namespace SMS_Search.Data
         public bool LastTransaction { get; set; } // For Table search
     }
 
+    /// <summary>
+    /// Represents the generated SQL and its associated parameters.
+    /// </summary>
     public class QueryResult
     {
         public string Sql { get; set; }
         public DynamicParameters Parameters { get; set; }
     }
 
+    /// <summary>
+    /// Responsible for constructing SQL queries based on SearchCriteria.
+    /// </summary>
     public class QueryBuilder
     {
         private readonly string _fctFields;
         private readonly string _tlzFields;
 
+        // Base query for retrieving Field Metadata from system tables
         private const string FieldSelectBase = @"SELECT
     COL.name AS 'Field',
     RBF.F1454 AS 'Description',
@@ -67,6 +77,9 @@ GROUP BY
             _tlzFields = string.IsNullOrEmpty(tlzFields) ? "F1034, F1039, F1128, F1129, F1179, F1253, F1710, F1131, F1048, F1709" : tlzFields;
         }
 
+        /// <summary>
+        /// Builds the SQL query and parameters for the given criteria.
+        /// </summary>
         public QueryResult Build(SearchCriteria criteria)
         {
             var p = new DynamicParameters();
@@ -95,6 +108,7 @@ GROUP BY
                 {
                     if (criteria.ShowFields)
                     {
+                        // Show Metadata for fields in the table
                         string table = criteria.Value;
                         HandleWildcards(ref table, out string op);
 
@@ -103,6 +117,7 @@ GROUP BY
                     }
                     else
                     {
+                        // Show Actual Records in the table
                         string tableName = SanitizeIdentifier(criteria.Value);
                         sql = $"SELECT * FROM {tableName}";
 
@@ -181,6 +196,9 @@ GROUP BY
             return new QueryResult { Sql = sql, Parameters = p };
         }
 
+        /// <summary>
+        /// Converts simple wildcard chars (*, ?) to SQL equivalents (%, _) and determines operator.
+        /// </summary>
         private void HandleWildcards(ref string value, out string op)
         {
             if (value.Contains("*") || value.Contains("?"))

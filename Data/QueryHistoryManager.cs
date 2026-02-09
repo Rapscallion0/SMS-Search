@@ -5,6 +5,9 @@ using System.Text.Json;
 
 namespace SMS_Search.Data
 {
+    /// <summary>
+    /// Singleton manager for persisting recent queries to the configuration file.
+    /// </summary>
     public class QueryHistoryManager
     {
         private static QueryHistoryManager _instance;
@@ -14,11 +17,17 @@ namespace SMS_Search.Data
         private const int MaxHistory = 20;
         private const string SectionName = "QUERY_HISTORY";
 
+        /// <summary>
+        /// Initializes the manager with the configuration provider.
+        /// </summary>
         public void Initialize(Utils.ConfigManager config)
         {
             _config = config;
         }
 
+        /// <summary>
+        /// Adds a query to history, moving it to the top if it already exists.
+        /// </summary>
         public void AddQuery(string type, string sql)
         {
             if (string.IsNullOrWhiteSpace(sql) || _config == null) return;
@@ -40,6 +49,9 @@ namespace SMS_Search.Data
             SaveHistory(type, history);
         }
 
+        /// <summary>
+        /// Retrieves the list of history items for a specific search type.
+        /// </summary>
         public List<string> GetHistory(string type)
         {
             if (_config == null) return new List<string>();
@@ -57,6 +69,9 @@ namespace SMS_Search.Data
             }
         }
 
+        /// <summary>
+        /// Clears history for a specific search type.
+        /// </summary>
         public void ClearHistory(string type)
         {
             if (_config == null) return;

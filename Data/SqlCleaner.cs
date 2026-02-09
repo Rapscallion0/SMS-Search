@@ -8,8 +8,15 @@ namespace SMS_Search.Data
         public string Replacement;
     }
 
+    /// <summary>
+    /// Provides default regex rules for cleaning and formatting SQL queries.
+    /// </summary>
     public static class SqlCleaner
     {
+        /// <summary>
+        /// Gets the default list of regex rules for SQL formatting/cleaning.
+        /// Includes replacement of XML entities, bracket normalization, and keyword formatting.
+        /// </summary>
         public static List<SqlCleaningRule> DefaultRules
         {
             get

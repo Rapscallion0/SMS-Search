@@ -4,6 +4,9 @@ using System.Drawing;
 using System.Windows.Forms;
 namespace SMS_Search.Forms
 {
+    /// <summary>
+    /// Simple splash form used to test connection or display status.
+    /// </summary>
 	public partial class frmTestCon : Form
 	{
 		public frmTestCon()

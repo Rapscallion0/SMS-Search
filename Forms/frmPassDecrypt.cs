@@ -10,6 +10,10 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Forms
 {
+    /// <summary>
+    /// Internal utility form for testing string encryption and decryption.
+    /// Accessible via Ctrl+Shift+Click on Setup button in Main form.
+    /// </summary>
     public partial class frmPassDecrypt : Form
     {
         public frmPassDecrypt()

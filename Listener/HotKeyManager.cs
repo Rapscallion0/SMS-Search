@@ -4,6 +4,9 @@ using System.Windows.Forms;
 
 namespace SMS_Search.Listener
 {
+    /// <summary>
+    /// P/Invoke wrappers for Windows Global Hotkey API.
+    /// </summary>
     public static class HotKeyManager
     {
         [DllImport("user32.dll", EntryPoint = "RegisterHotKey")]

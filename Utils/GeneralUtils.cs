@@ -37,6 +37,10 @@ namespace SMS_Search.Utils
             toast.Show();
         }
 
+        /// <summary>
+        /// Encrypts a string using Windows Data Protection (current user scope).
+        /// </summary>
+        /// <returns>Base64 encoded encrypted string.</returns>
         public static string Encrypt(string sLine)
         {
             if (string.IsNullOrEmpty(sLine)) return "";
@@ -52,6 +56,9 @@ namespace SMS_Search.Utils
             }
         }
 
+        /// <summary>
+        /// Decrypts a string using Windows Data Protection.
+        /// </summary>
         public static string Decrypt(string sLine)
         {
             if (string.IsNullOrEmpty(sLine)) return "";

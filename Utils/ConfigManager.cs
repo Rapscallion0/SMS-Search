@@ -7,6 +7,9 @@ using System.Runtime.InteropServices;
 
 namespace SMS_Search.Utils
 {
+    /// <summary>
+    /// Handles configuration loading and saving, using JSON storage with legacy INI migration support.
+    /// </summary>
     public class ConfigManager
     {
         private string _jsonFilePath;
@@ -85,6 +88,9 @@ namespace SMS_Search.Utils
             Load();
         }
 
+        /// <summary>
+        /// Loads configuration from the JSON file, or imports from INI if JSON is missing.
+        /// </summary>
         public void Load()
         {
             if (File.Exists(_jsonFilePath))
@@ -119,6 +125,9 @@ namespace SMS_Search.Utils
             }
         }
 
+        /// <summary>
+        /// Saves current configuration to the JSON file.
+        /// </summary>
         public void Save()
         {
             try
@@ -164,6 +173,9 @@ namespace SMS_Search.Utils
             return _config;
         }
 
+        /// <summary>
+        /// Reads all settings from the legacy INI file and converts them to the in-memory JSON structure.
+        /// </summary>
         private void ImportFromIni()
         {
             // Read all sections
@@ -180,7 +192,7 @@ namespace SMS_Search.Utils
             // Save to JSON
             Save();
 
-            // Rename INI file
+            // Rename INI file to .old
             try
             {
                 string oldIniPath = _iniFilePath + ".old";

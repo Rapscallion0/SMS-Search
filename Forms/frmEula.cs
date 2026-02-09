@@ -6,6 +6,9 @@ using System.IO;
 using System.Windows.Forms;
 namespace SMS_Search.Forms
 {
+    /// <summary>
+    /// Form that displays the End-User License Agreement (EULA) and requires acceptance.
+    /// </summary>
 	public class frmEula : Form
 	{
 		private IContainer components = null;
