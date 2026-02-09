@@ -17,7 +17,7 @@ namespace SMS_Search.Forms
 		private Label label2;
 		private Panel panel1;
 		private static string ConfigFilePath = Path.Combine(Application.StartupPath, "SMSSearch_settings.json");
-		private ConfigManager config = new ConfigManager(frmEula.ConfigFilePath);
+		private Utils.ConfigManager config = new Utils.ConfigManager(frmEula.ConfigFilePath);
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing && components != null)

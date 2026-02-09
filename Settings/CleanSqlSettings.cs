@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using SMS_Search.Utils;
+using SMS_Search.Data;
 using SMS_Search.Utils;
 
 namespace SMS_Search.Settings

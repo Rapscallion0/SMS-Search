@@ -10,11 +10,11 @@ namespace SMS_Search.Data
         private static QueryHistoryManager _instance;
         public static QueryHistoryManager Instance => _instance ?? (_instance = new QueryHistoryManager());
 
-        private ConfigManager _config;
+        private Utils.ConfigManager _config;
         private const int MaxHistory = 20;
         private const string SectionName = "QUERY_HISTORY";
 
-        public void Initialize(ConfigManager config)
+        public void Initialize(Utils.ConfigManager config)
         {
             _config = config;
         }
