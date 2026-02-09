@@ -54,6 +54,26 @@ namespace SMS_Search
 
                     break;
             }
+
+            if (!string.IsNullOrEmpty(title) && title != "Message")
+            {
+                lblToastType.Text = title;
+            }
+
+            // Adjust height based on content
+            int padding = 10;
+            int rightMargin = 10;
+            lblToastMessage.MaximumSize = new Size(this.Width - lblToastMessage.Left - rightMargin, 0);
+
+            // Use PerformLayout to ensure AutoSize calculates the new height
+            this.PerformLayout();
+
+            int requiredHeight = lblToastMessage.Bottom + padding;
+            if (requiredHeight > 60)
+            {
+                this.Height = requiredHeight;
+                pnlToastBorder.Height = this.Height;
+            }
         }
 
         protected override bool ShowWithoutActivation
