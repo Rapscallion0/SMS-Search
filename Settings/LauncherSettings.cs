@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using SMS_Search;
-using Log;
+using SMS_Search.Utils;
+using SMS_Search.Utils;
 using System.Management;
 
 namespace SMS_Search.Settings

@@ -3,8 +3,8 @@ using System.Windows.Forms;
 using System.Runtime.CompilerServices;
 using System.IO;
 using System.Threading;
-using Log;
-using SingleInstance;
+using SMS_Search.Utils;
+using SMS_Search.Forms;
 
 namespace SMS_Search
 {
