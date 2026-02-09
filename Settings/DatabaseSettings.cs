@@ -87,7 +87,7 @@ namespace SMS_Search.Settings
             }
 
             txtDbUser.Text = _config.GetValue("CONNECTION", "SQLUSER");
-            txtDbPassword.Text = Utils.Decrypt(_config.GetValue("CONNECTION", "SQLPASSWORD"));
+            txtDbPassword.Text = GeneralUtils.Decrypt(_config.GetValue("CONNECTION", "SQLPASSWORD"));
 
             _isLoaded = true;
         }
@@ -159,7 +159,7 @@ namespace SMS_Search.Settings
             {
                 _config.SetValue("CONNECTION", "WINDOWSAUTH", "0");
                 _config.SetValue("CONNECTION", "SQLUSER", txtDbUser.Text);
-                _config.SetValue("CONNECTION", "SQLPASSWORD", Utils.Encrypt(txtDbPassword.Text));
+                _config.SetValue("CONNECTION", "SQLPASSWORD", GeneralUtils.Encrypt(txtDbPassword.Text));
             }
             _config.Save();
             (this.ParentForm as frmConfig)?.FlashSaved();

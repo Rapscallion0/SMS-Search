@@ -139,7 +139,7 @@ namespace SMS_Search.Settings
                 string database = config.GetValue("CONNECTION", "DATABASE");
                 bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
                 string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+                string pass = useWinAuth ? null : GeneralUtils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 
                 dbConnector db = new dbConnector();
                 if (db.TestDbConn(server, database, false, user, pass))
@@ -226,7 +226,7 @@ namespace SMS_Search.Settings
                     tvSettings_AfterSelect(this, new TreeViewEventArgs(tvSettings.SelectedNode));
 
                  log.Logger(LogLevel.Info, "Settings reverted to default");
-                 Utils.showToast(0, "Settings reverted to default", "Settings", Screen.FromControl(this));
+                 GeneralUtils.showToast(0, "Settings reverted to default", "Settings", Screen.FromControl(this));
              }
         }
 

@@ -261,7 +261,7 @@ namespace SMS_Search.Forms
             clearItem.Click += (s, e) =>
             {
                 QueryHistoryManager.Instance.ClearHistory(type);
-                Utils.showToast(0, "History cleared", "History", Screen.FromControl(this));
+                GeneralUtils.showToast(0, "History cleared", "History", Screen.FromControl(this));
             };
 
             menu.Show(btn, new Point(0, btn.Height));
@@ -405,7 +405,7 @@ namespace SMS_Search.Forms
             {
                 if (!string.IsNullOrEmpty(lastRunVersion))
                 {
-                    Utils.showToast(0, "Updated from v" + lastRunVersion + " to v" + currentVersion, "Update", Screen.FromControl(this));
+                    GeneralUtils.showToast(0, "Updated from v" + lastRunVersion + " to v" + currentVersion, "Update", Screen.FromControl(this));
                 }
                 config.SetValue("GENERAL", "LAST_RUN_VERSION", currentVersion);
                 config.Save();
@@ -452,7 +452,7 @@ namespace SMS_Search.Forms
             else
             {
                 string user = config.GetValue("CONNECTION", "SQLUSER");
-                string pass = Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+                string pass = GeneralUtils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
                 return "Data Source=" + DbServer + ";Initial Catalog=" + DbDatabase + ";User ID=" + user + ";Password=" + pass + ";Persist Security Info=False;";
             }
 		}
@@ -472,7 +472,7 @@ namespace SMS_Search.Forms
             {
                 bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
                 string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+                string pass = useWinAuth ? null : GeneralUtils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 
                 var tables = await _repo.GetTablesAsync(server, database, user, pass);
 
@@ -608,7 +608,7 @@ namespace SMS_Search.Forms
                 string database = config.GetValue("CONNECTION", "DATABASE");
                 bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
                 string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+                string pass = useWinAuth ? null : GeneralUtils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 
                 // Attempt to connect
                 connected = await dbConn.TestDbConnAsync(server, database, false, user, pass);
@@ -716,7 +716,7 @@ namespace SMS_Search.Forms
 
             bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
             string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-            string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+            string pass = useWinAuth ? null : GeneralUtils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 
             _gridContext.SetConnection(server, database, user, pass);
 
@@ -838,7 +838,7 @@ namespace SMS_Search.Forms
 			    {
 				    tslblInfo.Text = "Connection failed!";
 				    tslblInfo.ForeColor = Color.Red;
-                    Utils.showToast(2, "Failed to connect to data source.\nPlease check your connection settings.", "SQL connection error", Screen.FromControl(this));
+                    GeneralUtils.showToast(2, "Failed to connect to data source.\nPlease check your connection settings.", "SQL connection error", Screen.FromControl(this));
 			    }
 			    setTabTextFocus();
                 if (!token.IsCancellationRequested)
@@ -895,7 +895,7 @@ namespace SMS_Search.Forms
                 this.Invoke(new Action(() => _gridContext_LoadError(sender, errorMessage)));
                 return;
             }
-            Utils.showToast(2, errorMessage, "Error loading data", Screen.FromControl(this));
+            GeneralUtils.showToast(2, errorMessage, "Error loading data", Screen.FromControl(this));
         }
 
         private async void dGrd_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -1291,7 +1291,7 @@ namespace SMS_Search.Forms
 			}
 			catch
 			{
-                Utils.showToast(3, "You must specify a valid Julian date (YYYYDDD).", "Julian date error", Screen.FromControl(this));
+                GeneralUtils.showToast(3, "You must specify a valid Julian date (YYYYDDD).", "Julian date error", Screen.FromControl(this));
 			}
 		}
         #endregion
@@ -1619,7 +1619,7 @@ namespace SMS_Search.Forms
             if (sb.Length > 0)
             {
                 Clipboard.SetText(sb.ToString());
-                Utils.showToast(0, "INSERT statements copied", "Copy", Screen.FromControl(this));
+                GeneralUtils.showToast(0, "INSERT statements copied", "Copy", Screen.FromControl(this));
             }
         }
 
@@ -1742,7 +1742,7 @@ namespace SMS_Search.Forms
             catch (Exception ex)
             {
                 log.Logger(LogLevel.Error, "Clipboard Error: " + ex.Message);
-                Utils.showToast(2, "Error copying to clipboard: " + ex.Message, "Copy Error", Screen.FromControl(this));
+                GeneralUtils.showToast(2, "Error copying to clipboard: " + ex.Message, "Copy Error", Screen.FromControl(this));
             }
         }
 
@@ -1953,7 +1953,7 @@ namespace SMS_Search.Forms
             string database = tscmbDbDatabase.Text;
             bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
             string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-            string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+            string pass = useWinAuth ? null : GeneralUtils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 
             try
             {
@@ -2166,7 +2166,7 @@ namespace SMS_Search.Forms
             {
                 bool useWinAuth = config.GetValue("CONNECTION", "WINDOWSAUTH") == "1" || string.IsNullOrEmpty(config.GetValue("CONNECTION", "WINDOWSAUTH"));
                 string user = useWinAuth ? null : config.GetValue("CONNECTION", "SQLUSER");
-                string pass = useWinAuth ? null : Utils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
+                string pass = useWinAuth ? null : GeneralUtils.Decrypt(config.GetValue("CONNECTION", "SQLPASSWORD"));
 
                 var dbs = await _repo.GetDatabasesAsync(server, user, pass);
                 tscmbDbDatabase.Items.AddRange(dbs.ToArray());
@@ -2175,7 +2175,7 @@ namespace SMS_Search.Forms
             catch (Exception ex)
             {
                  log.Logger(LogLevel.Error, "getDbNames error: " + ex.Message);
-                 Utils.showToast(2, "Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", Screen.FromControl(this));
+                 GeneralUtils.showToast(2, "Failed to connect to data source. \n\nSQL error:\n" + ex.Message, "SQL connection error", Screen.FromControl(this));
             }
             finally
             {
@@ -2721,7 +2721,7 @@ namespace SMS_Search.Forms
                         sw.Stop();
 
                         tslblInfo.Text = $"Exported in {sw.ElapsedMilliseconds} ms";
-                        Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
+                        GeneralUtils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
                     }
                     catch (OperationCanceledException)
                     {
@@ -2731,7 +2731,7 @@ namespace SMS_Search.Forms
                     }
                     catch (Exception ex)
                     {
-                        Utils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
+                        GeneralUtils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
                     }
                     finally
                     {
@@ -2788,11 +2788,11 @@ namespace SMS_Search.Forms
                                 writer.WriteLine(string.Join(",", values));
                             }
                         }
-                        Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
+                        GeneralUtils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
                     }
                     catch (Exception ex)
                     {
-                        Utils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
+                        GeneralUtils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
                     }
                     finally
                     {
@@ -2858,11 +2858,11 @@ namespace SMS_Search.Forms
                                 writer.WriteLine(string.Join(",", rowValues));
                             }
                         }
-                        Utils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
+                        GeneralUtils.showToast(0, "Export successful", "Export", Screen.FromControl(this));
                     }
                     catch (Exception ex)
                     {
-                        Utils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
+                        GeneralUtils.showToast(2, "Error exporting: " + ex.Message, "Export Error", Screen.FromControl(this));
                     }
                     finally
                     {
