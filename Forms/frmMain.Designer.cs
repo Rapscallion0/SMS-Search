@@ -20,141 +20,14 @@ namespace SMS_Search.Forms
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        /*protected override void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
             {
-                //components.Dispose();
+                components.Dispose();
             }
-            Dispose(disposing);
-        }*/
-
-        private BindingSource bindingSource;
-        private Button btnPopGrid;
-        private SMS_Search.Controls.ExDataGridView dGrd;
-        private ToolTip toolTip;
-        private GroupBox groupBox1;
-        private DateTimePicker dateGregorian;
-        private Label label1;
-        private TextBox txtJulian;
-        private TabPage tabPage4;
-        private TabPage tabPage5;
-        private RadioButton rdbCustSqlFct;
-        private Button btnBuildQryFct;
-        private Button btnClearFct;
-        private RadioButton rdbNumFct;
-        private RadioButton rdbDescFct;
-        private TextBox txtDescFct;
-        private TextBox txtNumFct;
-        private SMS_Search.Controls.SqlRichTextBox txtCustSqlFct;
-        private RadioButton rdbCustSqlTlz;
-        private RadioButton rdbNumTlz;
-        private Button btnBuildQryTlz;
-        private SMS_Search.Controls.SqlRichTextBox txtCustSqlTlz;
-        private Button btnClearTlz;
-        private TextBox txtNumTlz;
-        private TextBox txtDescTlz;
-        private RadioButton rdbDescTlz;
-        private Button btnSetup;
-        private TabControl tabCtl;
-        private TabPage tabFct;
-        private TabPage tabTlz;
-        private TabPage tabFields;
-        private Label label5;
-        private Label label3;
-        private Label label4;
-        private RadioButton rdbNumFld;
-        private RadioButton rdbDescFld;
-        private RadioButton rdbCustSqlFld;
-        private TextBox txtDescFld;
-        private TextBox txtNumFld;
-        private Button btnBuildQryFld;
-        private Button btnClearFld;
-        private SMS_Search.Controls.SqlRichTextBox txtCustSqlFld;
-        private Label label6;
-        private RadioButton rdbTableFld;
-        private ComboBox cmbTableFld;
-        private NotifyIcon notifyIcon;
-        private ContextMenuStrip contextMenuStripNotify;
-        private ToolStripMenuItem exitToolStripMenuItem;
-        private CheckBox chkSearchAnyFct;
-        private CheckBox chkSearchAnyTlz;
-        private CheckBox chkSearchAnyFld;
-        private BindingSource bindingSourceTbl;
-        private RadioButton rdbShowRecords;
-        private RadioButton rdbShowFields;
-        private Panel panel1;
-        private PictureBox picRefresh;
-        private ToolStrip toolStrip;
-        private ToolStripComboBox tscmbDbServer;
-        private ToolStripLabel tslblRecordCnt;
-        private ToolStripSeparator toolStripSeparator1;
-        private ToolStripComboBox tscmbDbDatabase;
-        private ToolStripSeparator toolStripSeparator2;
-        private ToolStripButton onTop;
-        private Button btnCleanSqlFct;
-        private Button btnCleanSqlTlz;
-        private Button btnCleanSqlFld;
-        private ToolStripLabel tsInfo;
-        private ToolStripSeparator toolStripSeparator3;
-        private CheckBox btnShowTarget;
-        private ToolStripSeparator toolStripSeparator4;
-        private ToolStripLabel tslblInfo;
-        private ToolStripProgressBar tsProgressBar;
-        private SplitContainer splitContainer;
-        private CheckBox chkLastTransaction;
-        private Label lblFilter;
-        private SMS_Search.Controls.SearchTextBox txtGridFilter;
-        private Label lblMatchCount;
-        private Button btnPrevMatch;
-        private Button btnNextMatch;
-        private Button btnHistFct;
-        private Button btnHistTlz;
-        private Button btnHistFld;
-
-        // New controls
-        private Button btnCancel;
-        private System.Windows.Forms.Timer _filterDebounceTimer;
-        private ContextMenuStrip _cellContextMenu;
-        private ToolStripMenuItem ctxMenuCell_Filter;
-        private ToolStripSeparator toolStripSeparatorCell1;
-        private ToolStripMenuItem ctxMenuCell_SelectAll;
-        private ToolStripMenuItem ctxMenuCell_Copy;
-        private ToolStripMenuItem ctxMenuCell_CopyWithHeaders;
-        private ToolStripMenuItem ctxMenuCell_AdvCopy;
-        private ToolStripMenuItem ctxMenuCell_AdvCopy_Content;
-        private ToolStripMenuItem ctxMenuCell_AdvCopy_Layout;
-        private ToolStripSeparator toolStripSeparatorCell2;
-        private ToolStripMenuItem ctxMenuCell_Resize;
-        private ToolStripMenuItem ctxMenuCell_Clear;
-        private ToolStripSeparator toolStripSeparatorCell3;
-        private ToolStripMenuItem ctxMenuCell_ExportSelected;
-        private ToolStripMenuItem ctxMenuCell_ExportAll;
-        private ToolStripMenuItem ctxMenuCell_ExportAll_Csv;
-        private ToolStripMenuItem ctxMenuCell_ExportAll_Json;
-        private ToolStripMenuItem ctxMenuCell_ExportAll_Excel;
-
-        private ContextMenuStrip _columnHeaderMenu;
-        private ToolStripMenuItem ctxMenuCol_ToggleDesc;
-        private ToolStripSeparator toolStripSeparatorCol1;
-        private ToolStripMenuItem ctxMenuCol_ExportAll;
-        private ToolStripMenuItem ctxMenuCol_ExportAll_Csv;
-        private ToolStripMenuItem ctxMenuCol_ExportAll_Json;
-        private ToolStripMenuItem ctxMenuCol_ExportAll_Excel;
-        private ToolStripMenuItem ctxMenuCol_Clear;
-
-        private ContextMenuStrip _rowHeaderMenu;
-        private ToolStripMenuItem ctxMenuRow_Copy;
-        private ToolStripMenuItem ctxMenuRow_CopyWithHeaders;
-        private ToolStripMenuItem ctxMenuRow_CopyInsert;
-        private ToolStripSeparator toolStripSeparatorRow1;
-        private ToolStripMenuItem ctxMenuRow_ExportSelectedCsv;
-        private ToolStripMenuItem ctxMenuRow_ExportAll;
-        private ToolStripMenuItem ctxMenuRow_ExportAll_Csv;
-        private ToolStripMenuItem ctxMenuRow_ExportAll_Json;
-        private ToolStripMenuItem ctxMenuRow_ExportAll_Excel;
-        private ToolStripMenuItem ctxMenuRow_Clear;
-
+            base.Dispose(disposing);
+        }
 
         #region Windows Form Designer generated code
 
@@ -323,6 +196,9 @@ namespace SMS_Search.Forms
             this.btnPopGrid.UseVisualStyleBackColor = true;
             this.btnPopGrid.Click += new System.EventHandler(this.btnPopGrid_Click);
             // 
+            // toolTip
+            //
+            //
             // btnSetup
             // 
             this.btnSetup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1613,9 +1489,131 @@ namespace SMS_Search.Forms
             this.PerformLayout();
 
         }
+
         #endregion
 
-        private ToolStripSeparator toolStripSeparator5;
-        private ToolStripButton ReconnectDB;
+        private System.Windows.Forms.BindingSource bindingSource;
+        private System.Windows.Forms.Button btnPopGrid;
+        private SMS_Search.Controls.ExDataGridView dGrd;
+        private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.DateTimePicker dateGregorian;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtJulian;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.RadioButton rdbCustSqlFct;
+        private System.Windows.Forms.Button btnBuildQryFct;
+        private System.Windows.Forms.Button btnClearFct;
+        private System.Windows.Forms.RadioButton rdbNumFct;
+        private System.Windows.Forms.RadioButton rdbDescFct;
+        private System.Windows.Forms.TextBox txtDescFct;
+        private System.Windows.Forms.TextBox txtNumFct;
+        private SMS_Search.Controls.SqlRichTextBox txtCustSqlFct;
+        private System.Windows.Forms.RadioButton rdbCustSqlTlz;
+        private System.Windows.Forms.RadioButton rdbNumTlz;
+        private System.Windows.Forms.Button btnBuildQryTlz;
+        private SMS_Search.Controls.SqlRichTextBox txtCustSqlTlz;
+        private System.Windows.Forms.Button btnClearTlz;
+        private System.Windows.Forms.TextBox txtNumTlz;
+        private System.Windows.Forms.TextBox txtDescTlz;
+        private System.Windows.Forms.RadioButton rdbDescTlz;
+        private System.Windows.Forms.Button btnSetup;
+        private System.Windows.Forms.TabControl tabCtl;
+        private System.Windows.Forms.TabPage tabFct;
+        private System.Windows.Forms.TabPage tabTlz;
+        private System.Windows.Forms.TabPage tabFields;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.RadioButton rdbNumFld;
+        private System.Windows.Forms.RadioButton rdbDescFld;
+        private System.Windows.Forms.RadioButton rdbCustSqlFld;
+        private System.Windows.Forms.TextBox txtDescFld;
+        private System.Windows.Forms.TextBox txtNumFld;
+        private System.Windows.Forms.Button btnBuildQryFld;
+        private System.Windows.Forms.Button btnClearFld;
+        private SMS_Search.Controls.SqlRichTextBox txtCustSqlFld;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.RadioButton rdbTableFld;
+        private System.Windows.Forms.ComboBox cmbTableFld;
+        private System.Windows.Forms.NotifyIcon notifyIcon;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripNotify;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.CheckBox chkSearchAnyFct;
+        private System.Windows.Forms.CheckBox chkSearchAnyTlz;
+        private System.Windows.Forms.CheckBox chkSearchAnyFld;
+        private System.Windows.Forms.BindingSource bindingSourceTbl;
+        private System.Windows.Forms.RadioButton rdbShowRecords;
+        private System.Windows.Forms.RadioButton rdbShowFields;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.PictureBox picRefresh;
+        private System.Windows.Forms.ToolStrip toolStrip;
+        private System.Windows.Forms.ToolStripComboBox tscmbDbServer;
+        private System.Windows.Forms.ToolStripLabel tslblRecordCnt;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripComboBox tscmbDbDatabase;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripButton onTop;
+        private System.Windows.Forms.Button btnCleanSqlFct;
+        private System.Windows.Forms.Button btnCleanSqlTlz;
+        private System.Windows.Forms.Button btnCleanSqlFld;
+        private System.Windows.Forms.ToolStripLabel tsInfo;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.CheckBox btnShowTarget;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripLabel tslblInfo;
+        private System.Windows.Forms.ToolStripProgressBar tsProgressBar;
+        private System.Windows.Forms.SplitContainer splitContainer;
+        private System.Windows.Forms.CheckBox chkLastTransaction;
+        private System.Windows.Forms.Label lblFilter;
+        private SMS_Search.Controls.SearchTextBox txtGridFilter;
+        private System.Windows.Forms.Label lblMatchCount;
+        private System.Windows.Forms.Button btnPrevMatch;
+        private System.Windows.Forms.Button btnNextMatch;
+        private System.Windows.Forms.Button btnHistFct;
+        private System.Windows.Forms.Button btnHistTlz;
+        private System.Windows.Forms.Button btnHistFld;
+        private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Timer _filterDebounceTimer;
+        private System.Windows.Forms.ContextMenuStrip _cellContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_Filter;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorCell1;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_SelectAll;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_Copy;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_CopyWithHeaders;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_AdvCopy;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_AdvCopy_Content;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_AdvCopy_Layout;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorCell2;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_Resize;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_Clear;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorCell3;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_ExportSelected;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_ExportAll;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_ExportAll_Csv;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_ExportAll_Json;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCell_ExportAll_Excel;
+        private System.Windows.Forms.ContextMenuStrip _columnHeaderMenu;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCol_ToggleDesc;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorCol1;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCol_ExportAll;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCol_ExportAll_Csv;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCol_ExportAll_Json;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCol_ExportAll_Excel;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuCol_Clear;
+        private System.Windows.Forms.ContextMenuStrip _rowHeaderMenu;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_Copy;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_CopyWithHeaders;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_CopyInsert;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorRow1;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_ExportSelectedCsv;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_ExportAll;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_ExportAll_Csv;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_ExportAll_Json;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_ExportAll_Excel;
+        private System.Windows.Forms.ToolStripMenuItem ctxMenuRow_Clear;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripButton ReconnectDB;
     }
 }
