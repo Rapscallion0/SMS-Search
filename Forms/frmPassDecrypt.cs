@@ -40,7 +40,7 @@ namespace SMS_Search.Forms
 
         private void btnDecrypt_Click(object sender, EventArgs e)
         {
-            txtDecrypted.Text = GeneralUtils.Decrypt(txtEncrypted.Text);
+            txtDecrypted.Text = Utils.GeneralUtils.Decrypt(txtEncrypted.Text);
 
             if (txtDecrypted.Text != "")
             {
@@ -48,7 +48,7 @@ namespace SMS_Search.Forms
                 Clipboard.SetText(txtDecrypted.Text);
 
                 // Show toast message
-                GeneralUtils.showToast(1, "Decrypted string copied to clipboard.");
+                Utils.GeneralUtils.showToast(1, "Decrypted string copied to clipboard.");
             }
             txtEncrypted.Focus();
         }

@@ -51,10 +51,10 @@ namespace SMS_Search.Forms
 		private List<ReplacementRule> _cleanSqlRules = new List<ReplacementRule>();
         private frmClipboardOptions.CopyAction? _clipboardSessionPreference = null;
 
-		private int FormHeightMin;
+		private int FormHeightMin = 300;
 		private int FormHeightExpanded = 600;
 		private int FormWidthMin = 600 + SystemInformation.FrameBorderSize.Width * 2;
-		private int GridMinRowHeight = 92;
+		private int GridMinRowHeight = 100;
 		private bool minimize = true;
 		private bool keyPressHandled;
 		private Logfile log = new Logfile();
