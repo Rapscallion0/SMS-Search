@@ -73,13 +73,10 @@ namespace SMS_Search.Forms
         private QueryBuilder _queryBuilder;
 		private ArrayList arrayGrdFld = new ArrayList();
 		private ArrayList arrayGrdDesc = new ArrayList();
-        private System.Windows.Forms.Timer _filterDebounceTimer;
-        private ContextMenuStrip _cellContextMenu;
-        private ContextMenuStrip _columnHeaderMenu;
-        private ContextMenuStrip _rowHeaderMenu;
+
+        // Removed fields moved to Designer: _filterDebounceTimer, _cellContextMenu, _columnHeaderMenu, _rowHeaderMenu, btnCancel
 
         private CancellationTokenSource _cts;
-        private Button btnCancel;
 
         private bool _highlightMatches = false;
         private Color _matchHighlightColor = Color.Yellow;
@@ -111,24 +108,7 @@ namespace SMS_Search.Forms
             dGrd.ShowEditingIcon = false;
             dGrd.CellMouseClick += dGrd_CellMouseClick;
 
-            // Setup debounce timer for filter text input
-            _filterDebounceTimer = new System.Windows.Forms.Timer();
-            _filterDebounceTimer.Interval = 500;
-            _filterDebounceTimer.Tick += _filterDebounceTimer_Tick;
-
-            SetupContextMenus();
-
-            // Initialize Cancel Button
-            btnCancel = new Button();
-            btnCancel.Name = "btnCancel";
-            btnCancel.Text = "Cancel";
-            btnCancel.Size = btnPopGrid.Size;
-            btnCancel.Location = btnPopGrid.Location;
-            btnCancel.Anchor = btnPopGrid.Anchor;
-            btnCancel.Visible = false;
-            btnCancel.Click += btnCancel_Click;
-            btnCancel.UseVisualStyleBackColor = true;
-            btnPopGrid.Parent.Controls.Add(btnCancel);
+            // Cancel Button is now initialized in Designer
             btnCancel.BringToFront();
 
             // Initialize History
@@ -1533,148 +1513,7 @@ namespace SMS_Search.Forms
             splitContainer.Panel2Collapsed = true;
         }
 
-        /// <summary>
-        /// Initializes context menus for cells, column headers, and row headers.
-        /// </summary>
-        private void SetupContextMenus()
-        {
-            // 1. Cell Context Menu
-            _cellContextMenu = new ContextMenuStrip();
-
-            // Filter by selection
-            var itemFilter = _cellContextMenu.Items.Add("Filter by selection");
-            itemFilter.Click += FilterBySelection_Click;
-
-            _cellContextMenu.Items.Add(new ToolStripSeparator());
-
-            // Select all
-            var itemSelectAll = _cellContextMenu.Items.Add("Select all");
-            itemSelectAll.Click += (s, e) => dGrd.SelectAll();
-
-            // Copy
-            var itemCopy = _cellContextMenu.Items.Add("Copy selected");
-            itemCopy.Click += (s, e) => CopyToClipboard(false);
-
-            // Copy with headers
-            var itemCopyWithHeaders = _cellContextMenu.Items.Add("Copy selected with headers");
-            itemCopyWithHeaders.Click += (s, e) => CopyToClipboard(true);
-
-            // Advance copy submenu
-            var itemAdvCopy = _cellContextMenu.Items.Add("Advance copy");
-            var itemAdvCopyContent = (itemAdvCopy as ToolStripMenuItem).DropDownItems.Add("Copy Content Only");
-            itemAdvCopyContent.Click += async (s, e) => {
-                 string del = config.GetValue("GENERAL", "COPY_DELIMITER");
-                 if (string.IsNullOrEmpty(del)) del = "TAB";
-                 await CopyContentOnlyAsync(false, del);
-            };
-            var itemAdvCopyLayout = (itemAdvCopy as ToolStripMenuItem).DropDownItems.Add("Preserve Layout");
-            itemAdvCopyLayout.Click += async (s, e) => {
-                 string del = config.GetValue("GENERAL", "COPY_DELIMITER");
-                 if (string.IsNullOrEmpty(del)) del = "TAB";
-                 await CopyPreserveLayoutAsync(false, del);
-            };
-
-            _cellContextMenu.Items.Add(new ToolStripSeparator());
-
-            // Resize
-            var itemResize = _cellContextMenu.Items.Add("Resize to fit content");
-            itemResize.Click += (s, e) => dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-
-            // Clear result
-            var itemClear = _cellContextMenu.Items.Add("Clear result");
-            itemClear.Click += (s, e) => ClearResults();
-
-            _cellContextMenu.Items.Add(new ToolStripSeparator());
-
-            // Export selected cells to CSV
-            var itemExportSelected = _cellContextMenu.Items.Add("Export selected cells to CSV");
-            itemExportSelected.Click += (s, e) => ExportSelectedCellsToCsv();
-
-            // Export all results
-            var itemExportAll = _cellContextMenu.Items.Add("Export all results...");
-            var itemExportCsv = (itemExportAll as ToolStripMenuItem).DropDownItems.Add("To CSV");
-            itemExportCsv.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Csv);
-            var itemExportJson = (itemExportAll as ToolStripMenuItem).DropDownItems.Add("To JSON");
-            itemExportJson.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Json);
-            var itemExportExcel = (itemExportAll as ToolStripMenuItem).DropDownItems.Add("To Excel (XML)");
-            itemExportExcel.Click += (s, e) => ExportAllResultsAsync(ExportFormat.ExcelXml);
-
-            _cellContextMenu.Opening += (s, e) =>
-            {
-                // Only enable "Filter by selection" if a single cell is active and has a value
-                bool canFilter = dGrd.CurrentCell != null && dGrd.CurrentCell.Value != null && !string.IsNullOrEmpty(dGrd.CurrentCell.Value.ToString());
-                itemFilter.Enabled = canFilter;
-
-                itemAdvCopy.Visible = IsSelectionDisjointed();
-            };
-
-
-            // 2. Column Header Context Menu
-            _columnHeaderMenu = new ContextMenuStrip();
-
-            var itemToggleDesc = _columnHeaderMenu.Items.Add("Show description in header");
-            itemToggleDesc.Click += async (s, e) =>
-            {
-                _showDescriptions = !_showDescriptions;
-                await setHeadersAsync();
-                setTabTextFocus();
-            };
-
-            _columnHeaderMenu.Items.Add(new ToolStripSeparator());
-
-            // Export all results
-            var itemColExportAll = _columnHeaderMenu.Items.Add("Export all results...");
-            var itemColExportCsv = (itemColExportAll as ToolStripMenuItem).DropDownItems.Add("To CSV");
-            itemColExportCsv.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Csv);
-            var itemColExportJson = (itemColExportAll as ToolStripMenuItem).DropDownItems.Add("To JSON");
-            itemColExportJson.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Json);
-            var itemColExportExcel = (itemColExportAll as ToolStripMenuItem).DropDownItems.Add("To Excel (XML)");
-            itemColExportExcel.Click += (s, e) => ExportAllResultsAsync(ExportFormat.ExcelXml);
-
-            // Clear result
-            var itemColClear = _columnHeaderMenu.Items.Add("Clear result");
-            itemColClear.Click += (s, e) => ClearResults();
-
-            _columnHeaderMenu.Opening += (s, e) =>
-            {
-                if (_showDescriptions)
-                    itemToggleDesc.Text = "Show field name in header";
-                else
-                    itemToggleDesc.Text = "Show description in header";
-            };
-
-
-            // 3. Row Header Context Menu
-            _rowHeaderMenu = new ContextMenuStrip();
-
-            var itemCopyRow = _rowHeaderMenu.Items.Add("Copy row(s)");
-            itemCopyRow.Click += (s, e) => CopyToClipboard(false);
-
-            var itemCopyRowHeaders = _rowHeaderMenu.Items.Add("Copy row(s) with headers");
-            itemCopyRowHeaders.Click += (s, e) => CopyToClipboard(true);
-
-            var itemRowCopyInsert = _rowHeaderMenu.Items.Add("Copy as SQL INSERT");
-            itemRowCopyInsert.Click += (s, e) => CopyAsSqlInsert();
-
-            _rowHeaderMenu.Items.Add(new ToolStripSeparator());
-
-            // Export selected rows to CSV
-            var itemRowExportSelected = _rowHeaderMenu.Items.Add("Export selected rows to CSV");
-            itemRowExportSelected.Click += (s, e) => ExportSelectedRowsToCsv();
-
-            // Export all results
-            var itemRowExportAll = _rowHeaderMenu.Items.Add("Export all results...");
-            var itemRowExportCsv = (itemRowExportAll as ToolStripMenuItem).DropDownItems.Add("To CSV");
-            itemRowExportCsv.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Csv);
-            var itemRowExportJson = (itemRowExportAll as ToolStripMenuItem).DropDownItems.Add("To JSON");
-            itemRowExportJson.Click += (s, e) => ExportAllResultsAsync(ExportFormat.Json);
-            var itemRowExportExcel = (itemRowExportAll as ToolStripMenuItem).DropDownItems.Add("To Excel (XML)");
-            itemRowExportExcel.Click += (s, e) => ExportAllResultsAsync(ExportFormat.ExcelXml);
-
-            // Clear result
-            var itemRowClear = _rowHeaderMenu.Items.Add("Clear result");
-            itemRowClear.Click += (s, e) => ClearResults();
-        }
+        // SetupContextMenus removed - logic moved to Designer and event handlers below
 
         private void dGrd_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
@@ -1707,6 +1546,161 @@ namespace SMS_Search.Forms
                 txtGridFilter.Text = dGrd.CurrentCell.Value.ToString();
             }
         }
+
+        #region Context Menu Handlers (Designer)
+
+        private void ctxMenuCell_SelectAll_Click(object sender, EventArgs e)
+        {
+            dGrd.SelectAll();
+        }
+
+        private void ctxMenuCell_Copy_Click(object sender, EventArgs e)
+        {
+            CopyToClipboard(false);
+        }
+
+        private void ctxMenuCell_CopyWithHeaders_Click(object sender, EventArgs e)
+        {
+            CopyToClipboard(true);
+        }
+
+        private async void ctxMenuCell_AdvCopy_Content_Click(object sender, EventArgs e)
+        {
+             string del = config.GetValue("GENERAL", "COPY_DELIMITER");
+             if (string.IsNullOrEmpty(del)) del = "TAB";
+             await CopyContentOnlyAsync(false, del);
+        }
+
+        private async void ctxMenuCell_AdvCopy_Layout_Click(object sender, EventArgs e)
+        {
+             string del = config.GetValue("GENERAL", "COPY_DELIMITER");
+             if (string.IsNullOrEmpty(del)) del = "TAB";
+             await CopyPreserveLayoutAsync(false, del);
+        }
+
+        private void ctxMenuCell_Resize_Click(object sender, EventArgs e)
+        {
+            dGrd.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+        }
+
+        private void ctxMenuCell_Clear_Click(object sender, EventArgs e)
+        {
+            ClearResults();
+        }
+
+        private void ctxMenuCell_ExportSelected_Click(object sender, EventArgs e)
+        {
+            ExportSelectedCellsToCsv();
+        }
+
+        private void ctxMenuCell_ExportAll_Csv_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.Csv);
+        }
+
+        private void ctxMenuCell_ExportAll_Json_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.Json);
+        }
+
+        private void ctxMenuCell_ExportAll_Excel_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.ExcelXml);
+        }
+
+        private void ctxMenuCell_Opening(object sender, CancelEventArgs e)
+        {
+            // Only enable "Filter by selection" if a single cell is active and has a value
+            bool canFilter = dGrd.CurrentCell != null && dGrd.CurrentCell.Value != null && !string.IsNullOrEmpty(dGrd.CurrentCell.Value.ToString());
+
+            if (ctxMenuCell_Filter != null) ctxMenuCell_Filter.Enabled = canFilter;
+
+            if (ctxMenuCell_AdvCopy != null) ctxMenuCell_AdvCopy.Visible = IsSelectionDisjointed();
+        }
+
+        // Column Header Menu
+
+        private async void ctxMenuCol_ToggleDesc_Click(object sender, EventArgs e)
+        {
+            _showDescriptions = !_showDescriptions;
+            await setHeadersAsync();
+            setTabTextFocus();
+        }
+
+        private void ctxMenuCol_ExportAll_Csv_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.Csv);
+        }
+
+        private void ctxMenuCol_ExportAll_Json_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.Json);
+        }
+
+        private void ctxMenuCol_ExportAll_Excel_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.ExcelXml);
+        }
+
+        private void ctxMenuCol_Clear_Click(object sender, EventArgs e)
+        {
+            ClearResults();
+        }
+
+        private void ctxMenuCol_Opening(object sender, CancelEventArgs e)
+        {
+            if (ctxMenuCol_ToggleDesc != null)
+            {
+                if (_showDescriptions)
+                    ctxMenuCol_ToggleDesc.Text = "Show field name in header";
+                else
+                    ctxMenuCol_ToggleDesc.Text = "Show description in header";
+            }
+        }
+
+        // Row Header Menu
+
+        private void ctxMenuRow_Copy_Click(object sender, EventArgs e)
+        {
+            CopyToClipboard(false);
+        }
+
+        private void ctxMenuRow_CopyWithHeaders_Click(object sender, EventArgs e)
+        {
+            CopyToClipboard(true);
+        }
+
+        private void ctxMenuRow_CopyInsert_Click(object sender, EventArgs e)
+        {
+            CopyAsSqlInsert();
+        }
+
+        private void ctxMenuRow_ExportSelectedCsv_Click(object sender, EventArgs e)
+        {
+            ExportSelectedRowsToCsv();
+        }
+
+        private void ctxMenuRow_ExportAll_Csv_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.Csv);
+        }
+
+        private void ctxMenuRow_ExportAll_Json_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.Json);
+        }
+
+        private void ctxMenuRow_ExportAll_Excel_Click(object sender, EventArgs e)
+        {
+            ExportAllResultsAsync(ExportFormat.ExcelXml);
+        }
+
+        private void ctxMenuRow_Clear_Click(object sender, EventArgs e)
+        {
+            ClearResults();
+        }
+
+        #endregion
 
         /// <summary>
         /// Generates and copies SQL INSERT statements for the selected rows.
