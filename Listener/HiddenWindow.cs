@@ -1,8 +1,8 @@
 using System;
 using System.Windows.Forms;
 using System.IO;
-using SMS_Search; // For ConfigManager
-using Log;
+using SMS_Search.Utils; // For ConfigManager
+using SMS_Search.Utils;
 
 namespace SMS_Search.Listener
 {

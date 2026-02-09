@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using SMS_Search;
+using SMS_Search.Utils;
 
 namespace SMS_Search.Settings
 {

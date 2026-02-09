@@ -5,9 +5,9 @@ using System.Data.Sql;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DbConn;
+using SMS_Search.Data;
 using Microsoft.Win32;
-using SMS_Search;
+using SMS_Search.Utils;
 
 namespace SMS_Search.Settings
 {

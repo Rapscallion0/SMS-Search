@@ -2,9 +2,8 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using SMS_Search;
-using Log;
-using DbConn;
+using SMS_Search.Utils;
+using SMS_Search.Data;
 
 namespace SMS_Search.Settings
 {
