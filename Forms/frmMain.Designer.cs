@@ -204,11 +204,9 @@ namespace SMS_Search.Forms
             this.tabFct = new System.Windows.Forms.TabPage();
             this.chkSearchAnyFct = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.txtCustSqlFct = new SMS_Search.Controls.SqlRichTextBox();
             this.tabTlz = new System.Windows.Forms.TabPage();
             this.chkSearchAnyTlz = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.txtCustSqlTlz = new SMS_Search.Controls.SqlRichTextBox();
             this.tabFields = new System.Windows.Forms.TabPage();
             this.chkLastTransaction = new System.Windows.Forms.CheckBox();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -225,7 +223,6 @@ namespace SMS_Search.Forms
             this.txtNumFld = new System.Windows.Forms.TextBox();
             this.btnClearFld = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
-            this.txtCustSqlFld = new SMS_Search.Controls.SqlRichTextBox();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStripNotify = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -246,13 +243,11 @@ namespace SMS_Search.Forms
             this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.bindingSourceTbl = new System.Windows.Forms.BindingSource(this.components);
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.btnNextMatch = new System.Windows.Forms.Button();
             this.btnPrevMatch = new System.Windows.Forms.Button();
             this.lblMatchCount = new System.Windows.Forms.Label();
-            this.txtGridFilter = new SMS_Search.Controls.SearchTextBox();
             this.lblFilter = new System.Windows.Forms.Label();
-            this.dGrd = new SMS_Search.Controls.ExDataGridView();
-            this.btnCancel = new System.Windows.Forms.Button();
             this._filterDebounceTimer = new System.Windows.Forms.Timer(this.components);
             this._cellContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ctxMenuCell_Filter = new System.Windows.Forms.ToolStripMenuItem();
@@ -291,6 +286,11 @@ namespace SMS_Search.Forms
             this.ctxMenuRow_ExportAll_Json = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxMenuRow_ExportAll_Excel = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxMenuRow_Clear = new System.Windows.Forms.ToolStripMenuItem();
+            this.txtCustSqlFct = new SMS_Search.Controls.SqlRichTextBox();
+            this.txtCustSqlTlz = new SMS_Search.Controls.SqlRichTextBox();
+            this.txtCustSqlFld = new SMS_Search.Controls.SqlRichTextBox();
+            this.txtGridFilter = new SMS_Search.Controls.SearchTextBox();
+            this.dGrd = new SMS_Search.Controls.ExDataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.picRefresh)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.tabCtl.SuspendLayout();
@@ -306,10 +306,10 @@ namespace SMS_Search.Forms
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             this._cellContextMenu.SuspendLayout();
             this._columnHeaderMenu.SuspendLayout();
             this._rowHeaderMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dGrd)).BeginInit();
             this.SuspendLayout();
             // 
             // btnPopGrid
@@ -382,7 +382,7 @@ namespace SMS_Search.Forms
             this.btnCleanSqlFct.Size = new System.Drawing.Size(85, 23);
             this.btnCleanSqlFct.TabIndex = 100;
             this.btnCleanSqlFct.Text = "Clean &Query";
-            this.toolTip.SetToolTip(this.btnCleanSqlFct, "Click to remove HTML formatting from query");
+            this.toolTip.SetToolTip(this.btnCleanSqlFct, "Click pretify query and remove log strings");
             this.btnCleanSqlFct.UseVisualStyleBackColor = true;
             this.btnCleanSqlFct.Click += new System.EventHandler(this.btnCleanSqlFct_Click);
             // 
@@ -720,21 +720,6 @@ namespace SMS_Search.Forms
             this.label5.TabIndex = 1;
             this.label5.Text = "Wildcards supported ( * and ? )";
             // 
-            // txtCustSqlFct
-            // 
-            this.txtCustSqlFct.AcceptsTab = true;
-            this.txtCustSqlFct.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlFct.Font = new System.Drawing.Font("Consolas", 9.75F);
-            this.txtCustSqlFct.Location = new System.Drawing.Point(97, 59);
-            this.txtCustSqlFct.Name = "txtCustSqlFct";
-            this.txtCustSqlFct.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 106);
-            this.txtCustSqlFct.TabIndex = 4;
-            this.txtCustSqlFct.Text = "";
-            this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
-            // 
             // tabTlz
             // 
             this.tabTlz.BackColor = System.Drawing.SystemColors.Control;
@@ -750,10 +735,10 @@ namespace SMS_Search.Forms
             this.tabTlz.Controls.Add(this.btnBuildQryTlz);
             this.tabTlz.Controls.Add(this.btnClearTlz);
             this.tabTlz.Controls.Add(this.txtCustSqlTlz);
-            this.tabTlz.Location = new System.Drawing.Point(4, 22);
+            this.tabTlz.Location = new System.Drawing.Point(4, 24);
             this.tabTlz.Name = "tabTlz";
             this.tabTlz.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTlz.Size = new System.Drawing.Size(588, 173);
+            this.tabTlz.Size = new System.Drawing.Size(588, 171);
             this.tabTlz.TabIndex = 1;
             this.tabTlz.Text = "Totalizer";
             // 
@@ -779,21 +764,6 @@ namespace SMS_Search.Forms
             this.label3.TabIndex = 1;
             this.label3.Text = "Wildcards supported ( * and ? )";
             // 
-            // txtCustSqlTlz
-            // 
-            this.txtCustSqlTlz.AcceptsTab = true;
-            this.txtCustSqlTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlTlz.Font = new System.Drawing.Font("Consolas", 9.75F);
-            this.txtCustSqlTlz.Location = new System.Drawing.Point(97, 59);
-            this.txtCustSqlTlz.Name = "txtCustSqlTlz";
-            this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlTlz.Size = new System.Drawing.Size(484, 108);
-            this.txtCustSqlTlz.TabIndex = 4;
-            this.txtCustSqlTlz.Text = "";
-            this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
-            // 
             // tabFields
             // 
             this.tabFields.BackColor = System.Drawing.SystemColors.Control;
@@ -815,10 +785,10 @@ namespace SMS_Search.Forms
             this.tabFields.Controls.Add(this.label6);
             this.tabFields.Controls.Add(this.picRefresh);
             this.tabFields.Controls.Add(this.txtCustSqlFld);
-            this.tabFields.Location = new System.Drawing.Point(4, 22);
+            this.tabFields.Location = new System.Drawing.Point(4, 24);
             this.tabFields.Name = "tabFields";
             this.tabFields.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFields.Size = new System.Drawing.Size(588, 173);
+            this.tabFields.Size = new System.Drawing.Size(588, 171);
             this.tabFields.TabIndex = 2;
             this.tabFields.Text = "Fields";
             // 
@@ -987,21 +957,6 @@ namespace SMS_Search.Forms
             this.label6.TabIndex = 45;
             this.label6.Text = "F";
             // 
-            // txtCustSqlFld
-            // 
-            this.txtCustSqlFld.AcceptsTab = true;
-            this.txtCustSqlFld.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCustSqlFld.Font = new System.Drawing.Font("Consolas", 9.75F);
-            this.txtCustSqlFld.Location = new System.Drawing.Point(97, 84);
-            this.txtCustSqlFld.Name = "txtCustSqlFld";
-            this.txtCustSqlFld.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 83);
-            this.txtCustSqlFld.TabIndex = 6;
-            this.txtCustSqlFld.Text = "";
-            this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
-            // 
             // notifyIcon
             // 
             this.notifyIcon.ContextMenuStrip = this.contextMenuStripNotify;
@@ -1065,7 +1020,7 @@ namespace SMS_Search.Forms
             this.tscmbDbServer.Enabled = false;
             this.tscmbDbServer.Name = "tscmbDbServer";
             this.tscmbDbServer.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.tscmbDbServer.Size = new System.Drawing.Size(50, 23);
+            this.tscmbDbServer.Size = new System.Drawing.Size(30, 23);
             this.tscmbDbServer.ToolTipText = "Server";
             this.tscmbDbServer.Visible = false;
             // 
@@ -1179,7 +1134,18 @@ namespace SMS_Search.Forms
             this.splitContainer.SplitterDistance = 240;
             this.splitContainer.TabIndex = 102;
             this.splitContainer.TabStop = false;
-            //this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnCancel.Location = new System.Drawing.Point(3, 208);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(78, 23);
+            this.btnCancel.TabIndex = 12;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Visible = false;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnNextMatch
             // 
@@ -1212,6 +1178,347 @@ namespace SMS_Search.Forms
             this.lblMatchCount.TabIndex = 14;
             this.lblMatchCount.Visible = false;
             // 
+            // lblFilter
+            // 
+            this.lblFilter.AutoSize = true;
+            this.lblFilter.Location = new System.Drawing.Point(5, 8);
+            this.lblFilter.Name = "lblFilter";
+            this.lblFilter.Size = new System.Drawing.Size(36, 15);
+            this.lblFilter.TabIndex = 10;
+            this.lblFilter.Text = "Filter:";
+            // 
+            // _filterDebounceTimer
+            // 
+            this._filterDebounceTimer.Interval = 500;
+            this._filterDebounceTimer.Tick += new System.EventHandler(this._filterDebounceTimer_Tick);
+            // 
+            // _cellContextMenu
+            // 
+            this._cellContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ctxMenuCell_Filter,
+            this.toolStripSeparatorCell1,
+            this.ctxMenuCell_SelectAll,
+            this.ctxMenuCell_Copy,
+            this.ctxMenuCell_CopyWithHeaders,
+            this.ctxMenuCell_AdvCopy,
+            this.toolStripSeparatorCell2,
+            this.ctxMenuCell_Resize,
+            this.ctxMenuCell_Clear,
+            this.toolStripSeparatorCell3,
+            this.ctxMenuCell_ExportSelected,
+            this.ctxMenuCell_ExportAll});
+            this._cellContextMenu.Name = "_cellContextMenu";
+            this._cellContextMenu.Size = new System.Drawing.Size(219, 220);
+            this._cellContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ctxMenuCell_Opening);
+            // 
+            // ctxMenuCell_Filter
+            // 
+            this.ctxMenuCell_Filter.Name = "ctxMenuCell_Filter";
+            this.ctxMenuCell_Filter.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_Filter.Text = "Filter by selection";
+            this.ctxMenuCell_Filter.Click += new System.EventHandler(this.FilterBySelection_Click);
+            // 
+            // toolStripSeparatorCell1
+            // 
+            this.toolStripSeparatorCell1.Name = "toolStripSeparatorCell1";
+            this.toolStripSeparatorCell1.Size = new System.Drawing.Size(215, 6);
+            // 
+            // ctxMenuCell_SelectAll
+            // 
+            this.ctxMenuCell_SelectAll.Name = "ctxMenuCell_SelectAll";
+            this.ctxMenuCell_SelectAll.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_SelectAll.Text = "Select all";
+            this.ctxMenuCell_SelectAll.Click += new System.EventHandler(this.ctxMenuCell_SelectAll_Click);
+            // 
+            // ctxMenuCell_Copy
+            // 
+            this.ctxMenuCell_Copy.Name = "ctxMenuCell_Copy";
+            this.ctxMenuCell_Copy.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_Copy.Text = "Copy selected";
+            this.ctxMenuCell_Copy.Click += new System.EventHandler(this.ctxMenuCell_Copy_Click);
+            // 
+            // ctxMenuCell_CopyWithHeaders
+            // 
+            this.ctxMenuCell_CopyWithHeaders.Name = "ctxMenuCell_CopyWithHeaders";
+            this.ctxMenuCell_CopyWithHeaders.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_CopyWithHeaders.Text = "Copy selected with headers";
+            this.ctxMenuCell_CopyWithHeaders.Click += new System.EventHandler(this.ctxMenuCell_CopyWithHeaders_Click);
+            // 
+            // ctxMenuCell_AdvCopy
+            // 
+            this.ctxMenuCell_AdvCopy.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ctxMenuCell_AdvCopy_Content,
+            this.ctxMenuCell_AdvCopy_Layout});
+            this.ctxMenuCell_AdvCopy.Name = "ctxMenuCell_AdvCopy";
+            this.ctxMenuCell_AdvCopy.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_AdvCopy.Text = "Advance copy";
+            // 
+            // ctxMenuCell_AdvCopy_Content
+            // 
+            this.ctxMenuCell_AdvCopy_Content.Name = "ctxMenuCell_AdvCopy_Content";
+            this.ctxMenuCell_AdvCopy_Content.Size = new System.Drawing.Size(176, 22);
+            this.ctxMenuCell_AdvCopy_Content.Text = "Copy Content Only";
+            this.ctxMenuCell_AdvCopy_Content.Click += new System.EventHandler(this.ctxMenuCell_AdvCopy_Content_Click);
+            // 
+            // ctxMenuCell_AdvCopy_Layout
+            // 
+            this.ctxMenuCell_AdvCopy_Layout.Name = "ctxMenuCell_AdvCopy_Layout";
+            this.ctxMenuCell_AdvCopy_Layout.Size = new System.Drawing.Size(176, 22);
+            this.ctxMenuCell_AdvCopy_Layout.Text = "Preserve Layout";
+            this.ctxMenuCell_AdvCopy_Layout.Click += new System.EventHandler(this.ctxMenuCell_AdvCopy_Layout_Click);
+            // 
+            // toolStripSeparatorCell2
+            // 
+            this.toolStripSeparatorCell2.Name = "toolStripSeparatorCell2";
+            this.toolStripSeparatorCell2.Size = new System.Drawing.Size(215, 6);
+            // 
+            // ctxMenuCell_Resize
+            // 
+            this.ctxMenuCell_Resize.Name = "ctxMenuCell_Resize";
+            this.ctxMenuCell_Resize.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_Resize.Text = "Resize to fit content";
+            this.ctxMenuCell_Resize.Click += new System.EventHandler(this.ctxMenuCell_Resize_Click);
+            // 
+            // ctxMenuCell_Clear
+            // 
+            this.ctxMenuCell_Clear.Name = "ctxMenuCell_Clear";
+            this.ctxMenuCell_Clear.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_Clear.Text = "Clear result";
+            this.ctxMenuCell_Clear.Click += new System.EventHandler(this.ctxMenuCell_Clear_Click);
+            // 
+            // toolStripSeparatorCell3
+            // 
+            this.toolStripSeparatorCell3.Name = "toolStripSeparatorCell3";
+            this.toolStripSeparatorCell3.Size = new System.Drawing.Size(215, 6);
+            // 
+            // ctxMenuCell_ExportSelected
+            // 
+            this.ctxMenuCell_ExportSelected.Name = "ctxMenuCell_ExportSelected";
+            this.ctxMenuCell_ExportSelected.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_ExportSelected.Text = "Export selected cells to CSV";
+            this.ctxMenuCell_ExportSelected.Click += new System.EventHandler(this.ctxMenuCell_ExportSelected_Click);
+            // 
+            // ctxMenuCell_ExportAll
+            // 
+            this.ctxMenuCell_ExportAll.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ctxMenuCell_ExportAll_Csv,
+            this.ctxMenuCell_ExportAll_Json,
+            this.ctxMenuCell_ExportAll_Excel});
+            this.ctxMenuCell_ExportAll.Name = "ctxMenuCell_ExportAll";
+            this.ctxMenuCell_ExportAll.Size = new System.Drawing.Size(218, 22);
+            this.ctxMenuCell_ExportAll.Text = "Export all results...";
+            // 
+            // ctxMenuCell_ExportAll_Csv
+            // 
+            this.ctxMenuCell_ExportAll_Csv.Name = "ctxMenuCell_ExportAll_Csv";
+            this.ctxMenuCell_ExportAll_Csv.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuCell_ExportAll_Csv.Text = "To CSV";
+            this.ctxMenuCell_ExportAll_Csv.Click += new System.EventHandler(this.ctxMenuCell_ExportAll_Csv_Click);
+            // 
+            // ctxMenuCell_ExportAll_Json
+            // 
+            this.ctxMenuCell_ExportAll_Json.Name = "ctxMenuCell_ExportAll_Json";
+            this.ctxMenuCell_ExportAll_Json.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuCell_ExportAll_Json.Text = "To JSON";
+            this.ctxMenuCell_ExportAll_Json.Click += new System.EventHandler(this.ctxMenuCell_ExportAll_Json_Click);
+            // 
+            // ctxMenuCell_ExportAll_Excel
+            // 
+            this.ctxMenuCell_ExportAll_Excel.Name = "ctxMenuCell_ExportAll_Excel";
+            this.ctxMenuCell_ExportAll_Excel.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuCell_ExportAll_Excel.Text = "To Excel (XML)";
+            this.ctxMenuCell_ExportAll_Excel.Click += new System.EventHandler(this.ctxMenuCell_ExportAll_Excel_Click);
+            // 
+            // _columnHeaderMenu
+            // 
+            this._columnHeaderMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ctxMenuCol_ToggleDesc,
+            this.toolStripSeparatorCol1,
+            this.ctxMenuCol_ExportAll,
+            this.ctxMenuCol_Clear});
+            this._columnHeaderMenu.Name = "_columnHeaderMenu";
+            this._columnHeaderMenu.Size = new System.Drawing.Size(218, 76);
+            this._columnHeaderMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ctxMenuCol_Opening);
+            // 
+            // ctxMenuCol_ToggleDesc
+            // 
+            this.ctxMenuCol_ToggleDesc.Name = "ctxMenuCol_ToggleDesc";
+            this.ctxMenuCol_ToggleDesc.Size = new System.Drawing.Size(217, 22);
+            this.ctxMenuCol_ToggleDesc.Text = "Show description in header";
+            this.ctxMenuCol_ToggleDesc.Click += new System.EventHandler(this.ctxMenuCol_ToggleDesc_Click);
+            // 
+            // toolStripSeparatorCol1
+            // 
+            this.toolStripSeparatorCol1.Name = "toolStripSeparatorCol1";
+            this.toolStripSeparatorCol1.Size = new System.Drawing.Size(214, 6);
+            // 
+            // ctxMenuCol_ExportAll
+            // 
+            this.ctxMenuCol_ExportAll.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ctxMenuCol_ExportAll_Csv,
+            this.ctxMenuCol_ExportAll_Json,
+            this.ctxMenuCol_ExportAll_Excel});
+            this.ctxMenuCol_ExportAll.Name = "ctxMenuCol_ExportAll";
+            this.ctxMenuCol_ExportAll.Size = new System.Drawing.Size(217, 22);
+            this.ctxMenuCol_ExportAll.Text = "Export all results...";
+            // 
+            // ctxMenuCol_ExportAll_Csv
+            // 
+            this.ctxMenuCol_ExportAll_Csv.Name = "ctxMenuCol_ExportAll_Csv";
+            this.ctxMenuCol_ExportAll_Csv.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuCol_ExportAll_Csv.Text = "To CSV";
+            this.ctxMenuCol_ExportAll_Csv.Click += new System.EventHandler(this.ctxMenuCol_ExportAll_Csv_Click);
+            // 
+            // ctxMenuCol_ExportAll_Json
+            // 
+            this.ctxMenuCol_ExportAll_Json.Name = "ctxMenuCol_ExportAll_Json";
+            this.ctxMenuCol_ExportAll_Json.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuCol_ExportAll_Json.Text = "To JSON";
+            this.ctxMenuCol_ExportAll_Json.Click += new System.EventHandler(this.ctxMenuCol_ExportAll_Json_Click);
+            // 
+            // ctxMenuCol_ExportAll_Excel
+            // 
+            this.ctxMenuCol_ExportAll_Excel.Name = "ctxMenuCol_ExportAll_Excel";
+            this.ctxMenuCol_ExportAll_Excel.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuCol_ExportAll_Excel.Text = "To Excel (XML)";
+            this.ctxMenuCol_ExportAll_Excel.Click += new System.EventHandler(this.ctxMenuCol_ExportAll_Excel_Click);
+            // 
+            // ctxMenuCol_Clear
+            // 
+            this.ctxMenuCol_Clear.Name = "ctxMenuCol_Clear";
+            this.ctxMenuCol_Clear.Size = new System.Drawing.Size(217, 22);
+            this.ctxMenuCol_Clear.Text = "Clear result";
+            this.ctxMenuCol_Clear.Click += new System.EventHandler(this.ctxMenuCol_Clear_Click);
+            // 
+            // _rowHeaderMenu
+            // 
+            this._rowHeaderMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ctxMenuRow_Copy,
+            this.ctxMenuRow_CopyWithHeaders,
+            this.ctxMenuRow_CopyInsert,
+            this.toolStripSeparatorRow1,
+            this.ctxMenuRow_ExportSelectedCsv,
+            this.ctxMenuRow_ExportAll,
+            this.ctxMenuRow_Clear});
+            this._rowHeaderMenu.Name = "_rowHeaderMenu";
+            this._rowHeaderMenu.Size = new System.Drawing.Size(220, 142);
+            // 
+            // ctxMenuRow_Copy
+            // 
+            this.ctxMenuRow_Copy.Name = "ctxMenuRow_Copy";
+            this.ctxMenuRow_Copy.Size = new System.Drawing.Size(219, 22);
+            this.ctxMenuRow_Copy.Text = "Copy row(s)";
+            this.ctxMenuRow_Copy.Click += new System.EventHandler(this.ctxMenuRow_Copy_Click);
+            // 
+            // ctxMenuRow_CopyWithHeaders
+            // 
+            this.ctxMenuRow_CopyWithHeaders.Name = "ctxMenuRow_CopyWithHeaders";
+            this.ctxMenuRow_CopyWithHeaders.Size = new System.Drawing.Size(219, 22);
+            this.ctxMenuRow_CopyWithHeaders.Text = "Copy row(s) with headers";
+            this.ctxMenuRow_CopyWithHeaders.Click += new System.EventHandler(this.ctxMenuRow_CopyWithHeaders_Click);
+            // 
+            // ctxMenuRow_CopyInsert
+            // 
+            this.ctxMenuRow_CopyInsert.Name = "ctxMenuRow_CopyInsert";
+            this.ctxMenuRow_CopyInsert.Size = new System.Drawing.Size(219, 22);
+            this.ctxMenuRow_CopyInsert.Text = "Copy as SQL INSERT";
+            this.ctxMenuRow_CopyInsert.Click += new System.EventHandler(this.ctxMenuRow_CopyInsert_Click);
+            // 
+            // toolStripSeparatorRow1
+            // 
+            this.toolStripSeparatorRow1.Name = "toolStripSeparatorRow1";
+            this.toolStripSeparatorRow1.Size = new System.Drawing.Size(216, 6);
+            // 
+            // ctxMenuRow_ExportSelectedCsv
+            // 
+            this.ctxMenuRow_ExportSelectedCsv.Name = "ctxMenuRow_ExportSelectedCsv";
+            this.ctxMenuRow_ExportSelectedCsv.Size = new System.Drawing.Size(219, 22);
+            this.ctxMenuRow_ExportSelectedCsv.Text = "Export selected rows to CSV";
+            this.ctxMenuRow_ExportSelectedCsv.Click += new System.EventHandler(this.ctxMenuRow_ExportSelectedCsv_Click);
+            // 
+            // ctxMenuRow_ExportAll
+            // 
+            this.ctxMenuRow_ExportAll.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ctxMenuRow_ExportAll_Csv,
+            this.ctxMenuRow_ExportAll_Json,
+            this.ctxMenuRow_ExportAll_Excel});
+            this.ctxMenuRow_ExportAll.Name = "ctxMenuRow_ExportAll";
+            this.ctxMenuRow_ExportAll.Size = new System.Drawing.Size(219, 22);
+            this.ctxMenuRow_ExportAll.Text = "Export all results...";
+            // 
+            // ctxMenuRow_ExportAll_Csv
+            // 
+            this.ctxMenuRow_ExportAll_Csv.Name = "ctxMenuRow_ExportAll_Csv";
+            this.ctxMenuRow_ExportAll_Csv.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuRow_ExportAll_Csv.Text = "To CSV";
+            this.ctxMenuRow_ExportAll_Csv.Click += new System.EventHandler(this.ctxMenuRow_ExportAll_Csv_Click);
+            // 
+            // ctxMenuRow_ExportAll_Json
+            // 
+            this.ctxMenuRow_ExportAll_Json.Name = "ctxMenuRow_ExportAll_Json";
+            this.ctxMenuRow_ExportAll_Json.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuRow_ExportAll_Json.Text = "To JSON";
+            this.ctxMenuRow_ExportAll_Json.Click += new System.EventHandler(this.ctxMenuRow_ExportAll_Json_Click);
+            // 
+            // ctxMenuRow_ExportAll_Excel
+            // 
+            this.ctxMenuRow_ExportAll_Excel.Name = "ctxMenuRow_ExportAll_Excel";
+            this.ctxMenuRow_ExportAll_Excel.Size = new System.Drawing.Size(151, 22);
+            this.ctxMenuRow_ExportAll_Excel.Text = "To Excel (XML)";
+            this.ctxMenuRow_ExportAll_Excel.Click += new System.EventHandler(this.ctxMenuRow_ExportAll_Excel_Click);
+            // 
+            // ctxMenuRow_Clear
+            // 
+            this.ctxMenuRow_Clear.Name = "ctxMenuRow_Clear";
+            this.ctxMenuRow_Clear.Size = new System.Drawing.Size(219, 22);
+            this.ctxMenuRow_Clear.Text = "Clear result";
+            this.ctxMenuRow_Clear.Click += new System.EventHandler(this.ctxMenuRow_Clear_Click);
+            // 
+            // txtCustSqlFct
+            // 
+            this.txtCustSqlFct.AcceptsTab = true;
+            this.txtCustSqlFct.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlFct.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.txtCustSqlFct.Location = new System.Drawing.Point(97, 59);
+            this.txtCustSqlFct.Name = "txtCustSqlFct";
+            this.txtCustSqlFct.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.txtCustSqlFct.Size = new System.Drawing.Size(483, 106);
+            this.txtCustSqlFct.TabIndex = 4;
+            this.txtCustSqlFct.Text = "";
+            this.txtCustSqlFct.Enter += new System.EventHandler(this.txtSqlFct_Enter);
+            // 
+            // txtCustSqlTlz
+            // 
+            this.txtCustSqlTlz.AcceptsTab = true;
+            this.txtCustSqlTlz.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlTlz.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.txtCustSqlTlz.Location = new System.Drawing.Point(97, 59);
+            this.txtCustSqlTlz.Name = "txtCustSqlTlz";
+            this.txtCustSqlTlz.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.txtCustSqlTlz.Size = new System.Drawing.Size(484, 106);
+            this.txtCustSqlTlz.TabIndex = 4;
+            this.txtCustSqlTlz.Text = "";
+            this.txtCustSqlTlz.Enter += new System.EventHandler(this.txtCustSqlTlz_Enter);
+            // 
+            // txtCustSqlFld
+            // 
+            this.txtCustSqlFld.AcceptsTab = true;
+            this.txtCustSqlFld.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCustSqlFld.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.txtCustSqlFld.Location = new System.Drawing.Point(97, 84);
+            this.txtCustSqlFld.Name = "txtCustSqlFld";
+            this.txtCustSqlFld.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.txtCustSqlFld.Size = new System.Drawing.Size(484, 81);
+            this.txtCustSqlFld.TabIndex = 6;
+            this.txtCustSqlFld.Text = "";
+            this.txtCustSqlFld.Enter += new System.EventHandler(this.txtCustSqlFld_Enter);
+            // 
             // txtGridFilter
             // 
             this.txtGridFilter.BackColor = System.Drawing.SystemColors.Window;
@@ -1222,15 +1529,6 @@ namespace SMS_Search.Forms
             this.txtGridFilter.Size = new System.Drawing.Size(229, 23);
             this.txtGridFilter.TabIndex = 11;
             this.txtGridFilter.TextChanged += new System.EventHandler(this.txtGridFilter_TextChanged);
-            // 
-            // lblFilter
-            // 
-            this.lblFilter.AutoSize = true;
-            this.lblFilter.Location = new System.Drawing.Point(5, 8);
-            this.lblFilter.Name = "lblFilter";
-            this.lblFilter.Size = new System.Drawing.Size(36, 15);
-            this.lblFilter.TabIndex = 10;
-            this.lblFilter.Text = "Filter:";
             // 
             // dGrd
             // 
@@ -1260,310 +1558,11 @@ namespace SMS_Search.Forms
             this.dGrd.Name = "dGrd";
             this.dGrd.ReadOnly = true;
             this.dGrd.RowHeadersVisible = false;
-            this.dGrd.Size = new System.Drawing.Size(594, 582);
+            this.dGrd.Size = new System.Drawing.Size(594, 268);
             this.dGrd.TabIndex = 4;
             this.dGrd.TabStop = false;
             this.dGrd.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dGrd_CellDoubleClick);
             // 
-            // btnCancel
-            //
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCancel.Location = new System.Drawing.Point(3, 208);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(78, 23);
-            this.btnCancel.TabIndex = 12;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Visible = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            //
-            // _filterDebounceTimer
-            //
-            this._filterDebounceTimer.Interval = 500;
-            this._filterDebounceTimer.Tick += new System.EventHandler(this._filterDebounceTimer_Tick);
-            //
-            // _cellContextMenu
-            //
-            this._cellContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ctxMenuCell_Filter,
-            this.toolStripSeparatorCell1,
-            this.ctxMenuCell_SelectAll,
-            this.ctxMenuCell_Copy,
-            this.ctxMenuCell_CopyWithHeaders,
-            this.ctxMenuCell_AdvCopy,
-            this.toolStripSeparatorCell2,
-            this.ctxMenuCell_Resize,
-            this.ctxMenuCell_Clear,
-            this.toolStripSeparatorCell3,
-            this.ctxMenuCell_ExportSelected,
-            this.ctxMenuCell_ExportAll});
-            this._cellContextMenu.Name = "_cellContextMenu";
-            this._cellContextMenu.Size = new System.Drawing.Size(181, 220);
-            this._cellContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ctxMenuCell_Opening);
-            //
-            // ctxMenuCell_Filter
-            //
-            this.ctxMenuCell_Filter.Name = "ctxMenuCell_Filter";
-            this.ctxMenuCell_Filter.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_Filter.Text = "Filter by selection";
-            this.ctxMenuCell_Filter.Click += new System.EventHandler(this.FilterBySelection_Click);
-            //
-            // toolStripSeparatorCell1
-            //
-            this.toolStripSeparatorCell1.Name = "toolStripSeparatorCell1";
-            this.toolStripSeparatorCell1.Size = new System.Drawing.Size(177, 6);
-            //
-            // ctxMenuCell_SelectAll
-            //
-            this.ctxMenuCell_SelectAll.Name = "ctxMenuCell_SelectAll";
-            this.ctxMenuCell_SelectAll.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_SelectAll.Text = "Select all";
-            this.ctxMenuCell_SelectAll.Click += new System.EventHandler(this.ctxMenuCell_SelectAll_Click);
-            //
-            // ctxMenuCell_Copy
-            //
-            this.ctxMenuCell_Copy.Name = "ctxMenuCell_Copy";
-            this.ctxMenuCell_Copy.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_Copy.Text = "Copy selected";
-            this.ctxMenuCell_Copy.Click += new System.EventHandler(this.ctxMenuCell_Copy_Click);
-            //
-            // ctxMenuCell_CopyWithHeaders
-            //
-            this.ctxMenuCell_CopyWithHeaders.Name = "ctxMenuCell_CopyWithHeaders";
-            this.ctxMenuCell_CopyWithHeaders.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_CopyWithHeaders.Text = "Copy selected with headers";
-            this.ctxMenuCell_CopyWithHeaders.Click += new System.EventHandler(this.ctxMenuCell_CopyWithHeaders_Click);
-            //
-            // ctxMenuCell_AdvCopy
-            //
-            this.ctxMenuCell_AdvCopy.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ctxMenuCell_AdvCopy_Content,
-            this.ctxMenuCell_AdvCopy_Layout});
-            this.ctxMenuCell_AdvCopy.Name = "ctxMenuCell_AdvCopy";
-            this.ctxMenuCell_AdvCopy.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_AdvCopy.Text = "Advance copy";
-            //
-            // ctxMenuCell_AdvCopy_Content
-            //
-            this.ctxMenuCell_AdvCopy_Content.Name = "ctxMenuCell_AdvCopy_Content";
-            this.ctxMenuCell_AdvCopy_Content.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_AdvCopy_Content.Text = "Copy Content Only";
-            this.ctxMenuCell_AdvCopy_Content.Click += new System.EventHandler(this.ctxMenuCell_AdvCopy_Content_Click);
-            //
-            // ctxMenuCell_AdvCopy_Layout
-            //
-            this.ctxMenuCell_AdvCopy_Layout.Name = "ctxMenuCell_AdvCopy_Layout";
-            this.ctxMenuCell_AdvCopy_Layout.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_AdvCopy_Layout.Text = "Preserve Layout";
-            this.ctxMenuCell_AdvCopy_Layout.Click += new System.EventHandler(this.ctxMenuCell_AdvCopy_Layout_Click);
-            //
-            // toolStripSeparatorCell2
-            //
-            this.toolStripSeparatorCell2.Name = "toolStripSeparatorCell2";
-            this.toolStripSeparatorCell2.Size = new System.Drawing.Size(177, 6);
-            //
-            // ctxMenuCell_Resize
-            //
-            this.ctxMenuCell_Resize.Name = "ctxMenuCell_Resize";
-            this.ctxMenuCell_Resize.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_Resize.Text = "Resize to fit content";
-            this.ctxMenuCell_Resize.Click += new System.EventHandler(this.ctxMenuCell_Resize_Click);
-            //
-            // ctxMenuCell_Clear
-            //
-            this.ctxMenuCell_Clear.Name = "ctxMenuCell_Clear";
-            this.ctxMenuCell_Clear.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_Clear.Text = "Clear result";
-            this.ctxMenuCell_Clear.Click += new System.EventHandler(this.ctxMenuCell_Clear_Click);
-            //
-            // toolStripSeparatorCell3
-            //
-            this.toolStripSeparatorCell3.Name = "toolStripSeparatorCell3";
-            this.toolStripSeparatorCell3.Size = new System.Drawing.Size(177, 6);
-            //
-            // ctxMenuCell_ExportSelected
-            //
-            this.ctxMenuCell_ExportSelected.Name = "ctxMenuCell_ExportSelected";
-            this.ctxMenuCell_ExportSelected.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_ExportSelected.Text = "Export selected cells to CSV";
-            this.ctxMenuCell_ExportSelected.Click += new System.EventHandler(this.ctxMenuCell_ExportSelected_Click);
-            //
-            // ctxMenuCell_ExportAll
-            //
-            this.ctxMenuCell_ExportAll.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ctxMenuCell_ExportAll_Csv,
-            this.ctxMenuCell_ExportAll_Json,
-            this.ctxMenuCell_ExportAll_Excel});
-            this.ctxMenuCell_ExportAll.Name = "ctxMenuCell_ExportAll";
-            this.ctxMenuCell_ExportAll.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_ExportAll.Text = "Export all results...";
-            //
-            // ctxMenuCell_ExportAll_Csv
-            //
-            this.ctxMenuCell_ExportAll_Csv.Name = "ctxMenuCell_ExportAll_Csv";
-            this.ctxMenuCell_ExportAll_Csv.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_ExportAll_Csv.Text = "To CSV";
-            this.ctxMenuCell_ExportAll_Csv.Click += new System.EventHandler(this.ctxMenuCell_ExportAll_Csv_Click);
-            //
-            // ctxMenuCell_ExportAll_Json
-            //
-            this.ctxMenuCell_ExportAll_Json.Name = "ctxMenuCell_ExportAll_Json";
-            this.ctxMenuCell_ExportAll_Json.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_ExportAll_Json.Text = "To JSON";
-            this.ctxMenuCell_ExportAll_Json.Click += new System.EventHandler(this.ctxMenuCell_ExportAll_Json_Click);
-            //
-            // ctxMenuCell_ExportAll_Excel
-            //
-            this.ctxMenuCell_ExportAll_Excel.Name = "ctxMenuCell_ExportAll_Excel";
-            this.ctxMenuCell_ExportAll_Excel.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCell_ExportAll_Excel.Text = "To Excel (XML)";
-            this.ctxMenuCell_ExportAll_Excel.Click += new System.EventHandler(this.ctxMenuCell_ExportAll_Excel_Click);
-            //
-            // _columnHeaderMenu
-            //
-            this._columnHeaderMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ctxMenuCol_ToggleDesc,
-            this.toolStripSeparatorCol1,
-            this.ctxMenuCol_ExportAll,
-            this.ctxMenuCol_Clear});
-            this._columnHeaderMenu.Name = "_columnHeaderMenu";
-            this._columnHeaderMenu.Size = new System.Drawing.Size(181, 98);
-            this._columnHeaderMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ctxMenuCol_Opening);
-            //
-            // ctxMenuCol_ToggleDesc
-            //
-            this.ctxMenuCol_ToggleDesc.Name = "ctxMenuCol_ToggleDesc";
-            this.ctxMenuCol_ToggleDesc.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCol_ToggleDesc.Text = "Show description in header";
-            this.ctxMenuCol_ToggleDesc.Click += new System.EventHandler(this.ctxMenuCol_ToggleDesc_Click);
-            //
-            // toolStripSeparatorCol1
-            //
-            this.toolStripSeparatorCol1.Name = "toolStripSeparatorCol1";
-            this.toolStripSeparatorCol1.Size = new System.Drawing.Size(177, 6);
-            //
-            // ctxMenuCol_ExportAll
-            //
-            this.ctxMenuCol_ExportAll.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ctxMenuCol_ExportAll_Csv,
-            this.ctxMenuCol_ExportAll_Json,
-            this.ctxMenuCol_ExportAll_Excel});
-            this.ctxMenuCol_ExportAll.Name = "ctxMenuCol_ExportAll";
-            this.ctxMenuCol_ExportAll.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCol_ExportAll.Text = "Export all results...";
-            //
-            // ctxMenuCol_ExportAll_Csv
-            //
-            this.ctxMenuCol_ExportAll_Csv.Name = "ctxMenuCol_ExportAll_Csv";
-            this.ctxMenuCol_ExportAll_Csv.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCol_ExportAll_Csv.Text = "To CSV";
-            this.ctxMenuCol_ExportAll_Csv.Click += new System.EventHandler(this.ctxMenuCol_ExportAll_Csv_Click);
-            //
-            // ctxMenuCol_ExportAll_Json
-            //
-            this.ctxMenuCol_ExportAll_Json.Name = "ctxMenuCol_ExportAll_Json";
-            this.ctxMenuCol_ExportAll_Json.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCol_ExportAll_Json.Text = "To JSON";
-            this.ctxMenuCol_ExportAll_Json.Click += new System.EventHandler(this.ctxMenuCol_ExportAll_Json_Click);
-            //
-            // ctxMenuCol_ExportAll_Excel
-            //
-            this.ctxMenuCol_ExportAll_Excel.Name = "ctxMenuCol_ExportAll_Excel";
-            this.ctxMenuCol_ExportAll_Excel.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCol_ExportAll_Excel.Text = "To Excel (XML)";
-            this.ctxMenuCol_ExportAll_Excel.Click += new System.EventHandler(this.ctxMenuCol_ExportAll_Excel_Click);
-            //
-            // ctxMenuCol_Clear
-            //
-            this.ctxMenuCol_Clear.Name = "ctxMenuCol_Clear";
-            this.ctxMenuCol_Clear.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuCol_Clear.Text = "Clear result";
-            this.ctxMenuCol_Clear.Click += new System.EventHandler(this.ctxMenuCol_Clear_Click);
-            //
-            // _rowHeaderMenu
-            //
-            this._rowHeaderMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ctxMenuRow_Copy,
-            this.ctxMenuRow_CopyWithHeaders,
-            this.ctxMenuRow_CopyInsert,
-            this.toolStripSeparatorRow1,
-            this.ctxMenuRow_ExportSelectedCsv,
-            this.ctxMenuRow_ExportAll,
-            this.ctxMenuRow_Clear});
-            this._rowHeaderMenu.Name = "_rowHeaderMenu";
-            this._rowHeaderMenu.Size = new System.Drawing.Size(181, 142);
-            //
-            // ctxMenuRow_Copy
-            //
-            this.ctxMenuRow_Copy.Name = "ctxMenuRow_Copy";
-            this.ctxMenuRow_Copy.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_Copy.Text = "Copy row(s)";
-            this.ctxMenuRow_Copy.Click += new System.EventHandler(this.ctxMenuRow_Copy_Click);
-            //
-            // ctxMenuRow_CopyWithHeaders
-            //
-            this.ctxMenuRow_CopyWithHeaders.Name = "ctxMenuRow_CopyWithHeaders";
-            this.ctxMenuRow_CopyWithHeaders.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_CopyWithHeaders.Text = "Copy row(s) with headers";
-            this.ctxMenuRow_CopyWithHeaders.Click += new System.EventHandler(this.ctxMenuRow_CopyWithHeaders_Click);
-            //
-            // ctxMenuRow_CopyInsert
-            //
-            this.ctxMenuRow_CopyInsert.Name = "ctxMenuRow_CopyInsert";
-            this.ctxMenuRow_CopyInsert.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_CopyInsert.Text = "Copy as SQL INSERT";
-            this.ctxMenuRow_CopyInsert.Click += new System.EventHandler(this.ctxMenuRow_CopyInsert_Click);
-            //
-            // toolStripSeparatorRow1
-            //
-            this.toolStripSeparatorRow1.Name = "toolStripSeparatorRow1";
-            this.toolStripSeparatorRow1.Size = new System.Drawing.Size(177, 6);
-            //
-            // ctxMenuRow_ExportSelectedCsv
-            //
-            this.ctxMenuRow_ExportSelectedCsv.Name = "ctxMenuRow_ExportSelectedCsv";
-            this.ctxMenuRow_ExportSelectedCsv.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_ExportSelectedCsv.Text = "Export selected rows to CSV";
-            this.ctxMenuRow_ExportSelectedCsv.Click += new System.EventHandler(this.ctxMenuRow_ExportSelectedCsv_Click);
-            //
-            // ctxMenuRow_ExportAll
-            //
-            this.ctxMenuRow_ExportAll.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ctxMenuRow_ExportAll_Csv,
-            this.ctxMenuRow_ExportAll_Json,
-            this.ctxMenuRow_ExportAll_Excel});
-            this.ctxMenuRow_ExportAll.Name = "ctxMenuRow_ExportAll";
-            this.ctxMenuRow_ExportAll.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_ExportAll.Text = "Export all results...";
-            //
-            // ctxMenuRow_ExportAll_Csv
-            //
-            this.ctxMenuRow_ExportAll_Csv.Name = "ctxMenuRow_ExportAll_Csv";
-            this.ctxMenuRow_ExportAll_Csv.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_ExportAll_Csv.Text = "To CSV";
-            this.ctxMenuRow_ExportAll_Csv.Click += new System.EventHandler(this.ctxMenuRow_ExportAll_Csv_Click);
-            //
-            // ctxMenuRow_ExportAll_Json
-            //
-            this.ctxMenuRow_ExportAll_Json.Name = "ctxMenuRow_ExportAll_Json";
-            this.ctxMenuRow_ExportAll_Json.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_ExportAll_Json.Text = "To JSON";
-            this.ctxMenuRow_ExportAll_Json.Click += new System.EventHandler(this.ctxMenuRow_ExportAll_Json_Click);
-            //
-            // ctxMenuRow_ExportAll_Excel
-            //
-            this.ctxMenuRow_ExportAll_Excel.Name = "ctxMenuRow_ExportAll_Excel";
-            this.ctxMenuRow_ExportAll_Excel.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_ExportAll_Excel.Text = "To Excel (XML)";
-            this.ctxMenuRow_ExportAll_Excel.Click += new System.EventHandler(this.ctxMenuRow_ExportAll_Excel_Click);
-            //
-            // ctxMenuRow_Clear
-            //
-            this.ctxMenuRow_Clear.Name = "ctxMenuRow_Clear";
-            this.ctxMenuRow_Clear.Size = new System.Drawing.Size(180, 22);
-            this.ctxMenuRow_Clear.Text = "Clear result";
-            this.ctxMenuRow_Clear.Click += new System.EventHandler(this.ctxMenuRow_Clear_Click);
-            //
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1605,10 +1604,10 @@ namespace SMS_Search.Forms
             this.splitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dGrd)).EndInit();
             this._cellContextMenu.ResumeLayout(false);
             this._columnHeaderMenu.ResumeLayout(false);
             this._rowHeaderMenu.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dGrd)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
