@@ -1,125 +1,85 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using SMS_Search.Data;
-using SMS_Search.Services;
-using SMS_Search.Utils;
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
+using SMS_Search.Services;
+using SMS_Search.Views;
+using SMS_Search.Data;
+using SMS_Search.Utils;
 
 namespace SMS_Search.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
-        private readonly ILoggerService _logger;
+        private readonly IConfigService _config;
         private readonly IDialogService _dialogService;
-        private readonly IConfigService _configService;
-        private readonly IQueryHistoryService _historyService;
-        private readonly IHotkeyService _hotkeyService;
         private readonly IServiceProvider _serviceProvider;
-
-        public event Action RequestOpenSettings;
+        private readonly ILoggerService _logger;
+        private readonly IQueryHistoryService _historyService; // Restore history service dependency
 
         public MainViewModel(
-            SearchViewModel searchViewModel,
-            ResultsViewModel resultsViewModel,
-            ILoggerService logger,
+            IConfigService config,
             IDialogService dialogService,
-            IConfigService configService,
-            IQueryHistoryService historyService,
-            IHotkeyService hotkeyService,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            ILoggerService logger,
+            IQueryHistoryService historyService, // Inject it
+            SearchViewModel searchViewModel,
+            ResultsViewModel resultsViewModel)
         {
-            SearchViewModel = searchViewModel;
-            ResultsViewModel = resultsViewModel;
-            _logger = logger;
+            _config = config;
             _dialogService = dialogService;
-            _configService = configService;
-            _historyService = historyService;
-            _hotkeyService = hotkeyService;
             _serviceProvider = serviceProvider;
-
-            ExecuteSearchCommand = new AsyncRelayCommand(ExecuteSearch);
-            OpenSettingsCommand = new RelayCommand(OpenSettings);
-            OpenUnarchiveCommand = new RelayCommand(OpenUnarchive);
-
-            // Julian Date Converter
-            UpdateJulianDate();
+            _logger = logger;
+            _historyService = historyService;
+            SearchVm = searchViewModel;
+            ResultsVm = resultsViewModel;
         }
 
-        public SearchViewModel SearchViewModel { get; }
-        public ResultsViewModel ResultsViewModel { get; }
+        public SearchViewModel SearchVm { get; }
+        public ResultsViewModel ResultsVm { get; }
 
-        public IAsyncRelayCommand ExecuteSearchCommand { get; }
-        public IRelayCommand OpenSettingsCommand { get; }
-        public IRelayCommand OpenUnarchiveCommand { get; }
-
-        [ObservableProperty]
-        private string _julianDateText;
-
-        [ObservableProperty]
-        private DateTime _gregorianDate = DateTime.Today;
-
-        [ObservableProperty]
-        private bool _isUnarchiveTargetVisible;
-
-        private bool _isUpdatingDate;
-
-        partial void OnJulianDateTextChanged(string value)
+        [RelayCommand]
+        private async Task Search()
         {
-            if (_isUpdatingDate) return;
-            if (value != null && value.Length == 7 && int.TryParse(value, out int _))
-            {
-                try
-                {
-                    int year = int.Parse(value.Substring(0, 4));
-                    int day = int.Parse(value.Substring(4, 3));
-                    _isUpdatingDate = true;
-                    GregorianDate = new DateTime(year, 1, 1).AddDays(day - 1);
-                    _isUpdatingDate = false;
-                }
-                catch { _isUpdatingDate = false; }
-            }
-        }
+             var criteria = SearchVm.GetSearchCriteria();
 
-        partial void OnGregorianDateChanged(DateTime value)
-        {
-            if (_isUpdatingDate) return;
-            UpdateJulianDate();
-        }
-
-        private void UpdateJulianDate()
-        {
-             _isUpdatingDate = true;
-             DateTime dt = GregorianDate;
-             int days = dt.DayOfYear;
-             JulianDateText = $"{dt.Year}{days:D3}";
-             _isUpdatingDate = false;
-        }
-
-        private void OpenUnarchive()
-        {
-            var window = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<SMS_Search.Views.UnarchiveWindow>(_serviceProvider);
-            window.Show();
-            IsUnarchiveTargetVisible = true;
-            window.Closed += (s, e) => IsUnarchiveTargetVisible = false;
-        }
-
-        private async Task ExecuteSearch()
-        {
-             var criteria = SearchViewModel.GetSearchCriteria();
-
-             await ResultsViewModel.ExecuteSearchAsync(criteria);
-
-             if (criteria.Type == SearchType.CustomSql)
+             // Basic validation
+             if (criteria.Type != SearchType.Table && string.IsNullOrWhiteSpace(criteria.Value))
              {
-                 _historyService.AddQuery(criteria.Mode.ToString(), criteria.Value);
+                 _dialogService.ShowToast("Please enter a search term.", "Search", ToastType.Warning);
+                 return;
              }
+
+             // Add to history
+             if (criteria.Type != SearchType.Table && !string.IsNullOrWhiteSpace(criteria.Value))
+             {
+                 _historyService.AddQuery(SearchVm.SelectedMode.ToString(), criteria.Value);
+             }
+
+             await ResultsVm.ExecuteSearchAsync(criteria);
         }
 
+        [RelayCommand]
         private void OpenSettings()
         {
-            RequestOpenSettings?.Invoke();
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control &&
+                (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                var encryptWin = new EncryptionUtilityWindow();
+                encryptWin.DataContext = _serviceProvider.GetRequiredService<EncryptionUtilityViewModel>();
+                encryptWin.Owner = System.Windows.Application.Current.MainWindow;
+                encryptWin.ShowDialog();
+            }
+            else
+            {
+                var settingsWin = _serviceProvider.GetRequiredService<SettingsWindow>();
+                settingsWin.DataContext = _serviceProvider.GetRequiredService<SettingsViewModel>();
+                settingsWin.Owner = System.Windows.Application.Current.MainWindow;
+                settingsWin.ShowDialog();
+            }
         }
     }
 }

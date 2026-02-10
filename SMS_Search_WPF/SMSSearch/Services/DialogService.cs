@@ -1,8 +1,20 @@
+using System;
 using System.Windows;
 using Microsoft.Win32;
+using SMS_Search.Views;
 
 namespace SMS_Search.Services
 {
+    public interface IDialogService
+    {
+        void ShowMessage(string message, string title);
+        void ShowError(string message, string title);
+        bool ShowConfirmation(string message, string title);
+        string OpenFileDialog(string filter);
+        string SaveFileDialog(string filter, string defaultName = "");
+        void ShowToast(string message, string title, ToastType type = ToastType.Info);
+    }
+
     public class DialogService : IDialogService
     {
         public void ShowMessage(string message, string title)
@@ -34,9 +46,17 @@ namespace SMS_Search.Services
             return null;
         }
 
-        public void ShowToast(string message, string title)
+        public void ShowToast(string message, string title, ToastType type = ToastType.Info)
         {
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+            // Ensure UI thread access for creating window
+            if (Application.Current != null && Application.Current.Dispatcher != null)
+            {
+                 Application.Current.Dispatcher.Invoke(() =>
+                 {
+                     var toast = new ToastWindow(message, title, type);
+                     toast.Show();
+                 });
+            }
         }
     }
 }

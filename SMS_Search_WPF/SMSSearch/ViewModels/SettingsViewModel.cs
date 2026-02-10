@@ -1,8 +1,10 @@
+using System;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SMS_Search.Services;
 using SMS_Search.Utils;
-using System.Windows.Controls;
+using SMS_Search.ViewModels;
 
 namespace SMS_Search.ViewModels
 {
@@ -10,25 +12,30 @@ namespace SMS_Search.ViewModels
     {
         private readonly IConfigService _config;
         private readonly IDialogService _dialogService;
+        private readonly ILoggerService _logger;
+        private readonly IHotkeyService _hotkeyService;
 
-        public event System.Action RequestClose;
-
-        public GeneralSettingsViewModel General { get; }
-        public DisplaySettingsViewModel Display { get; }
-        public CleanSqlSettingsViewModel CleanSql { get; }
-
-        public SettingsViewModel(IConfigService config, IDialogService dialogService)
+        public SettingsViewModel(
+            IConfigService config,
+            IDialogService dialogService,
+            ILoggerService logger,
+            IHotkeyService hotkeyService)
         {
             _config = config;
             _dialogService = dialogService;
+            _logger = logger;
+            _hotkeyService = hotkeyService;
 
-            General = new GeneralSettingsViewModel(config);
-            Display = new DisplaySettingsViewModel(config);
-            CleanSql = new CleanSqlSettingsViewModel(config);
+            // Load initial connection settings
+            _server = _config.GetValue("CONNECTION", "SERVER");
+            _database = _config.GetValue("CONNECTION", "DATABASE");
+            _user = _config.GetValue("CONNECTION", "SQLUSER");
 
-            Server = _config.GetValue("CONNECTION", "SERVER");
-            Database = _config.GetValue("CONNECTION", "DATABASE");
-            User = _config.GetValue("CONNECTION", "SQLUSER");
+            // Sub-ViewModels
+            General = new GeneralSettingsViewModel(_config);
+            Display = new DisplaySettingsViewModel(_config);
+            CleanSql = new CleanSqlSettingsViewModel(_config);
+            Launcher = new LauncherSettingsViewModel(_config, _hotkeyService, _logger);
         }
 
         [ObservableProperty]
@@ -40,28 +47,39 @@ namespace SMS_Search.ViewModels
         [ObservableProperty]
         private string _user;
 
-        [RelayCommand]
+        public GeneralSettingsViewModel General { get; }
+        public DisplaySettingsViewModel Display { get; }
+        public CleanSqlSettingsViewModel CleanSql { get; }
+        public LauncherSettingsViewModel Launcher { get; }
+
+        public IRelayCommand<object> SaveCommand => new RelayCommand<object>(Save);
+
         private void Save(object parameter)
         {
-            PasswordBox passwordBox = parameter as PasswordBox;
-
-            _config.SetValue("CONNECTION", "SERVER", Server);
-            _config.SetValue("CONNECTION", "DATABASE", Database);
-            _config.SetValue("CONNECTION", "SQLUSER", User);
-
-            if (passwordBox != null && !string.IsNullOrEmpty(passwordBox.Password))
+            try
             {
-                string encrypted = GeneralUtils.Encrypt(passwordBox.Password);
-                _config.SetValue("CONNECTION", "SQLPASSWORD", encrypted);
+                _config.SetValue("CONNECTION", "SERVER", Server);
+                _config.SetValue("CONNECTION", "DATABASE", Database);
+                _config.SetValue("CONNECTION", "SQLUSER", User);
+
+                if (parameter is System.Windows.Controls.PasswordBox pb && !string.IsNullOrEmpty(pb.Password))
+                {
+                    _config.SetValue("CONNECTION", "SQLPASSWORD", GeneralUtils.Encrypt(pb.Password));
+                }
+
+                General.Save();
+                Display.Save();
+                CleanSql.Save();
+                Launcher.Save();
+
+                _config.Save();
+                _dialogService.ShowToast("Settings saved successfully.", "Settings", SMS_Search.Views.ToastType.Success);
             }
-
-            General.Save();
-            Display.Save();
-            CleanSql.Save();
-
-            _config.Save();
-            _dialogService.ShowMessage("Settings saved. You may need to restart or reload tables.", "Settings");
-            RequestClose?.Invoke();
+            catch (Exception ex)
+            {
+                _logger.LogError("Error saving settings", ex);
+                _dialogService.ShowError("Failed to save settings: " + ex.Message, "Error");
+            }
         }
     }
 }

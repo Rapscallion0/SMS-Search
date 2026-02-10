@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:SMS_Search.ViewModels"
         mc:Ignorable="d"
         xmlns:views="clr-namespace:SMS_Search.Views"
-        Title="Settings" Height="400" Width="500"
+        Title="Settings" Height="450" Width="500"
         WindowStartupLocation="CenterOwner">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -38,6 +38,9 @@
             </TabItem>
             <TabItem Header="Clean SQL">
                 <views:CleanSqlSettingsView DataContext="{Binding CleanSql}"/>
+            </TabItem>
+            <TabItem Header="Launcher">
+                <views:LauncherSettingsView DataContext="{Binding Launcher}"/>
             </TabItem>
         </TabControl>
 
