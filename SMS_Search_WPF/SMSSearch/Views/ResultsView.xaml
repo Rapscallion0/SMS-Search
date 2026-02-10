@@ -50,8 +50,10 @@
                 <ContextMenu>
                     <MenuItem Header="Copy" Command="Copy"/>
                     <MenuItem Header="Copy with Headers" Click="CopyWithHeaders_Click"/>
-                    <MenuItem Header="Copy as SQL INSERT" Click="CopyAsSqlInsert_Click"/>
+                    <MenuItem Header="Copy as SQL INSERT" Command="{Binding CopyInsertCommand}" CommandParameter="{Binding PlacementTarget.SelectedItems, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                     <MenuItem Header="Filter by Selection" Click="FilterBySelection_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Toggle Header Description" Command="{Binding ToggleHeaderDescriptionCommand}"/>
                     <Separator/>
                     <MenuItem Header="Export to CSV" Command="{Binding ExportCsvCommand}"/>
                     <MenuItem Header="Export to JSON" Command="{Binding ExportJsonCommand}"/>

@@ -13,10 +13,18 @@ namespace SMS_Search.ViewModels
 
         public event System.Action RequestClose;
 
+        public GeneralSettingsViewModel General { get; }
+        public DisplaySettingsViewModel Display { get; }
+        public CleanSqlSettingsViewModel CleanSql { get; }
+
         public SettingsViewModel(IConfigService config, IDialogService dialogService)
         {
             _config = config;
             _dialogService = dialogService;
+
+            General = new GeneralSettingsViewModel(config);
+            Display = new DisplaySettingsViewModel(config);
+            CleanSql = new CleanSqlSettingsViewModel(config);
 
             Server = _config.GetValue("CONNECTION", "SERVER");
             Database = _config.GetValue("CONNECTION", "DATABASE");
@@ -46,6 +54,10 @@ namespace SMS_Search.ViewModels
                 string encrypted = GeneralUtils.Encrypt(passwordBox.Password);
                 _config.SetValue("CONNECTION", "SQLPASSWORD", encrypted);
             }
+
+            General.Save();
+            Display.Save();
+            CleanSql.Save();
 
             _config.Save();
             _dialogService.ShowMessage("Settings saved. You may need to restart or reload tables.", "Settings");

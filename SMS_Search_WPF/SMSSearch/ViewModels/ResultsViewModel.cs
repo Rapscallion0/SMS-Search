@@ -18,13 +18,20 @@ namespace SMS_Search.ViewModels
         private readonly IDialogService _dialogService;
         private readonly QueryBuilder _queryBuilder;
         private readonly IConfigService _configService;
+        private readonly IClipboardService _clipboardService;
 
-        public ResultsViewModel(VirtualGridContext gridContext, ILoggerService logger, IDialogService dialogService, IConfigService configService)
+        public ResultsViewModel(
+            VirtualGridContext gridContext,
+            ILoggerService logger,
+            IDialogService dialogService,
+            IConfigService configService,
+            IClipboardService clipboardService)
         {
             _gridContext = gridContext;
             _logger = logger;
             _dialogService = dialogService;
             _configService = configService;
+            _clipboardService = clipboardService;
 
             string fctFields = _configService.GetValue("QUERY", "FUNCTION");
             string tlzFields = _configService.GetValue("QUERY", "TOTALIZER");
@@ -40,6 +47,9 @@ namespace SMS_Search.ViewModels
             ApplyFilterCommand = new AsyncRelayCommand<string>(ApplyFilterAsync);
             FindNextCommand = new AsyncRelayCommand(() => FindMatchAsync(true));
             FindPreviousCommand = new AsyncRelayCommand(() => FindMatchAsync(false));
+
+            ToggleHeaderDescriptionCommand = new RelayCommand(() => ShowDescriptionHeaders = !ShowDescriptionHeaders);
+            CopyInsertCommand = new RelayCommand<System.Collections.IList>(CopyAsSqlInsert);
         }
 
         [ObservableProperty]
@@ -63,7 +73,11 @@ namespace SMS_Search.ViewModels
         [ObservableProperty]
         private string _tableName;
 
+        [ObservableProperty]
+        private bool _showDescriptionHeaders;
+
         public event EventHandler<int> ScrollToRowRequested;
+        public event EventHandler HeadersUpdated;
 
         public IAsyncRelayCommand<string> ApplyFilterCommand { get; }
         public IAsyncRelayCommand FindNextCommand { get; }
@@ -72,6 +86,54 @@ namespace SMS_Search.ViewModels
         public IAsyncRelayCommand ExportCsvCommand { get; }
         public IAsyncRelayCommand ExportJsonCommand { get; }
         public IAsyncRelayCommand ExportExcelCommand { get; }
+
+        public IRelayCommand ToggleHeaderDescriptionCommand { get; }
+        public IRelayCommand<System.Collections.IList> CopyInsertCommand { get; }
+        public IRelayCommand<System.Collections.IList> ExportSelectedCsvCommand { get; }
+
+        // Dictionary mapping Column Name -> Header Text (Description or Name)
+        public Dictionary<string, string> ColumnHeaders { get; private set; } = new Dictionary<string, string>();
+
+        private DataTable _lastSchema;
+
+        partial void OnShowDescriptionHeadersChanged(bool value)
+        {
+             UpdateHeadersAsync();
+        }
+
+        private async void UpdateHeadersAsync()
+        {
+            if (_lastSchema == null) return;
+
+            ColumnHeaders.Clear();
+            List<string> colNames = new List<string>();
+            foreach(DataColumn c in _lastSchema.Columns) colNames.Add(c.ColumnName);
+
+            if (ShowDescriptionHeaders)
+            {
+                 try
+                 {
+                     var descriptions = await _gridContext.GetColumnDescriptionsAsync(colNames);
+                     for (int i = 0; i < colNames.Count; i++)
+                     {
+                         string desc = (i < descriptions.Count) ? descriptions[i] : "";
+                         ColumnHeaders[colNames[i]] = !string.IsNullOrEmpty(desc) ? desc : colNames[i];
+                     }
+                 }
+                 catch (Exception ex)
+                 {
+                     _logger.LogError("Failed to load descriptions", ex);
+                     // Fallback
+                     foreach(var name in colNames) ColumnHeaders[name] = name;
+                 }
+            }
+            else
+            {
+                 foreach(var name in colNames) ColumnHeaders[name] = name;
+            }
+
+            HeadersUpdated?.Invoke(this, EventArgs.Empty);
+        }
 
         private void OnDataReady(object sender, EventArgs e)
         {
@@ -127,6 +189,9 @@ namespace SMS_Search.ViewModels
 
                 // Load initial count and cache schema
                 var schema = await _gridContext.GetSchemaAsync(queryResult.Sql, queryResult.Parameters);
+                _lastSchema = schema;
+                UpdateHeadersAsync();
+
                 await _gridContext.LoadAsync(queryResult.Sql, queryResult.Parameters);
 
                 // Create new collection
@@ -267,6 +332,62 @@ namespace SMS_Search.ViewModels
                 IsBusy = false;
                 StatusText = $"Found {TotalRecords} records";
             }
+        }
+
+        private void CopyAsSqlInsert(System.Collections.IList selectedItems)
+        {
+            if (selectedItems == null || selectedItems.Count == 0 || _lastSchema == null) return;
+
+            string table = TableName;
+            if (string.IsNullOrWhiteSpace(table) || table == "ResultTable") table = "[TableName]";
+            if (!table.StartsWith("[") && !table.Contains(" ")) table = "[" + table + "]";
+
+            var sb = new System.Text.StringBuilder();
+
+            var cols = _lastSchema.Columns;
+            var colNames = new List<string>();
+            foreach(DataColumn c in cols) colNames.Add(c.ColumnName);
+
+            sb.Append($"INSERT INTO {table} (");
+            sb.Append(string.Join(", ", System.Linq.Enumerable.Select(colNames, c => $"[{c}]")));
+            sb.AppendLine(") VALUES");
+
+            for (int i = 0; i < selectedItems.Count; i++)
+            {
+                var item = selectedItems[i];
+                if (item is VirtualRow row)
+                {
+                    sb.Append("(");
+                    var vals = new List<string>();
+                    for (int c = 0; c < colNames.Count; c++)
+                    {
+                        var val = row.GetValue(c);
+                        vals.Add(FormatSqlValue(val));
+                    }
+                    sb.Append(string.Join(", ", vals));
+                    sb.Append(")");
+                    if (i < selectedItems.Count - 1) sb.AppendLine(","); else sb.AppendLine(";");
+                }
+            }
+
+            _clipboardService.SetText(sb.ToString());
+            _dialogService.ShowMessage("INSERT statements copied to clipboard", "Copy");
+        }
+
+        private string FormatSqlValue(object value)
+        {
+            if (value == null || value == DBNull.Value) return "NULL";
+            if (value is bool b) return b ? "1" : "0";
+            if (IsNumeric(value)) return value.ToString();
+            if (value is DateTime dt) return $"'{dt:yyyy-MM-dd HH:mm:ss.fff}'";
+            return $"'{value.ToString().Replace("'", "''")}'";
+        }
+
+        private bool IsNumeric(object value)
+        {
+            return value is sbyte || value is byte || value is short || value is ushort ||
+                   value is int || value is uint || value is long || value is ulong ||
+                   value is float || value is double || value is decimal;
         }
     }
 }
