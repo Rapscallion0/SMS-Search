@@ -5,9 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
 using SMS_Search.ViewModels;
+using SMS_Search.Data;
 
 namespace SMS_Search.Views
 {
@@ -125,33 +127,32 @@ namespace SMS_Search.Views
 
         private void CopyWithHeaders_Click(object sender, RoutedEventArgs e)
         {
-            CopySelectedCells(true);
+            CopySelectedCells(true, true);
         }
 
-        private void CopySelectedCells(bool includeHeaders)
+        private void AdvancedCopy_Click(object sender, RoutedEventArgs e)
+        {
+             if (resultsGrid.SelectedCells.Count == 0) return;
+
+             var dlg = new ClipboardOptionsWindow();
+             dlg.Owner = Window.GetWindow(this);
+             if (dlg.ShowDialog() == true)
+             {
+                 CopySelectedCells(false, dlg.PreserveLayout);
+             }
+        }
+
+        private void CopySelectedCells(bool includeHeaders, bool preserveLayout)
         {
             if (resultsGrid.SelectedCells.Count == 0) return;
 
-            // Get bounds
             var cells = resultsGrid.SelectedCells;
-            var rows = cells.Select(c => c.Item).Distinct().ToList(); // Note: Item order might not match visual row order if sorting?
-            // Usually SelectedCells returns in selection order.
-            // But for copy we want visual order.
-            // Items.IndexOf is expensive in virtual mode?
-            // Actually, we can just sort by index if we can get it.
-            // Since we can't easily get index without scanning, let's assume selection order is close enough or acceptable for now,
-            // OR use a slower sort. Given virtual mode, scanning is bad.
-            // Wait, we can use the order they appear in `resultsGrid.Items` if we iterate items and check selection? No, too slow.
-            // Let's rely on `SelectedCells` order or try to sort by RowIndex if available.
-            // VirtualRow has internal index? Not public.
-            // But we can check if item implements an index property? No.
+            var rows = cells.Select(c => c.Item).Distinct().ToList();
 
-            // Group by row and sort by RowIndex
-            var grouped = cells.GroupBy(c => c.Item)
-                               .OrderBy(g => (g.Key as SMS_Search.Data.VirtualRow)?.RowIndex ?? 0)
-                               .ToList();
+            // We need to sort rows by their index to maintain visual order
+            rows = rows.OrderBy(r => (r as VirtualRow)?.RowIndex ?? 0).ToList();
 
-            // Get unique columns in visual order
+            // Sort columns by DisplayIndex
             var cols = cells.Select(c => c.Column).Distinct().OrderBy(c => c.DisplayIndex).ToList();
 
             var sb = new StringBuilder();
@@ -161,31 +162,32 @@ namespace SMS_Search.Views
                 sb.AppendLine(string.Join("\t", cols.Select(c => c.Header)));
             }
 
-            foreach (var group in grouped)
+            foreach (var row in rows)
             {
-                var row = group.Key;
                 var values = new List<string>();
                 foreach (var col in cols)
                 {
-                    // Check if this cell is actually selected?
-                    // Standard copy usually copies the rectangular region or just selected cells?
-                    // "Copy with Headers" usually implies copying the selected data as a table.
-                    // If selection is disjoint, we fill gaps with empty strings?
-                    // Let's assume we output values for all columns in the bounding box of selection for that row.
+                    // Check if this specific cell (row, col) is in the selection
+                    bool isSelected = cells.Any(c => c.Item == row && c.Column == col);
 
-                    // Actually, let's just iterate the columns we identified. If the cell (row, col) is in SelectedCells, output value. Else empty.
-                    bool isSelected = group.Any(c => c.Column == col);
                     if (isSelected)
                     {
                         var val = GetCellValue(row, col);
                         values.Add(val?.ToString() ?? "");
                     }
-                    else
+                    else if (preserveLayout)
                     {
-                         values.Add("");
+                        // Not selected but we preserve layout (gap)
+                        values.Add("");
                     }
+                    // Else: not selected and not preserving layout -> skip value (content only)
                 }
-                sb.AppendLine(string.Join("\t", values));
+
+                // Only append row if we have values (skip empty rows if copy content only filtered everything out)
+                if (values.Count > 0)
+                {
+                    sb.AppendLine(string.Join("\t", values));
+                }
             }
 
             try
@@ -194,7 +196,7 @@ namespace SMS_Search.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to copy to clipboard: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to copy: " + ex.Message);
             }
         }
 
@@ -232,6 +234,61 @@ namespace SMS_Search.Views
                 txtFilter.Focus();
                 e.Handled = true;
             }
+        }
+
+        // New Context Menu Command Handlers
+        private void CopyColumnName_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem mi && mi.Tag is DataGridColumn col)
+            {
+                try { Clipboard.SetText(col.Header.ToString()); } catch { }
+            }
+        }
+
+        private void HideColumn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem mi && mi.Tag is DataGridColumn col)
+            {
+                col.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void BestFit_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem mi && mi.Tag is DataGridColumn col)
+            {
+                col.Width = new DataGridLength(1, DataGridLengthUnitType.Auto);
+            }
+        }
+
+        private void CopyRow_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItems = resultsGrid.SelectedItems;
+            if (selectedItems.Count == 0) return;
+
+            var sb = new StringBuilder();
+            if (selectedItems.Count > 0)
+            {
+                var props = TypeDescriptor.GetProperties(selectedItems[0]);
+                foreach (var item in selectedItems)
+                {
+                    var values = new List<string>();
+                    foreach (PropertyDescriptor prop in props)
+                    {
+                        values.Add(prop.GetValue(item)?.ToString() ?? "");
+                    }
+                    sb.AppendLine(string.Join("\t", values));
+                }
+            }
+            try { Clipboard.SetText(sb.ToString()); } catch { }
+        }
+
+        private void CopyAsInsert_Click(object sender, RoutedEventArgs e)
+        {
+             if (DataContext is ResultsViewModel vm)
+             {
+                 vm.CopyInsertCommand.Execute(resultsGrid.SelectedItems);
+             }
         }
     }
 }
