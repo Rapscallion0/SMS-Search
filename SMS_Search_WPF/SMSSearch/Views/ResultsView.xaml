@@ -7,7 +7,8 @@
              xmlns:conv="clr-namespace:SMS_Search.Converters"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:ResultsViewModel}"
-             d:DesignHeight="300" d:DesignWidth="400">
+             d:DesignHeight="300" d:DesignWidth="400"
+             PreviewKeyDown="UserControl_PreviewKeyDown">
     <UserControl.Resources>
         <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
@@ -15,21 +16,43 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="{Binding StatusText}" Margin="5" FontWeight="Bold"/>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding SearchResults}"
+        <Grid Grid.Row="1" Margin="5,0,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Filter:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <TextBox x:Name="txtFilter" Grid.Column="1" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" TextChanged="txtFilter_TextChanged" />
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="5,0,0,0">
+                <Button Content="&lt;" Command="{Binding FindPreviousCommand}" Width="25" Margin="0,0,2,0" ToolTip="Find Previous"/>
+                <Button Content="&gt;" Command="{Binding FindNextCommand}" Width="25" Margin="0,0,5,0" ToolTip="Find Next"/>
+                <TextBlock Text="{Binding MatchStatusText}" VerticalAlignment="Center" MinWidth="100"/>
+            </StackPanel>
+        </Grid>
+
+        <DataGrid Grid.Row="2" x:Name="resultsGrid" ItemsSource="{Binding SearchResults}"
                   AutoGenerateColumns="True"
                   IsReadOnly="True"
                   SelectionMode="Extended"
                   EnableRowVirtualization="True"
                   VirtualizingPanel.IsVirtualizing="True"
-                  VirtualizingPanel.VirtualizationMode="Recycling">
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  SelectionChanged="resultsGrid_SelectionChanged">
             <DataGrid.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Copy" Command="Copy"/>
+                    <MenuItem Header="Copy with Headers" Click="CopyWithHeaders_Click"/>
+                    <MenuItem Header="Copy as SQL INSERT" Click="CopyAsSqlInsert_Click"/>
+                    <MenuItem Header="Filter by Selection" Click="FilterBySelection_Click"/>
+                    <Separator/>
                     <MenuItem Header="Export to CSV" Command="{Binding ExportCsvCommand}"/>
                     <MenuItem Header="Export to JSON" Command="{Binding ExportJsonCommand}"/>
                     <MenuItem Header="Export to Excel XML" Command="{Binding ExportExcelCommand}"/>
@@ -37,7 +60,7 @@
             </DataGrid.ContextMenu>
         </DataGrid>
 
-        <ProgressBar Grid.Row="2" IsIndeterminate="True" Height="10"
+        <ProgressBar Grid.Row="3" IsIndeterminate="True" Height="10"
                      Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
     </Grid>
 </UserControl>
