@@ -61,10 +61,10 @@ namespace SMS_Search
             base.OnStartup(e);
 
             var logger = Services.GetRequiredService<ILoggerService>();
-            var config = Services.GetRequiredService<IConfigService>();
+            var configService = Services.GetRequiredService<IConfigService>();
 
             // EULA Check
-            if (config.GetValue("GENERAL", "EULA") != "1")
+            if (configService.GetValue("GENERAL", "EULA") != "1")
             {
                 var eulaWindow = Services.GetRequiredService<EulaWindow>();
                 bool? result = eulaWindow.ShowDialog();
@@ -76,7 +76,7 @@ namespace SMS_Search
             }
 
             // Update Check
-            if (config.GetValue("GENERAL", "CHECKUPDATE") == "1")
+            if (configService.GetValue("GENERAL", "CHECKUPDATE") == "1")
             {
                 var updateChecker = Services.GetRequiredService<UpdateChecker>();
                 var info = await updateChecker.CheckForUpdatesAsync();
