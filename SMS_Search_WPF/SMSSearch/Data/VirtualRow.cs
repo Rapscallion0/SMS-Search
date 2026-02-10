@@ -9,6 +9,8 @@ namespace SMS_Search.Data
         private readonly int _rowIndex;
         private readonly PropertyDescriptorCollection _properties;
 
+        public int RowIndex => _rowIndex;
+
         public VirtualRow(VirtualGridContext context, int rowIndex, PropertyDescriptorCollection properties)
         {
             _context = context;
