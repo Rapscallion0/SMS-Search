@@ -23,6 +23,7 @@ namespace SMS_Search.Views
             _debounceTimer.Tick += DebounceTimer_Tick;
 
             this.DataContextChanged += ResultsView_DataContextChanged;
+            resultsGrid.AutoGeneratingColumn += resultsGrid_AutoGeneratingColumn;
         }
 
         private void ResultsView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -30,11 +31,40 @@ namespace SMS_Search.Views
             if (e.NewValue is ResultsViewModel newVm)
             {
                 newVm.ScrollToRowRequested += Vm_ScrollToRowRequested;
+                newVm.HeadersUpdated += Vm_HeadersUpdated;
             }
             if (e.OldValue is ResultsViewModel oldVm)
             {
                 oldVm.ScrollToRowRequested -= Vm_ScrollToRowRequested;
+                oldVm.HeadersUpdated -= Vm_HeadersUpdated;
             }
+        }
+
+        private void Vm_HeadersUpdated(object sender, EventArgs e)
+        {
+            if (DataContext is ResultsViewModel vm)
+            {
+                foreach (var col in resultsGrid.Columns)
+                {
+                    string key = col.SortMemberPath;
+                    if (!string.IsNullOrEmpty(key) && vm.ColumnHeaders.TryGetValue(key, out string header))
+                    {
+                        col.Header = header;
+                    }
+                }
+            }
+        }
+
+        private void resultsGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+             if (DataContext is ResultsViewModel vm)
+             {
+                 string key = e.PropertyName;
+                 if (vm.ColumnHeaders.TryGetValue(key, out string header))
+                 {
+                     e.Column.Header = header;
+                 }
+             }
         }
 
         private void Vm_ScrollToRowRequested(object sender, int rowIndex)
@@ -96,67 +126,6 @@ namespace SMS_Search.Views
         private void CopyWithHeaders_Click(object sender, RoutedEventArgs e)
         {
             CopySelectedCells(true);
-        }
-
-        private void CopyAsSqlInsert_Click(object sender, RoutedEventArgs e)
-        {
-            var vm = DataContext as ResultsViewModel;
-            if (vm == null || resultsGrid.SelectedCells.Count == 0) return;
-
-            string tableName = vm.TableName;
-            if (string.IsNullOrWhiteSpace(tableName)) tableName = "TableName";
-            if (!tableName.StartsWith("[")) tableName = "[" + tableName + "]";
-
-            // Get unique rows
-            var selectedRows = resultsGrid.SelectedCells.Select(c => c.Item).Distinct().ToList();
-
-            // Get visible columns (all visible columns for INSERT)
-            var visibleCols = resultsGrid.Columns.Where(c => c.Visibility == Visibility.Visible).OrderBy(c => c.DisplayIndex).ToList();
-            if (visibleCols.Count == 0) return;
-
-            var sb = new StringBuilder();
-            sb.Append($"INSERT INTO {tableName} (");
-            sb.Append(string.Join(", ", visibleCols.Select(c => $"[{c.Header}]")));
-            sb.AppendLine(") VALUES");
-
-            // Sort rows by index
-            selectedRows = selectedRows.OrderBy(r => (r as SMS_Search.Data.VirtualRow)?.RowIndex ?? 0).ToList();
-
-            int batchSize = 1000;
-            for (int i = 0; i < selectedRows.Count; i++)
-            {
-                if (i > 0 && i % batchSize == 0)
-                {
-                    sb.AppendLine(";");
-                    sb.AppendLine($"INSERT INTO {tableName} (");
-                    sb.Append(string.Join(", ", visibleCols.Select(c => $"[{c.Header}]")));
-                    sb.AppendLine(") VALUES");
-                }
-                else if (i > 0)
-                {
-                    sb.AppendLine(",");
-                }
-
-                var row = selectedRows[i];
-                var values = new List<string>();
-                foreach (var col in visibleCols)
-                {
-                    var val = GetCellValue(row, col);
-                    values.Add(FormatSqlValue(val));
-                }
-                sb.Append("(" + string.Join(", ", values) + ")");
-            }
-            sb.AppendLine(";");
-
-            try
-            {
-                Clipboard.SetText(sb.ToString());
-                MessageBox.Show("SQL INSERT statements copied to clipboard.", "Copy", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to copy to clipboard: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
 
         private void CopySelectedCells(bool includeHeaders)

@@ -459,5 +459,10 @@ namespace SMS_Search.Data
 
             return await _repo.GetMatchRowIndexAsync(_server, _database, _user, _pass, _baseSql, _parameters, FilterText, searchText, colTypes, startRowIndex, SortColumn, SortDirection, forward, cancellationToken);
         }
+
+        public async Task<List<string>> GetColumnDescriptionsAsync(IEnumerable<string> columns, CancellationToken cancellationToken = default)
+        {
+            return await _repo.GetColumnDescriptionsAsync(_server, _database, _user, _pass, columns, cancellationToken);
+        }
     }
 }
