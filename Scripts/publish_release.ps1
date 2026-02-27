@@ -1,6 +1,6 @@
 param(
     [string]$AssemblyInfoPath,
-    [string]$InputPath
+    [string]$ExePath
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,25 +23,16 @@ if ($confirm -ne 'Yes') {
 try {
     Write-Host "Starting GitHub Release process..."
 
-    # Check if AssemblyInfo exists
+    # Check if files exist
     if (-not (Test-Path $AssemblyInfoPath)) {
         Throw "AssemblyInfo.cs not found at $AssemblyInfoPath"
     }
-
-    # Resolve ExePath
-    if (Test-Path $InputPath -PathType Container) {
-        $ExePath = Join-Path $InputPath "SMS Search.exe"
-        Write-Host "Input is a directory. Looking for executable at: $ExePath"
-    } else {
-        $ExePath = $InputPath
-        Write-Host "Input is a file: $ExePath"
-    }
-
     if (-not (Test-Path $ExePath)) {
         Throw "Executable not found at $ExePath"
     }
 
     # Extract Version from AssemblyInfo.cs
+    # We look for [assembly: AssemblyVersion("...")]
     $content = Get-Content $AssemblyInfoPath -Raw
     if ($content -match '\[assembly: AssemblyVersion\("([^"]+)"\)\]') {
         $version = $matches[1]
@@ -77,6 +68,8 @@ try {
     }
 
     # Check if release already exists using gh CLI
+    # We allow the error stream to go to null, we just care about the exit code.
+    # Note: running an external command like gh inside PowerShell updates $LASTEXITCODE
     $releaseExists = $false
     try {
         gh release view $version 2>&1 | Out-Null
@@ -84,7 +77,8 @@ try {
             $releaseExists = $true
         }
     } catch {
-        # Ignore
+        # If gh release view fails, it usually means the release doesn't exist.
+        # We proceed to create it.
     }
 
     if ($releaseExists) {
@@ -92,21 +86,10 @@ try {
         exit 0
     }
 
-    # Create Zip file
-    $zipPath = Join-Path (Split-Path $ExePath) "SMS_Search.zip"
-    Write-Host "Creating zip archive at $zipPath..."
-
-    if (Test-Path $zipPath) {
-        Remove-Item $zipPath -Force
-    }
-
-    # Compress only the executable
-    Compress-Archive -Path $ExePath -DestinationPath $zipPath -Force
-
     # Create Release
     Write-Host "Creating release $version and uploading artifact..."
-    # Upload the zip file
-    gh release create $version $zipPath --generate-notes
+    # --generate-notes automatically creates release notes based on pull requests/commits
+    gh release create $version $ExePath --generate-notes
 
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Successfully created release $version."
